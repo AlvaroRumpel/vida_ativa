@@ -103,7 +103,8 @@
 - v1 requirements: 21 total
 - Mapped to phases: 21
 - Unmapped: 0 ✓
+- Phase 6 (PWA Hardening) finalizes Phase 1 deliverables (INFRA-01, PWA-01) — no additional requirement ownership
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 after roadmap creation*
