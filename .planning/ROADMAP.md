@@ -46,7 +46,11 @@ Plans:
   3. User can log in with existing email/password credentials
   4. User can request a password reset email and receives it
   5. User closes the browser, reopens the app, and is still logged in without re-authenticating
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — AuthCubit + AuthState, GoRouter auth guards, main.dart BlocProvider wiring, test stubs
+- [ ] 02-02-PLAN.md — Login screen (Google + email/password) and Register screen
+- [ ] 02-03-PLAN.md — Splash, Profile, AccessDenied screens + human verification checkpoint
 
 ### Phase 3: Schedule
 **Goal**: Users can browse the weekly schedule and see which slots are available, booked, or blocked, with prices, before committing to a booking
@@ -102,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
-| 2. Auth | 0/TBD | Not started | - |
+| 2. Auth | 0/3 | Planned | - |
 | 3. Schedule | 0/TBD | Not started | - |
 | 4. Booking | 0/TBD | Not started | - |
 | 5. Admin | 0/TBD | Not started | - |
