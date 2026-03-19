@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The app shell renders correctly on a 390px mobile viewport without horizontal scroll (mobile-first layout baseline)
   4. `firestore.rules` file exists in the repo, is deployed, and denies unauthenticated writes to all collections
   5. `web/manifest.json` has maskable icons and `display: standalone`; `firebase.json` has SPA rewrite and no-cache header for the service worker file
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 01-PLAN-01.md — Dependencies, data models, PWA config, Firestore security rules
 - [ ] 01-PLAN-02.md — AppTheme, go_router, app shell with BottomNav, Riverpod setup
@@ -101,7 +101,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planning complete | - |
+| 1. Foundation | 1/2 | In Progress|  |
 | 2. Auth | 0/TBD | Not started | - |
 | 3. Schedule | 0/TBD | Not started | - |
 | 4. Booking | 0/TBD | Not started | - |

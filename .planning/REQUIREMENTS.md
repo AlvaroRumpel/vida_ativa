@@ -36,10 +36,10 @@
 
 ### PWA & Infrastructure
 
-- [ ] **PWA-01**: App é instalável no celular como PWA (manifest.json, ícones, service worker)
+- [x] **PWA-01**: App é instalável no celular como PWA (manifest.json, ícones, service worker)
 - [ ] **PWA-02**: Interface é responsiva e projetada mobile-first
-- [ ] **INFRA-01**: Regras de segurança do Firestore implementadas e deployadas antes de dados reais
-- [ ] **INFRA-02**: Modelos de dados (UserModel, SlotModel, BookingModel, BlockedDateModel) implementados com serialização Firestore
+- [x] **INFRA-01**: Regras de segurança do Firestore implementadas e deployadas antes de dados reais
+- [x] **INFRA-02**: Modelos de dados (UserModel, SlotModel, BookingModel, BlockedDateModel) implementados com serialização Firestore
 
 ## v2 Requirements
 
@@ -77,9 +77,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
-| INFRA-02 | Phase 1 | Pending |
-| PWA-01 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
+| INFRA-02 | Phase 1 | Complete |
+| PWA-01 | Phase 1 | Complete |
 | PWA-02 | Phase 1 | Pending |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
