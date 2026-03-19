@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-19T20:21:53.305Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-19T20:27:31Z"
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -23,30 +23,31 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 01 (foundation) — EXECUTING
-Plan: 2 of 2
+Phase: 01 (foundation) — COMPLETE
+Plan: 2 of 2 (all plans done)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 8 min
-- Total execution time: 0.13 hours
+- Total plans completed: 2
+- Average duration: 6 min
+- Total execution time: 0.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1/2 | 8 min | 8 min |
+| 01-foundation | 2/2 | 12 min | 6 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 8 min
-- Trend: -
+- Last 5 plans: 8 min, 4 min
+- Trend: faster
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 8 | 3 tasks | 9 files |
+| Phase 01-foundation P02 | 4 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Recent decisions affecting current work:
 - [01-01]: Firestore rules Phase 1 bootstrap — authentication-only guards, Phase 6 adds isAdmin() role checks
 - [Phase 01-foundation]: flutter_bloc chosen for state management (flutter_bloc ^9.1.1, go_router ^17.1.0, equatable ^2.0.8 installed)
 - [Phase 01-foundation]: BookingModel.generateId() enforces {slotId}_{date} pattern — always use .doc(id).set() inside Transaction, never .add()
+- [01-02]: No ProviderScope in main.dart — BLoC does not require root wrapper; BlocProviders added at feature level in Phase 2+
+- [01-02]: StatefulShellRoute.indexedStack keeps each tab branch alive independently — tab state preserved on switch
+- [01-02]: /admin has no guard in Phase 1 — role check added in Phase 2 with AuthBloc redirect
 
 ### Pending Todos
 
@@ -77,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-19T20:21:53.300Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-19T20:27:31Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
