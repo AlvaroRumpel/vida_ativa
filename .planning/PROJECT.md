@@ -16,6 +16,10 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ Firebase inicializado (firebase_options.dart gerado) — existente
 - ✓ Dependências instaladas: firebase_core, firebase_auth, cloud_firestore — existente
 - ✓ main.dart inicializa Firebase corretamente — existente
+- ✓ INFRA-01: firestore.rules deployável com bootstrap de autenticação — Validated in Phase 1: Foundation
+- ✓ INFRA-02: Modelos UserModel, SlotModel, BookingModel, BlockedDateModel com serialização Firestore — Validated in Phase 1: Foundation
+- ✓ PWA-01: manifest.json com nome "Vida Ativa", theme_color verde, display standalone, ícones maskable — Validated in Phase 1: Foundation
+- ✓ PWA-02: App shell mobile-first com BottomNavigationBar e roteamento go_router — Validated in Phase 1: Foundation
 
 ### Active
 
@@ -41,12 +45,15 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ## Context
 
-- Stack: Flutter Web, Firebase Auth (Google + Phone), Cloud Firestore, Firebase Hosting
-- Modelo de dados já definido: `/users`, `/slots`, `/bookings`, `/blockedDates`
+- Stack: Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, flutter_bloc, go_router
+- Modelo de dados implementado: `/users`, `/slots`, `/bookings`, `/blockedDates` — com serialização Firestore e Equatable
 - Slots são recorrentes (ex: toda segunda às 08h); bookings são instâncias para uma data específica
-- Perfis: `client` (reserva) e `admin` (gerencia)
-- Estrutura de pastas planejada: `lib/features/{auth,schedule,booking,admin}` + `lib/core/{models,services}`
-- FlutterFire já configurado com `firebase_options.dart` gerado
+- BookingModel.generateId(slotId, date) → ID determinístico `{slotId}_{date}` — anti-double-booking via Transaction
+- Perfis: `client` (reserva) e `admin` (gerencia) — role guard no go_router em Phase 2
+- Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
+- FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
+
+**Current state:** Phase 1 complete — foundation skeleton built. Phase 2 next: auth (Google + email/password).
 
 ## Constraints
 
@@ -64,4 +71,4 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | Slots recorrentes + bookings por data | Separa a configuração do horário da instância de reserva | — Pending |
 
 ---
-*Last updated: 2026-03-19 after initialization*
+*Last updated: 2026-03-19 after Phase 1: Foundation complete*
