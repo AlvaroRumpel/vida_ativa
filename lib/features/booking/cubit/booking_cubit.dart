@@ -1,0 +1,83 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:vida_ativa/core/models/booking_model.dart';
+import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
+
+class BookingCubit extends Cubit<BookingState> {
+  final FirebaseFirestore _firestore;
+  final String _userId;
+  StreamSubscription<QuerySnapshot>? _sub;
+
+  BookingCubit({
+    required FirebaseFirestore firestore,
+    required String userId,
+  })  : _firestore = firestore,
+        _userId = userId,
+        super(const BookingInitial()) {
+    _startStream();
+  }
+
+  void _startStream() {
+    emit(const BookingLoading());
+    _sub = _firestore
+        .collection('bookings')
+        .where('userId', isEqualTo: _userId)
+        .snapshots()
+        .listen(
+      (snapshot) {
+        final bookings =
+            snapshot.docs.map((d) => BookingModel.fromFirestore(d)).toList();
+        emit(BookingLoaded(bookings));
+      },
+      onError: (e) => emit(const BookingError('Erro ao carregar reservas.')),
+    );
+  }
+
+  Future<void> bookSlot({
+    required String slotId,
+    required String dateString,
+    required double price,
+    required String startTime,
+  }) async {
+    final docId = BookingModel.generateId(slotId, dateString);
+    final ref = _firestore.collection('bookings').doc(docId);
+
+    await _firestore.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (snap.exists) {
+        final existing = BookingModel.fromFirestore(snap);
+        if (!existing.isCancelled) throw Exception('slot_already_booked');
+      }
+
+      final booking = BookingModel(
+        id: docId,
+        slotId: slotId,
+        date: dateString,
+        userId: _userId,
+        status: 'pending',
+        createdAt: DateTime.now(),
+        startTime: startTime,
+        price: price,
+      );
+      tx.set(ref, booking.toFirestore());
+    });
+    // Stream subscription picks up the new booking reactively — no state emit here.
+  }
+
+  Future<void> cancelBooking(String bookingId) async {
+    await _firestore.collection('bookings').doc(bookingId).update({
+      'status': 'cancelled',
+      'cancelledAt': Timestamp.fromDate(DateTime.now()),
+    });
+    // Stream subscription picks up the change reactively — no state emit here.
+  }
+
+  @override
+  Future<void> close() {
+    _sub?.cancel();
+    return super.close();
+  }
+}

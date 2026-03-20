@@ -9,6 +9,8 @@ class BookingModel extends Equatable {
   final String status; // "pending" | "confirmed" | "cancelled"
   final DateTime createdAt;
   final DateTime? cancelledAt;
+  final String? startTime; // "HH:mm" — stored at booking time for display
+  final double? price; // Stored at booking time for display
 
   const BookingModel({
     required this.id,
@@ -18,6 +20,8 @@ class BookingModel extends Equatable {
     required this.status,
     required this.createdAt,
     this.cancelledAt,
+    this.startTime,
+    this.price,
   });
 
   /// Generates the deterministic document ID for anti-double-booking.
@@ -36,6 +40,8 @@ class BookingModel extends Equatable {
       cancelledAt: data['cancelledAt'] != null
           ? (data['cancelledAt'] as Timestamp).toDate()
           : null,
+      startTime: data['startTime'] as String?,
+      price: data['price'] != null ? (data['price'] as num).toDouble() : null,
     );
   }
 
@@ -47,6 +53,8 @@ class BookingModel extends Equatable {
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
       if (cancelledAt != null) 'cancelledAt': Timestamp.fromDate(cancelledAt!),
+      if (startTime != null) 'startTime': startTime,
+      if (price != null) 'price': price,
     };
   }
 
@@ -55,5 +63,5 @@ class BookingModel extends Equatable {
   bool get isCancelled => status == 'cancelled';
 
   @override
-  List<Object?> get props => [id, slotId, date, userId, status, createdAt, cancelledAt];
+  List<Object?> get props => [id, slotId, date, userId, status, createdAt, cancelledAt, startTime, price];
 }
