@@ -14,6 +14,7 @@ import 'package:vida_ativa/features/auth/ui/register_screen.dart';
 import 'package:vida_ativa/features/auth/ui/splash_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/booking/ui/my_bookings_placeholder_screen.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
 import 'package:vida_ativa/features/schedule/ui/schedule_screen.dart';
@@ -94,7 +95,14 @@ GoRouter createRouter(AuthCubit authCubit) {
       // Main app shell with bottom navigation
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return AppShell(navigationShell: navigationShell);
+          final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+          return BlocProvider(
+            create: (_) => BookingCubit(
+              firestore: FirebaseFirestore.instance,
+              userId: authState.user.uid,
+            ),
+            child: AppShell(navigationShell: navigationShell),
+          );
         },
         branches: [
           // Tab 0: Agenda
