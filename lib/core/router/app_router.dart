@@ -15,7 +15,7 @@ import 'package:vida_ativa/features/auth/ui/splash_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
-import 'package:vida_ativa/features/booking/ui/my_bookings_placeholder_screen.dart';
+import 'package:vida_ativa/features/booking/ui/my_bookings_screen.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
 import 'package:vida_ativa/features/schedule/ui/schedule_screen.dart';
 
@@ -126,7 +126,7 @@ GoRouter createRouter(AuthCubit authCubit) {
               GoRoute(
                 path: '/bookings',
                 builder: (context, state) =>
-                    const MyBookingsPlaceholderScreen(),
+                    const MyBookingsScreen(),
               ),
             ],
           ),
