@@ -13,7 +13,7 @@ Six phases derived from a strict dependency chain: data models and infrastructur
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Data models, Firebase wiring, PWA manifest, Firestore security rules bootstrap, go_router + BLoC structural setup
-- [ ] **Phase 2: Auth** - Google Sign-In and email/password auth, route scaffold with role-based guards, persistent session
+- [x] **Phase 2: Auth** - Google Sign-In and email/password auth, route scaffold with role-based guards, persistent session
 - [ ] **Phase 3: Schedule** - Read-only weekly slot display with available/booked/blocked states and price display
 - [ ] **Phase 4: Booking** - Reserve a slot (atomic transaction), cancel own booking, view my bookings
 - [ ] **Phase 5: Admin** - Slot CRUD, blocked dates, booking list with confirm/reject, configurable approval mode
@@ -46,11 +46,11 @@ Plans:
   3. User can log in with existing email/password credentials
   4. User can request a password reset email and receives it
   5. User closes the browser, reopens the app, and is still logged in without re-authenticating
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans executed
 Plans:
-- [ ] 02-01-PLAN.md — AuthCubit + AuthState, GoRouter auth guards, main.dart BlocProvider wiring, test stubs
-- [ ] 02-02-PLAN.md — Login screen (Google + email/password) and Register screen
-- [ ] 02-03-PLAN.md — Splash, Profile, AccessDenied screens + human verification checkpoint
+- [x] 02-01-PLAN.md — AuthCubit + AuthState, GoRouter auth guards, main.dart BlocProvider wiring, test stubs
+- [x] 02-02-PLAN.md — Login screen (Google + email/password) and Register screen
+- [x] 02-03-PLAN.md — Splash, Profile, AccessDenied screens + human verification checkpoint
 
 ### Phase 3: Schedule
 **Goal**: Users can browse the weekly schedule and see which slots are available, booked, or blocked, with prices, before committing to a booking
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
-| 2. Auth | 2/3 | In Progress|  |
+| 2. Auth | 3/3 | Complete | 2026-03-20 |
 | 3. Schedule | 0/TBD | Not started | - |
 | 4. Booking | 0/TBD | Not started | - |
 | 5. Admin | 0/TBD | Not started | - |

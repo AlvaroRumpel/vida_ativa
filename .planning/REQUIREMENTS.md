@@ -11,7 +11,7 @@
 - [x] **AUTH-02**: Usuário pode fazer login com email e senha
 - [x] **AUTH-03**: Usuário pode criar conta com email e senha
 - [x] **AUTH-04**: Usuário pode recuperar senha via link enviado por email
-- [ ] **AUTH-05**: Sessão do usuário persiste entre sessões do browser
+- [x] **AUTH-05**: Sessão do usuário persiste entre sessões do browser
 
 ### Schedule (Agenda)
 
@@ -85,7 +85,7 @@
 | AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Complete |
 | AUTH-04 | Phase 2 | Complete |
-| AUTH-05 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Complete |
 | SCHED-01 | Phase 3 | Pending |
 | SCHED-02 | Phase 3 | Pending |
 | SCHED-03 | Phase 3 | Pending |
@@ -107,4 +107,4 @@
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after roadmap creation*
+*Last updated: 2026-03-20 after Phase 2 completion*

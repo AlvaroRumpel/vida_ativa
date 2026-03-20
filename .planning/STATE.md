@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: "Completed 02-02-PLAN.md"
-last_updated: "2026-03-20T01:04:00Z"
+stopped_at: "Completed 02-03-PLAN.md"
+last_updated: "2026-03-20T01:12:00Z"
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,16 +23,16 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 02 (auth) — EXECUTING
-Plan: 2 of 3
+Phase: 02 (auth) — COMPLETE
+Plan: 3 of 3
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 6 min
-- Total execution time: 0.20 hours
+- Total execution time: 0.29 hours
 
 **By Phase:**
 
@@ -42,12 +42,13 @@ Plan: 2 of 3
 
 **Recent Trend:**
 
-- Last 5 plans: 8 min, 4 min
-- Trend: faster
+- Last 5 plans: 8 min, 4 min, 5 min
+- Trend: stable
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 8 | 3 tasks | 9 files |
 | Phase 01-foundation P02 | 4 | 2 tasks | 10 files |
+| Phase 02-auth P03 | 5 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [02-02]: BlocConsumer used in auth screens (listener + builder) to reduce widget nesting vs separate BlocListener + BlocBuilder
 - [02-02]: Auth error routing uses lowercase message keyword inspection to assign errors to email vs password field
 - [02-02]: Loading state shows inline CircularProgressIndicator inside FilledButton — avoids layout shift, keeps button size stable
+- [02-03]: ProfileScreen accesses FirebaseAuth.instance.currentUser?.photoURL directly since UserModel does not store photoURL — avoids changing model interface
+- [02-03]: SplashScreen uses AppTheme.primaryGreen constant instead of hardcoded Color literal for brand consistency
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T01:04:00Z
-Stopped at: Completed 02-02-PLAN.md
-Resume file: .planning/phases/02-auth/02-03-PLAN.md
+Last session: 2026-03-20T01:12:00Z
+Stopped at: Completed 02-03-PLAN.md
+Resume file: .planning/phases/03-schedule/03-01-PLAN.md
