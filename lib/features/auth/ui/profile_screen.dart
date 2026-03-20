@@ -28,21 +28,7 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                CircleAvatar(
-                  radius: 48,
-                  backgroundColor: AppTheme.primaryGreen,
-                  backgroundImage:
-                      photoURL != null ? NetworkImage(photoURL) : null,
-                  child: photoURL == null && user.displayName.isNotEmpty
-                      ? Text(
-                          user.displayName[0].toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            color: Colors.white,
-                          ),
-                        )
-                      : null,
-                ),
+                _Avatar(photoURL: photoURL, displayName: user.displayName),
                 const SizedBox(height: 16),
                 Text(
                   user.displayName,
@@ -72,6 +58,60 @@ class ProfileScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _Avatar extends StatefulWidget {
+  const _Avatar({required this.photoURL, required this.displayName});
+
+  final String? photoURL;
+  final String displayName;
+
+  @override
+  State<_Avatar> createState() => _AvatarState();
+}
+
+class _AvatarState extends State<_Avatar> {
+  bool _imageError = false;
+
+  @override
+  void didUpdateWidget(_Avatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.photoURL != widget.photoURL) {
+      _imageError = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showInitial =
+        widget.photoURL == null || _imageError;
+
+    return CircleAvatar(
+      radius: 48,
+      backgroundColor: AppTheme.primaryGreen,
+      child: showInitial
+          ? Text(
+              widget.displayName.isNotEmpty
+                  ? widget.displayName[0].toUpperCase()
+                  : '?',
+              style: const TextStyle(fontSize: 36, color: Colors.white),
+            )
+          : ClipOval(
+              child: Image.network(
+                widget.photoURL!,
+                width: 96,
+                height: 96,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) setState(() => _imageError = true);
+                  });
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
     );
   }
 }
