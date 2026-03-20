@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
@@ -45,6 +46,14 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 const Divider(),
                 const SizedBox(height: 16),
+                if (user.isAdmin) ...[
+                  FilledButton.icon(
+                    onPressed: () => GoRouter.of(context).go('/admin'),
+                    icon: const Icon(Icons.admin_panel_settings),
+                    label: const Text('Painel Admin'),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 OutlinedButton.icon(
                   onPressed: () => context.read<AuthCubit>().signOut(),
                   icon: const Icon(Icons.logout),

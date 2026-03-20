@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/app_shell.dart';
-import 'package:vida_ativa/features/admin/ui/admin_placeholder_screen.dart';
+import 'package:vida_ativa/features/admin/cubit/admin_blocked_date_cubit.dart';
+import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
+import 'package:vida_ativa/features/admin/cubit/admin_slot_cubit.dart';
+import 'package:vida_ativa/features/admin/ui/admin_screen.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 import 'package:vida_ativa/features/auth/ui/access_denied_screen.dart';
@@ -90,7 +93,29 @@ GoRouter createRouter(AuthCubit authCubit) {
       ),
       GoRoute(
         path: '/admin',
-        builder: (_, _) => const AdminPlaceholderScreen(),
+        builder: (context, _) {
+          final authState =
+              context.read<AuthCubit>().state as AuthAuthenticated;
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    AdminSlotCubit(firestore: FirebaseFirestore.instance),
+              ),
+              BlocProvider(
+                create: (_) => AdminBlockedDateCubit(
+                    firestore: FirebaseFirestore.instance),
+              ),
+              BlocProvider(
+                create: (_) => AdminBookingCubit(
+                  firestore: FirebaseFirestore.instance,
+                  adminUid: authState.user.uid,
+                ),
+              ),
+            ],
+            child: const AdminScreen(),
+          );
+        },
       ),
       // Main app shell with bottom navigation
       StatefulShellRoute.indexedStack(
