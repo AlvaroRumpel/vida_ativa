@@ -41,9 +41,14 @@ class BookingCubit extends Cubit<BookingState> {
     required String dateString,
     required double price,
     required String startTime,
+    required String userDisplayName,
   }) async {
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
+
+    final configSnap = await _firestore.collection('config').doc('booking').get();
+    final mode = configSnap.data()?['confirmationMode'] ?? 'manual';
+    final initialStatus = mode == 'automatic' ? 'confirmed' : 'pending';
 
     await _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);
@@ -57,10 +62,11 @@ class BookingCubit extends Cubit<BookingState> {
         slotId: slotId,
         date: dateString,
         userId: _userId,
-        status: 'pending',
+        status: initialStatus,
         createdAt: DateTime.now(),
         startTime: startTime,
         price: price,
+        userDisplayName: userDisplayName,
       );
       tx.set(ref, booking.toFirestore());
     });

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
+import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 
@@ -29,11 +32,13 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       _errorMessage = null;
     });
     try {
+      final authState = context.read<AuthCubit>().state as AuthAuthenticated;
       await widget.bookingCubit.bookSlot(
         slotId: widget.viewModel.slot.id,
         dateString: widget.viewModel.dateString,
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
+        userDisplayName: authState.user.displayName,
       );
       if (mounted) {
         Navigator.pop(context);

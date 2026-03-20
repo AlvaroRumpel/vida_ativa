@@ -95,12 +95,14 @@ class BookingCard extends StatelessWidget {
   Color _statusColor(String status) => switch (status) {
         'pending' => Colors.orange,
         'confirmed' => AppTheme.primaryGreen,
+        'rejected' => Colors.red,
         _ => Colors.grey,
       };
 
   String _statusLabel(String status) => switch (status) {
         'pending' => 'Aguardando',
         'confirmed' => 'Confirmado',
+        'rejected' => 'Recusado',
         _ => 'Cancelado',
       };
 
