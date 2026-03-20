@@ -8,7 +8,7 @@ import 'package:vida_ativa/features/admin/ui/admin_placeholder_screen.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 import 'package:vida_ativa/features/auth/ui/access_denied_screen.dart';
-import 'package:vida_ativa/features/auth/ui/login_placeholder_screen.dart';
+import 'package:vida_ativa/features/auth/ui/login_screen.dart';
 import 'package:vida_ativa/features/auth/ui/profile_placeholder_screen.dart';
 import 'package:vida_ativa/features/auth/ui/register_screen.dart';
 import 'package:vida_ativa/features/auth/ui/splash_screen.dart';
@@ -74,7 +74,7 @@ GoRouter createRouter(AuthCubit authCubit) {
       ),
       GoRoute(
         path: '/login',
-        builder: (_, _) => const LoginPlaceholderScreen(),
+        builder: (_, _) => const LoginScreen(),
       ),
       GoRoute(
         path: '/register',
