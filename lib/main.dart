@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'features/auth/cubit/auth_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,16 +14,40 @@ void main() async {
   runApp(const VidaAtivaApp());
 }
 
-class VidaAtivaApp extends StatelessWidget {
+class VidaAtivaApp extends StatefulWidget {
   const VidaAtivaApp({super.key});
 
   @override
+  State<VidaAtivaApp> createState() => _VidaAtivaAppState();
+}
+
+class _VidaAtivaAppState extends State<VidaAtivaApp> {
+  late final AuthCubit _authCubit;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _authCubit = AuthCubit();
+    _router = createRouter(_authCubit);
+  }
+
+  @override
+  void dispose() {
+    _authCubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Vida Ativa',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      routerConfig: appRouter,
+    return BlocProvider.value(
+      value: _authCubit,
+      child: MaterialApp.router(
+        title: 'Vida Ativa',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        routerConfig: _router,
+      ),
     );
   }
 }

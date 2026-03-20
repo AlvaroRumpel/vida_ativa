@@ -1,66 +1,129 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/app_shell.dart';
-import 'package:vida_ativa/features/schedule/ui/schedule_placeholder_screen.dart';
-import 'package:vida_ativa/features/booking/ui/my_bookings_placeholder_screen.dart';
-import 'package:vida_ativa/features/auth/ui/profile_placeholder_screen.dart';
-import 'package:vida_ativa/features/auth/ui/login_placeholder_screen.dart';
 import 'package:vida_ativa/features/admin/ui/admin_placeholder_screen.dart';
+import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
+import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
+import 'package:vida_ativa/features/auth/ui/access_denied_screen.dart';
+import 'package:vida_ativa/features/auth/ui/login_placeholder_screen.dart';
+import 'package:vida_ativa/features/auth/ui/profile_placeholder_screen.dart';
+import 'package:vida_ativa/features/auth/ui/register_screen.dart';
+import 'package:vida_ativa/features/auth/ui/splash_screen.dart';
+import 'package:vida_ativa/features/booking/ui/my_bookings_placeholder_screen.dart';
+import 'package:vida_ativa/features/schedule/ui/schedule_placeholder_screen.dart';
 
-final appRouter = GoRouter(
-  initialLocation: '/home',
-  routes: [
-    // Main app shell with bottom navigation
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return AppShell(navigationShell: navigationShell);
-      },
-      branches: [
-        // Tab 0: Agenda
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/home',
-              builder: (context, state) => const SchedulePlaceholderScreen(),
-            ),
-          ],
-        ),
-        // Tab 1: Minhas Reservas
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/bookings',
-              builder: (context, state) => const MyBookingsPlaceholderScreen(),
-            ),
-          ],
-        ),
-        // Tab 2: Perfil
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/profile',
-              builder: (context, state) => const ProfilePlaceholderScreen(),
-            ),
-          ],
-        ),
-      ],
-    ),
-    // Login route (outside shell -- no bottom nav)
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginPlaceholderScreen(),
-    ),
-    // Admin route (outside shell -- separate layout, Phase 2 adds role guard)
-    GoRoute(
-      path: '/admin',
-      builder: (context, state) => const AdminPlaceholderScreen(),
-    ),
-  ],
-  // Redirect / to /home
-  redirect: (context, state) {
-    if (state.matchedLocation == '/') {
-      return '/home';
-    }
-    return null;
-  },
-);
+class _AuthStateNotifier extends ChangeNotifier {
+  final AuthCubit _cubit;
+  late final StreamSubscription<AuthState> _subscription;
+
+  _AuthStateNotifier(this._cubit) {
+    _subscription = _cubit.stream.listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter createRouter(AuthCubit authCubit) {
+  final notifier = _AuthStateNotifier(authCubit);
+
+  return GoRouter(
+    initialLocation: '/splash',
+    refreshListenable: notifier,
+    redirect: (context, state) {
+      final authState = authCubit.state;
+      final location = state.matchedLocation;
+
+      // Still initializing — stay on splash
+      if (authState is AuthInitial || authState is AuthLoading) {
+        return location == '/splash' ? null : '/splash';
+      }
+
+      final isAuthenticated = authState is AuthAuthenticated;
+      final isOnAuthPage =
+          location == '/login' || location == '/register';
+
+      // Not authenticated — must go to login
+      if (!isAuthenticated && !isOnAuthPage) return '/login';
+
+      // Authenticated but on auth page — go home
+      if (isAuthenticated && isOnAuthPage) return '/home';
+
+      // Admin guard: authenticated client trying /admin
+      if (authState is AuthAuthenticated && location.startsWith('/admin')) {
+        if (!authState.user.isAdmin) return '/access-denied';
+      }
+
+      // Splash after auth resolved — route to destination
+      if (location == '/splash') {
+        return isAuthenticated ? '/home' : '/login';
+      }
+
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (_, _) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (_, _) => const LoginPlaceholderScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (_, _) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/access-denied',
+        builder: (_, _) => const AccessDeniedScreen(),
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (_, _) => const AdminPlaceholderScreen(),
+      ),
+      // Main app shell with bottom navigation
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AppShell(navigationShell: navigationShell);
+        },
+        branches: [
+          // Tab 0: Agenda
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const SchedulePlaceholderScreen(),
+              ),
+            ],
+          ),
+          // Tab 1: Minhas Reservas
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/bookings',
+                builder: (context, state) =>
+                    const MyBookingsPlaceholderScreen(),
+              ),
+            ],
+          ),
+          // Tab 2: Perfil
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfilePlaceholderScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+}
