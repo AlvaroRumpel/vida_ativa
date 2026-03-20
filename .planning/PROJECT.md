@@ -25,6 +25,9 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ AUTH-03: Cadastro com email/senha — Validated in Phase 2: Auth
 - ✓ AUTH-04: Recuperação de senha por email — Validated in Phase 2: Auth
 - ✓ AUTH-05: Sessão persistente entre sessões do browser — Validated in Phase 2: Auth
+- ✓ SCHED-01: Usuário pode visualizar horários disponíveis/ocupados/bloqueados organizados por semana — Validated in Phase 3: Schedule
+- ✓ SCHED-02: Usuário pode selecionar um dia para ver os slots daquele dia — Validated in Phase 3: Schedule
+- ✓ SCHED-03: Preço do slot exibido na listagem — Validated in Phase 3: Schedule
 
 ### Active
 
@@ -58,7 +61,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
 - FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
 
-**Current state:** Phase 2 complete — auth fully implemented (Google + email/password, session persistence, role guards). Phase 3 next: schedule (read-only weekly slot view).
+**Current state:** Phase 3 complete — schedule screen implemented (weekly calendar, day chips PT-BR, slot cards with colored borders, R$ pricing, skeleton loading, blocked date handling). Phase 4 next: booking (reserve a slot).
 
 ## Constraints
 
