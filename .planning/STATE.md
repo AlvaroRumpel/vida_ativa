@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: "Completed 03-01-PLAN.md"
-last_updated: "2026-03-20T02:17:00Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-20T02:24:37.769Z"
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -50,6 +50,7 @@ Plan: 2 of 2
 | Phase 01-foundation P02 | 4 | 2 tasks | 10 files |
 | Phase 02-auth P03 | 5 | 3 tasks | 5 files |
 | Phase 03-schedule P01 | 3 | 2 tasks | 3 files |
+| Phase 03-schedule P02 | 3 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [03-01]: ScheduleCubit uses cache-then-recompute — all three stream values must be non-null before emitting ScheduleLoaded
 - [03-01]: Cancelled bookings excluded at Firestore query level (whereIn: pending/confirmed) — never seen by _resolveStatus()
 - [03-01]: date.weekday used directly as dayOfWeek filter — both Dart and SlotModel use 1=Mon..7=Sun, no adjustment needed
+- [Phase 03-02]: intl added as explicit direct dependency for NumberFormat.currency(locale: pt_BR) — transitive-only usage is fragile
+- [Phase 03-02]: BlocProvider<ScheduleCubit> at GoRoute /home builder level — cubit scoped to route lifetime, matches Phase 2 pattern
+- [Phase 03-02]: SlotList uses Dart sealed class exhaustive switch expression — compile-time exhaustiveness guarantee for all ScheduleState variants
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T01:50:41.335Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-schedule/03-CONTEXT.md
+Last session: 2026-03-20T02:24:37.763Z
+Stopped at: Completed 03-02-PLAN.md
+Resume file: None

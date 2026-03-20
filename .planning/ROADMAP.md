@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Data models, Firebase wiring, PWA manifest, Firestore security rules bootstrap, go_router + BLoC structural setup
 - [x] **Phase 2: Auth** - Google Sign-In and email/password auth, route scaffold with role-based guards, persistent session
-- [ ] **Phase 3: Schedule** - Read-only weekly slot display with available/booked/blocked states and price display
+- [x] **Phase 3: Schedule** - Read-only weekly slot display with available/booked/blocked states and price display (completed 2026-03-20)
 - [ ] **Phase 4: Booking** - Reserve a slot (atomic transaction), cancel own booking, view my bookings
 - [ ] **Phase 5: Admin** - Slot CRUD, blocked dates, booking list with confirm/reject, configurable approval mode
 - [ ] **Phase 6: PWA Hardening** - Final security rules deploy, service worker update strategy, iOS install banner, production deployment
@@ -61,7 +61,7 @@ Plans:
   2. Tapping a day shows the slots for that day, each labeled as available, booked, or blocked
   3. Each slot card displays its price
   4. Blocked dates (e.g., holidays) suppress their slots so no available slots appear for that day
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 03-01-PLAN.md — SlotViewModel, ScheduleState, ScheduleCubit with three-stream Firestore architecture
 - [ ] 03-02-PLAN.md — Schedule UI widgets (screen, week header, day chips, slot list, slot card, skeleton) + router wiring
@@ -110,7 +110,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
 | 2. Auth | 3/3 | Complete    | 2026-03-20 |
-| 3. Schedule | 1/2 | In Progress|  |
+| 3. Schedule | 2/2 | Complete   | 2026-03-20 |
 | 4. Booking | 0/TBD | Not started | - |
 | 5. Admin | 0/TBD | Not started | - |
 | 6. PWA Hardening | 0/TBD | Not started | - |
