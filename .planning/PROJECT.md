@@ -36,11 +36,11 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - [ ] Usuário pode reservar um horário disponível
 - [ ] Usuário pode cancelar sua própria reserva
 - [ ] Sistema impede dupla reserva no mesmo slot/dia
-- [ ] Admin pode criar e gerenciar slots recorrentes (dia da semana + horário + preço)
-- [ ] Admin pode bloquear datas específicas (feriados, manutenção, etc.)
-- [ ] Admin pode visualizar todas as reservas
-- [ ] Admin pode confirmar ou recusar reservas pendentes
-- [ ] Fluxo de confirmação de reserva é configurável (automático ou requer aprovação do admin)
+- [x] Admin pode criar e gerenciar slots recorrentes (dia da semana + horário + preço) — Validated in Phase 5: Admin
+- [x] Admin pode bloquear datas específicas (feriados, manutenção, etc.) — Validated in Phase 5: Admin
+- [x] Admin pode visualizar todas as reservas — Validated in Phase 5: Admin
+- [x] Admin pode confirmar ou recusar reservas pendentes — Validated in Phase 5: Admin
+- [x] Fluxo de confirmação de reserva é configurável (automático ou requer aprovação do admin) — Validated in Phase 5: Admin
 - [ ] App é instalável como PWA no celular
 
 ### Out of Scope
@@ -61,7 +61,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
 - FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
 
-**Current state:** Phase 4 complete — booking feature implemented (slot reservation via Firestore transaction with anti-double-booking, BookingConfirmationSheet, MyBookingsScreen with Próximas/Passadas sections, cancel flow, BookingCubit at shell level, intl PT-BR locale init, Firestore web persistence disabled). Phase 5 next: admin tools.
+**Current state:** Phase 5 complete — admin panel implemented (AdminScreen with 3 tabs, slot CRUD + active toggle, blocked date management, booking list with confirm/reject per date, confirmation mode toggle automatic/manual, MultiBlocProvider at router level, ProfileScreen admin entry button, BookingModel extended with rejected status + userDisplayName). Phase 6 next: PWA hardening.
 
 ## Constraints
 
