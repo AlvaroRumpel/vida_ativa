@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
+import 'package:vida_ativa/features/booking/ui/booking_confirmation_sheet.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_state.dart';
+import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 import 'package:vida_ativa/features/schedule/ui/slot_card.dart';
 import 'package:vida_ativa/features/schedule/ui/slot_skeleton.dart';
 
@@ -39,8 +43,31 @@ class SlotList extends StatelessWidget {
       ScheduleLoaded(:final slots) => ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           itemCount: slots.length,
-          itemBuilder: (context, index) => SlotCard(viewModel: slots[index]),
+          itemBuilder: (context, index) {
+            final vm = slots[index];
+            return SlotCard(
+              viewModel: vm,
+              onTap: vm.status == SlotStatus.available
+                  ? () => _showBookingSheet(context, vm)
+                  : null,
+            );
+          },
         ),
     };
   }
+}
+
+void _showBookingSheet(BuildContext context, SlotViewModel viewModel) {
+  final bookingCubit = context.read<BookingCubit>();
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (_) => BookingConfirmationSheet(
+      viewModel: viewModel,
+      bookingCubit: bookingCubit,
+    ),
+  );
 }

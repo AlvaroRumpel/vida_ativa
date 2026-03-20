@@ -5,12 +5,16 @@ import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 
 class SlotCard extends StatelessWidget {
   final SlotViewModel viewModel;
+  final VoidCallback? onTap;
 
-  const SlotCard({super.key, required this.viewModel});
+  const SlotCard({super.key, required this.viewModel, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: IntrinsicHeight(
@@ -50,6 +54,7 @@ class SlotCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
