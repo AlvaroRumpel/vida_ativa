@@ -20,6 +20,11 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ INFRA-02: Modelos UserModel, SlotModel, BookingModel, BlockedDateModel com serialização Firestore — Validated in Phase 1: Foundation
 - ✓ PWA-01: manifest.json com nome "Vida Ativa", theme_color verde, display standalone, ícones maskable — Validated in Phase 1: Foundation
 - ✓ PWA-02: App shell mobile-first com BottomNavigationBar e roteamento go_router — Validated in Phase 1: Foundation
+- ✓ AUTH-01: Login com Google (signInWithPopup) — Validated in Phase 2: Auth
+- ✓ AUTH-02: Login com email/senha — Validated in Phase 2: Auth
+- ✓ AUTH-03: Cadastro com email/senha — Validated in Phase 2: Auth
+- ✓ AUTH-04: Recuperação de senha por email — Validated in Phase 2: Auth
+- ✓ AUTH-05: Sessão persistente entre sessões do browser — Validated in Phase 2: Auth
 
 ### Active
 
@@ -53,7 +58,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
 - FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
 
-**Current state:** Phase 1 complete — foundation skeleton built. Phase 2 next: auth (Google + email/password).
+**Current state:** Phase 2 complete — auth fully implemented (Google + email/password, session persistence, role guards). Phase 3 next: schedule (read-only weekly slot view).
 
 ## Constraints
 
