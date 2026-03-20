@@ -12,8 +12,11 @@ import 'package:vida_ativa/features/auth/ui/login_screen.dart';
 import 'package:vida_ativa/features/auth/ui/profile_screen.dart';
 import 'package:vida_ativa/features/auth/ui/register_screen.dart';
 import 'package:vida_ativa/features/auth/ui/splash_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/features/booking/ui/my_bookings_placeholder_screen.dart';
-import 'package:vida_ativa/features/schedule/ui/schedule_placeholder_screen.dart';
+import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
+import 'package:vida_ativa/features/schedule/ui/schedule_screen.dart';
 
 class _AuthStateNotifier extends ChangeNotifier {
   final AuthCubit _cubit;
@@ -99,7 +102,13 @@ GoRouter createRouter(AuthCubit authCubit) {
             routes: [
               GoRoute(
                 path: '/home',
-                builder: (context, state) => const SchedulePlaceholderScreen(),
+                builder: (context, state) => BlocProvider(
+                  create: (context) => ScheduleCubit(
+                    firestore: FirebaseFirestore.instance,
+                    authCubit: context.read<AuthCubit>(),
+                  ),
+                  child: const ScheduleScreen(),
+                ),
               ),
             ],
           ),
