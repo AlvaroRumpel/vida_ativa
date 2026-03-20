@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-03-20T01:19:11.656Z"
+stopped_at: "Completed 03-01-PLAN.md"
+last_updated: "2026-03-20T02:17:00Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 02 — auth
+**Current focus:** Phase 03 — schedule
 
 ## Current Position
 
-Phase: 02 (auth) — COMPLETE
-Plan: 3 of 3
+Phase: 03 (schedule) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 3 of 3
 | Phase 01-foundation P01 | 8 | 3 tasks | 9 files |
 | Phase 01-foundation P02 | 4 | 2 tasks | 10 files |
 | Phase 02-auth P03 | 5 | 3 tasks | 5 files |
+| Phase 03-schedule P01 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [02-02]: Loading state shows inline CircularProgressIndicator inside FilledButton — avoids layout shift, keeps button size stable
 - [02-03]: ProfileScreen accesses FirebaseAuth.instance.currentUser?.photoURL directly since UserModel does not store photoURL — avoids changing model interface
 - [02-03]: SplashScreen uses AppTheme.primaryGreen constant instead of hardcoded Color literal for brand consistency
+- [03-01]: ScheduleCubit uses cache-then-recompute — all three stream values must be non-null before emitting ScheduleLoaded
+- [03-01]: Cancelled bookings excluded at Firestore query level (whereIn: pending/confirmed) — never seen by _resolveStatus()
+- [03-01]: date.weekday used directly as dayOfWeek filter — both Dart and SlotModel use 1=Mon..7=Sun, no adjustment needed
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T01:12:00Z
-Stopped at: Completed 02-03-PLAN.md
-Resume file: .planning/phases/03-schedule/03-01-PLAN.md
+Last session: 2026-03-20T01:50:41.335Z
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-schedule/03-CONTEXT.md

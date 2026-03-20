@@ -15,9 +15,9 @@
 
 ### Schedule (Agenda)
 
-- [ ] **SCHED-01**: Usuário pode visualizar horários disponíveis e ocupados organizados por semana
-- [ ] **SCHED-02**: Usuário pode selecionar um dia para ver os slots daquele dia
-- [ ] **SCHED-03**: Preço do slot é exibido na listagem de horários
+- [x] **SCHED-01**: Usuário pode visualizar horários disponíveis e ocupados organizados por semana
+- [x] **SCHED-02**: Usuário pode selecionar um dia para ver os slots daquele dia
+- [x] **SCHED-03**: Preço do slot é exibido na listagem de horários
 
 ### Booking (Reservas)
 
@@ -86,9 +86,9 @@
 | AUTH-03 | Phase 2 | Complete |
 | AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Complete |
-| SCHED-01 | Phase 3 | Pending |
-| SCHED-02 | Phase 3 | Pending |
-| SCHED-03 | Phase 3 | Pending |
+| SCHED-01 | Phase 3 | Complete |
+| SCHED-02 | Phase 3 | Complete |
+| SCHED-03 | Phase 3 | Complete |
 | BOOK-01 | Phase 4 | Pending |
 | BOOK-02 | Phase 4 | Pending |
 | BOOK-03 | Phase 4 | Pending |
