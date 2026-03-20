@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Data models, Firebase wiring, PWA manifest, Firestore security rules bootstrap, go_router + BLoC structural setup
 - [x] **Phase 2: Auth** - Google Sign-In and email/password auth, route scaffold with role-based guards, persistent session
 - [x] **Phase 3: Schedule** - Read-only weekly slot display with available/booked/blocked states and price display (completed 2026-03-20)
-- [ ] **Phase 4: Booking** - Reserve a slot (atomic transaction), cancel own booking, view my bookings
+- [x] **Phase 4: Booking** - Reserve a slot (atomic transaction), cancel own booking, view my bookings (completed 2026-03-20)
 - [ ] **Phase 5: Admin** - Slot CRUD, blocked dates, booking list with confirm/reject, configurable approval mode
 - [ ] **Phase 6: PWA Hardening** - Final security rules deploy, service worker update strategy, iOS install banner, production deployment
 
@@ -63,8 +63,8 @@ Plans:
   4. Blocked dates (e.g., holidays) suppress their slots so no available slots appear for that day
 **Plans:** 2/2 plans complete
 Plans:
-- [ ] 03-01-PLAN.md — SlotViewModel, ScheduleState, ScheduleCubit with three-stream Firestore architecture
-- [ ] 03-02-PLAN.md — Schedule UI widgets (screen, week header, day chips, slot list, slot card, skeleton) + router wiring
+- [x] 03-01-PLAN.md — SlotViewModel, ScheduleState, ScheduleCubit with three-stream Firestore architecture
+- [x] 03-02-PLAN.md — Schedule UI widgets (screen, week header, day chips, slot list, slot card, skeleton) + router wiring
 
 ### Phase 4: Booking
 **Goal**: Users can reserve an available slot, view their own bookings, and cancel a booking — with zero risk of double-booking due to concurrent reservations
@@ -75,10 +75,10 @@ Plans:
   2. User can see a list of their upcoming and past bookings with current status (Pending / Confirmed / Cancelled)
   3. User can cancel one of their own bookings and it disappears from their upcoming list
   4. The app never shows a booking as confirmed before the server write is acknowledged (no ghost bookings)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 Plans:
-- [ ] 04-01-PLAN.md — BookingCubit data layer, BookingModel extension, Firestore persistence fix, shell-level cubit wiring
-- [ ] 04-02-PLAN.md — Booking UI (SlotCard tap, confirmation sheet, MyBookingsScreen, BookingCard, cancel flow, router wiring)
+- [x] 04-01-PLAN.md — BookingCubit data layer, BookingModel extension, Firestore persistence fix, shell-level cubit wiring
+- [x] 04-02-PLAN.md — Booking UI (SlotCard tap, confirmation sheet, MyBookingsScreen, BookingCard, cancel flow, router wiring)
 
 ### Phase 5: Admin
 **Goal**: Admins can configure the schedule (slots, blocked dates) and manage bookings (view, confirm, reject) through a protected admin interface
@@ -114,6 +114,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
 | 2. Auth | 3/3 | Complete    | 2026-03-20 |
 | 3. Schedule | 2/2 | Complete   | 2026-03-20 |
-| 4. Booking | 1/2 | In Progress|  |
+| 4. Booking | 2/2 | Complete    | 2026-03-20 |
 | 5. Admin | 0/TBD | Not started | - |
 | 6. PWA Hardening | 0/TBD | Not started | - |

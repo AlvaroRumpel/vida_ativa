@@ -61,7 +61,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
 - FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
 
-**Current state:** Phase 3 complete — schedule screen implemented (weekly calendar, day chips PT-BR, slot cards with colored borders, R$ pricing, skeleton loading, blocked date handling). Phase 4 next: booking (reserve a slot).
+**Current state:** Phase 4 complete — booking feature implemented (slot reservation via Firestore transaction with anti-double-booking, BookingConfirmationSheet, MyBookingsScreen with Próximas/Passadas sections, cancel flow, BookingCubit at shell level, intl PT-BR locale init, Firestore web persistence disabled). Phase 5 next: admin tools.
 
 ## Constraints
 
