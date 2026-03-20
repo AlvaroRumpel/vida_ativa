@@ -117,11 +117,11 @@ No external specs — requirements fully captured in decisions above.
 
 ### Established Patterns
 - Material 3 com `useMaterial3: true` e `ColorScheme.fromSeed` — manter e mover para AppTheme
-- Firebase packages já instalados: firebase_core 4.5.0, firebase_auth 6.2.0, cloud_firestore 6.1.3 — adicionar riverpod e go_router ao pubspec.yaml
+- Firebase packages já instalados: firebase_core 4.5.0, firebase_auth 6.2.0, cloud_firestore 6.1.3 — adicionar flutter_bloc e go_router ao pubspec.yaml
 
 ### Integration Points
-- `main.dart` é o único entry point — Phase 1 o transforma: wrap com ProviderScope, troca MaterialApp por MaterialApp.router
-- `pubspec.yaml` precisa de 2 novas deps: `flutter_riverpod` (^2.x) e `go_router` (^14.x)
+- `main.dart` é o único entry point — Phase 1 o transforma: troca MaterialApp por MaterialApp.router (BLoC não precisa de root wrapper como ProviderScope)
+- `pubspec.yaml` precisa de 2 novas deps: `flutter_bloc` (^9.x) e `go_router` (^14.x)
 - `firebase.json` existe mas sem SPA rewrite — adicionar configuração de hosting
 
 </code_context>
