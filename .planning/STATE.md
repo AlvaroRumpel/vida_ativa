@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 04 complete — approved
-last_updated: "2026-03-20T21:00:00.000Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-20T21:12:43.462Z"
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 04 (booking) — COMPLETE
-Next: 05 (admin)
+Phase: 05 (admin) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Next: 05 (admin)
 | Phase 03-schedule P02 | 3 | 2 tasks | 8 files |
 | Phase 04-booking P01 | 4 | 2 tasks | 5 files |
 | Phase 04-booking P02 | 12 | 2 tasks | 6 files |
+| Phase 05-admin P01 | 6 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [Phase 04-booking]: BookingConfirmationSheet is a StatefulWidget managing its own isSubmitting/errorMessage — keeps cubit state clean, sheet stays open on error
 - [Phase 04-booking]: context.read<BookingCubit>() captured before showModalBottomSheet builder — bottom sheet subtree has no BlocProvider access
 - [Phase 04-booking]: String.compareTo() used for YYYY-MM-DD date comparisons — Dart String does not define >= / < operators
+- [Phase 05-admin]: AdminBookingCubit.selectDate cancels previous StreamSubscription before starting new date stream — avoids duplicate emissions
+- [Phase 05-admin]: bookSlot reads /config/booking before transaction (not inside) — Firestore transactions only support tx.get() reads on passed refs
+- [Phase 05-admin]: setConfirmationMode re-emits AdminBookingLoaded immediately with new mode — UI toggle responds without waiting for Firestore round-trip
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:10:12.928Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-20T21:15:00.000Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None

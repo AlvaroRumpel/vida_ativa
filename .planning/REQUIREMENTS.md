@@ -27,12 +27,12 @@
 
 ### Admin
 
-- [ ] **ADMN-01**: Admin pode criar e editar slots recorrentes (dia da semana + horário + preço)
-- [ ] **ADMN-02**: Admin pode desativar um slot recorrente sem excluí-lo
-- [ ] **ADMN-03**: Admin pode bloquear datas específicas (feriados, manutenção, eventos)
-- [ ] **ADMN-04**: Admin pode ver todas as reservas filtradas por data
-- [ ] **ADMN-05**: Admin pode confirmar ou recusar reservas pendentes
-- [ ] **ADMN-06**: Admin pode configurar o modo de confirmação (automático ou aprovação manual)
+- [x] **ADMN-01**: Admin pode criar e editar slots recorrentes (dia da semana + horário + preço)
+- [x] **ADMN-02**: Admin pode desativar um slot recorrente sem excluí-lo
+- [x] **ADMN-03**: Admin pode bloquear datas específicas (feriados, manutenção, eventos)
+- [x] **ADMN-04**: Admin pode ver todas as reservas filtradas por data
+- [x] **ADMN-05**: Admin pode confirmar ou recusar reservas pendentes
+- [x] **ADMN-06**: Admin pode configurar o modo de confirmação (automático ou aprovação manual)
 
 ### PWA & Infrastructure
 
@@ -92,12 +92,12 @@
 | BOOK-01 | Phase 4 | Complete |
 | BOOK-02 | Phase 4 | Complete |
 | BOOK-03 | Phase 4 | Complete |
-| ADMN-01 | Phase 5 | Pending |
-| ADMN-02 | Phase 5 | Pending |
-| ADMN-03 | Phase 5 | Pending |
-| ADMN-04 | Phase 5 | Pending |
-| ADMN-05 | Phase 5 | Pending |
-| ADMN-06 | Phase 5 | Pending |
+| ADMN-01 | Phase 5 | Complete |
+| ADMN-02 | Phase 5 | Complete |
+| ADMN-03 | Phase 5 | Complete |
+| ADMN-04 | Phase 5 | Complete |
+| ADMN-05 | Phase 5 | Complete |
+| ADMN-06 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 21 total
