@@ -75,7 +75,7 @@ Plans:
   2. User can see a list of their upcoming and past bookings with current status (Pending / Confirmed / Cancelled)
   3. User can cancel one of their own bookings and it disappears from their upcoming list
   4. The app never shows a booking as confirmed before the server write is acknowledged (no ghost bookings)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 04-01-PLAN.md — BookingCubit data layer, BookingModel extension, Firestore persistence fix, shell-level cubit wiring
 - [ ] 04-02-PLAN.md — Booking UI (SlotCard tap, confirmation sheet, MyBookingsScreen, BookingCard, cancel flow, router wiring)
@@ -114,6 +114,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
 | 2. Auth | 3/3 | Complete    | 2026-03-20 |
 | 3. Schedule | 2/2 | Complete   | 2026-03-20 |
-| 4. Booking | 0/2 | Planned | - |
+| 4. Booking | 1/2 | In Progress|  |
 | 5. Admin | 0/TBD | Not started | - |
 | 6. PWA Hardening | 0/TBD | Not started | - |

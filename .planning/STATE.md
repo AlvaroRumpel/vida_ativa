@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-20T02:55:53.659Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-20T20:02:02.724Z"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 03 — schedule
+**Current focus:** Phase 04 — booking
 
 ## Current Position
 
-Phase: 03 (schedule) — EXECUTING
+Phase: 04 (booking) — EXECUTING
 Plan: 2 of 2
 
 ## Performance Metrics
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 02-auth P03 | 5 | 3 tasks | 5 files |
 | Phase 03-schedule P01 | 3 | 2 tasks | 3 files |
 | Phase 03-schedule P02 | 3 | 2 tasks | 8 files |
+| Phase 04-booking P01 | 4 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 03-02]: intl added as explicit direct dependency for NumberFormat.currency(locale: pt_BR) — transitive-only usage is fragile
 - [Phase 03-02]: BlocProvider<ScheduleCubit> at GoRoute /home builder level — cubit scoped to route lifetime, matches Phase 2 pattern
 - [Phase 03-02]: SlotList uses Dart sealed class exhaustive switch expression — compile-time exhaustiveness guarantee for all ScheduleState variants
+- [Phase 04-booking]: BookingCubit queries without .orderBy() to avoid composite index — sorted locally in Dart in Plan 02 UI
+- [Phase 04-booking]: bookSlot and cancelBooking do not emit cubit state — reactive stream subscription handles UI updates
+- [Phase 04-booking]: BookingCubit provided at StatefulShellRoute level so Schedule and Bookings tabs share the same instance
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T02:55:53.651Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-booking/04-CONTEXT.md
+Last session: 2026-03-20T20:02:02.719Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
