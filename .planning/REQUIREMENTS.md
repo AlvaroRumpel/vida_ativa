@@ -7,10 +7,10 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: Usuário pode fazer login com conta Google
-- [ ] **AUTH-02**: Usuário pode fazer login com email e senha
-- [ ] **AUTH-03**: Usuário pode criar conta com email e senha
-- [ ] **AUTH-04**: Usuário pode recuperar senha via link enviado por email
+- [x] **AUTH-01**: Usuário pode fazer login com conta Google
+- [x] **AUTH-02**: Usuário pode fazer login com email e senha
+- [x] **AUTH-03**: Usuário pode criar conta com email e senha
+- [x] **AUTH-04**: Usuário pode recuperar senha via link enviado por email
 - [ ] **AUTH-05**: Sessão do usuário persiste entre sessões do browser
 
 ### Schedule (Agenda)
@@ -81,10 +81,10 @@
 | INFRA-02 | Phase 1 | Complete |
 | PWA-01 | Phase 1 | Complete |
 | PWA-02 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
-| AUTH-04 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
+| AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | SCHED-01 | Phase 3 | Pending |
 | SCHED-02 | Phase 3 | Pending |

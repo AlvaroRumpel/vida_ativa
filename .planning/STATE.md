@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-19T21:05:44.098Z"
+stopped_at: "Completed 02-02-PLAN.md"
+last_updated: "2026-03-20T01:04:00Z"
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 5
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 01 — foundation
+**Current focus:** Phase 02 — auth
 
 ## Current Position
 
-Phase: 01 (foundation) — COMPLETE
-Plan: 2 of 2 (all plans done)
+Phase: 02 (auth) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -69,6 +69,9 @@ Recent decisions affecting current work:
 - [01-02]: No ProviderScope in main.dart — BLoC does not require root wrapper; BlocProviders added at feature level in Phase 2+
 - [01-02]: StatefulShellRoute.indexedStack keeps each tab branch alive independently — tab state preserved on switch
 - [01-02]: /admin has no guard in Phase 1 — role check added in Phase 2 with AuthBloc redirect
+- [02-02]: BlocConsumer used in auth screens (listener + builder) to reduce widget nesting vs separate BlocListener + BlocBuilder
+- [02-02]: Auth error routing uses lowercase message keyword inspection to assign errors to email vs password field
+- [02-02]: Loading state shows inline CircularProgressIndicator inside FilledButton — avoids layout shift, keeps button size stable
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-19T21:05:44.092Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-auth/02-CONTEXT.md
+Last session: 2026-03-20T01:04:00Z
+Stopped at: Completed 02-02-PLAN.md
+Resume file: .planning/phases/02-auth/02-03-PLAN.md
