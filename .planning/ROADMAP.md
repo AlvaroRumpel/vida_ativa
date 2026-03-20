@@ -91,10 +91,10 @@ Plans:
   4. Admin can view all bookings filtered by date and see the requester and status for each
   5. Admin can confirm or reject a pending booking, and the client's booking status updates accordingly
   6. Admin can toggle the confirmation mode (automatic vs. manual approval) and newly created bookings reflect the active mode
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 Plans:
-- [ ] 05-01-PLAN.md — Data layer: BookingModel extension (rejected + userDisplayName), BookingCubit config mode, three admin cubits
-- [ ] 05-02-PLAN.md — Admin UI: AdminScreen with tabs, slot/blocked-date/booking management, router wiring, ProfileScreen admin button
+- [x] 05-01-PLAN.md — Data layer: BookingModel extension (rejected + userDisplayName), BookingCubit config mode, three admin cubits
+- [x] 05-02-PLAN.md — Admin UI: AdminScreen with tabs, slot/blocked-date/booking management, router wiring, ProfileScreen admin button
 
 ### Phase 6: PWA Hardening
 **Goal**: The app is safe for real users — Firestore rules are restrictive and deployed, the service worker update flow works, and the app installs cleanly as a PWA on iOS and Android
