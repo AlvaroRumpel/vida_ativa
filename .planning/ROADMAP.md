@@ -61,7 +61,10 @@ Plans:
   2. Tapping a day shows the slots for that day, each labeled as available, booked, or blocked
   3. Each slot card displays its price
   4. Blocked dates (e.g., holidays) suppress their slots so no available slots appear for that day
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — SlotViewModel, ScheduleState, ScheduleCubit with three-stream Firestore architecture
+- [ ] 03-02-PLAN.md — Schedule UI widgets (screen, week header, day chips, slot list, slot card, skeleton) + router wiring
 
 ### Phase 4: Booking
 **Goal**: Users can reserve an available slot, view their own bookings, and cancel a booking — with zero risk of double-booking due to concurrent reservations
@@ -107,7 +110,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
 | 2. Auth | 3/3 | Complete    | 2026-03-20 |
-| 3. Schedule | 0/TBD | Not started | - |
+| 3. Schedule | 0/2 | Planned | - |
 | 4. Booking | 0/TBD | Not started | - |
 | 5. Admin | 0/TBD | Not started | - |
 | 6. PWA Hardening | 0/TBD | Not started | - |
