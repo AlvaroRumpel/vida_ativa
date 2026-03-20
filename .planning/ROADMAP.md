@@ -46,7 +46,7 @@ Plans:
   3. User can log in with existing email/password credentials
   4. User can request a password reset email and receives it
   5. User closes the browser, reopens the app, and is still logged in without re-authenticating
-**Plans:** 3/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 02-01-PLAN.md — AuthCubit + AuthState, GoRouter auth guards, main.dart BlocProvider wiring, test stubs
 - [x] 02-02-PLAN.md — Login screen (Google + email/password) and Register screen
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-19 |
-| 2. Auth | 3/3 | Complete | 2026-03-20 |
+| 2. Auth | 3/3 | Complete    | 2026-03-20 |
 | 3. Schedule | 0/TBD | Not started | - |
 | 4. Booking | 0/TBD | Not started | - |
 | 5. Admin | 0/TBD | Not started | - |
