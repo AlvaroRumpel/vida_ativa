@@ -9,7 +9,7 @@ import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
 class BookingCubit extends Cubit<BookingState> {
   final FirebaseFirestore _firestore;
   final String _userId;
-  StreamSubscription<QuerySnapshot>? _sub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
 
   BookingCubit({
     required FirebaseFirestore firestore,

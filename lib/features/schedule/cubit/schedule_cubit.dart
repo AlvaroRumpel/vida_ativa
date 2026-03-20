@@ -14,9 +14,9 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   final FirebaseFirestore _firestore;
   final AuthCubit _authCubit;
 
-  StreamSubscription<QuerySnapshot>? _slotsSubscription;
-  StreamSubscription<QuerySnapshot>? _bookingsSubscription;
-  StreamSubscription<DocumentSnapshot>? _blockedDateSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _slotsSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _bookingsSubscription;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _blockedDateSubscription;
 
   // Cache last values from each stream for recomputation
   List<SlotModel>? _cachedSlots;
