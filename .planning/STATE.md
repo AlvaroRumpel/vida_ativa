@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-20T20:02:02.724Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-20T20:10:12.934Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -52,6 +52,7 @@ Plan: 2 of 2
 | Phase 03-schedule P01 | 3 | 2 tasks | 3 files |
 | Phase 03-schedule P02 | 3 | 2 tasks | 8 files |
 | Phase 04-booking P01 | 4 | 2 tasks | 5 files |
+| Phase 04-booking P02 | 12 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 04-booking]: BookingCubit queries without .orderBy() to avoid composite index — sorted locally in Dart in Plan 02 UI
 - [Phase 04-booking]: bookSlot and cancelBooking do not emit cubit state — reactive stream subscription handles UI updates
 - [Phase 04-booking]: BookingCubit provided at StatefulShellRoute level so Schedule and Bookings tabs share the same instance
+- [Phase 04-booking]: BookingConfirmationSheet is a StatefulWidget managing its own isSubmitting/errorMessage — keeps cubit state clean, sheet stays open on error
+- [Phase 04-booking]: context.read<BookingCubit>() captured before showModalBottomSheet builder — bottom sheet subtree has no BlocProvider access
+- [Phase 04-booking]: String.compareTo() used for YYYY-MM-DD date comparisons — Dart String does not define >= / < operators
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:02:02.719Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-20T20:10:12.928Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
