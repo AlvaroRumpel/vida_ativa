@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-23T13:51:52.244Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-23T18:24:35.940Z"
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 13
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 05 — admin
+**Current focus:** Phase 06 — PWA Hardening
 
 ## Current Position
 
-Phase: 05 (admin) — EXECUTING
-Plan: 2 of 2
+Phase: 06 (PWA Hardening) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: 2 of 2
 | Phase 04-booking P01 | 4 | 2 tasks | 5 files |
 | Phase 04-booking P02 | 12 | 2 tasks | 6 files |
 | Phase 05-admin P01 | 6 | 2 tasks | 10 files |
+| Phase 06-pwa-hardening P01 | 2 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Recent decisions affecting current work:
 - [Phase 05-admin]: AdminBookingCubit.selectDate cancels previous StreamSubscription before starting new date stream — avoids duplicate emissions
 - [Phase 05-admin]: bookSlot reads /config/booking before transaction (not inside) — Firestore transactions only support tx.get() reads on passed refs
 - [Phase 05-admin]: setConfirmationMode re-emits AdminBookingLoaded immediately with new mode — UI toggle responds without waiting for Firestore round-trip
+- [Phase 06-pwa-hardening]: isAdmin() checks .data.role == 'admin' string field in Firestore, not .data.isAdmin bool — avoids silent failure for all users
+- [Phase 06-pwa-hardening]: dart:ui_web used for iOS detection in install banner — avoids dart:js_interop complexity, navigator.standalone check omitted as redundant
 
 ### Pending Todos
 
@@ -107,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T13:51:52.238Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-pwa-hardening/06-CONTEXT.md
+Last session: 2026-03-23T18:24:35.935Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None
