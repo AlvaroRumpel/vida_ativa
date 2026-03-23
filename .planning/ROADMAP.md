@@ -105,7 +105,10 @@ Plans:
   2. On iOS Safari, the app displays a prompt guiding the user to "Add to Home Screen"
   3. Firestore security rules pass a manual review: unauthenticated users cannot write anything; clients cannot read other users' bookings; admin writes are gated by the `isAdmin()` rule
   4. `firebase deploy` runs cleanly from the repo and produces a working production URL
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Firestore security rules rewrite, index.html title fix, iOS install banner
+- [ ] 06-02-PLAN.md — Flutter web build, Firebase deploy, production verification checkpoint
 
 ## Progress
 
@@ -119,4 +122,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Schedule | 2/2 | Complete   | 2026-03-20 |
 | 4. Booking | 2/2 | Complete    | 2026-03-20 |
 | 5. Admin | 1/2 | In Progress|  |
-| 6. PWA Hardening | 0/TBD | Not started | - |
+| 6. PWA Hardening | 0/2 | Not started | - |
