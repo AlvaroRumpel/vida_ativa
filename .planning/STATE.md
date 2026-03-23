@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-23T18:24:35.940Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-23T18:35:41.656Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 06 (PWA Hardening) — EXECUTING
-Plan: 1 of 2
+Phase: 06 (PWA Hardening) — COMPLETE
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Plan: 1 of 2
 | Phase 04-booking P02 | 12 | 2 tasks | 6 files |
 | Phase 05-admin P01 | 6 | 2 tasks | 10 files |
 | Phase 06-pwa-hardening P01 | 2 | 3 tasks | 4 files |
+| Phase 06-pwa-hardening P02 | 5 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,7 @@ Recent decisions affecting current work:
 - [Phase 05-admin]: setConfirmationMode re-emits AdminBookingLoaded immediately with new mode — UI toggle responds without waiting for Firestore round-trip
 - [Phase 06-pwa-hardening]: isAdmin() checks .data.role == 'admin' string field in Firestore, not .data.isAdmin bool — avoids silent failure for all users
 - [Phase 06-pwa-hardening]: dart:ui_web used for iOS detection in install banner — avoids dart:js_interop complexity, navigator.standalone check omitted as redundant
+- [Phase 06-pwa-hardening]: firebase deploy --only hosting,firestore:rules deploys web app and rules atomically in a single command
 
 ### Pending Todos
 
@@ -110,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T18:24:35.935Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-23T18:35:41.647Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
