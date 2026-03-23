@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-23T18:41:30.313Z"
+status: milestone_complete
+stopped_at: v1.0 milestone archived
+last_updated: "2026-03-23"
 progress:
   total_phases: 6
   completed_phases: 6
@@ -16,10 +16,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-19)
+See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 06 — PWA Hardening
+**Current focus:** v1.0 milestone complete — planning v2.0
 
 ## Current Position
 
