@@ -28,6 +28,8 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ SCHED-01: Usuário pode visualizar horários disponíveis/ocupados/bloqueados organizados por semana — Validated in Phase 3: Schedule
 - ✓ SCHED-02: Usuário pode selecionar um dia para ver os slots daquele dia — Validated in Phase 3: Schedule
 - ✓ SCHED-03: Preço do slot exibido na listagem — Validated in Phase 3: Schedule
+- ✓ PWA-01 (finalized): iOS install banner via SnackBar; apple-mobile-web-app-title = "Vida Ativa"; app deployed to vida-ativa-94ba0.web.app — Validated in Phase 6: PWA Hardening
+- ✓ INFRA-01 (finalized): Firestore rules with isAdmin() checking role == "admin", per-collection RBAC deployed; unauthenticated writes denied — Validated in Phase 6: PWA Hardening
 
 ### Active
 
@@ -41,7 +43,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - [x] Admin pode visualizar todas as reservas — Validated in Phase 5: Admin
 - [x] Admin pode confirmar ou recusar reservas pendentes — Validated in Phase 5: Admin
 - [x] Fluxo de confirmação de reserva é configurável (automático ou requer aprovação do admin) — Validated in Phase 5: Admin
-- [ ] App é instalável como PWA no celular
+- [x] App é instalável como PWA no celular — Validated in Phase 6: PWA Hardening
 
 ### Out of Scope
 
@@ -61,7 +63,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Estrutura de pastas implementada: `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router}`
 - FlutterFire configurado; app shell com BottomNav (Agenda/Minhas Reservas/Perfil) + rotas /admin e /login
 
-**Current state:** Phase 5 complete — admin panel implemented (AdminScreen with 3 tabs, slot CRUD + active toggle, blocked date management, booking list with confirm/reject per date, confirmation mode toggle automatic/manual, MultiBlocProvider at router level, ProfileScreen admin entry button, BookingModel extended with rejected status + userDisplayName). Phase 6 next: PWA hardening.
+**Current state:** Phase 6 complete — all 6 phases done. App is live at vida-ativa-94ba0.web.app. Production Firestore rules with isAdmin() role-based access deployed. iOS install SnackBar in AppShell. PWA title "Vida Ativa" fixed. v1 milestone complete.
 
 ## Constraints
 
@@ -79,4 +81,4 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | Slots recorrentes + bookings por data | Separa a configuração do horário da instância de reserva | — Pending |
 
 ---
-*Last updated: 2026-03-19 after Phase 1: Foundation complete*
+*Last updated: 2026-03-23 after Phase 6: PWA Hardening complete — v1 milestone done*
