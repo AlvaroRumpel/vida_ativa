@@ -41,7 +41,10 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   2. Ao confirmar uma reserva, cliente pode opcionalmente adicionar um campo de texto listando participantes (ex: "João, Maria, Pedro")
   3. Admin que abre a listagem de reservas vê nome do cliente e participantes diretamente na linha, sem precisar abrir cada item
   4. Regras de segurança do Firestore permitem leitura de bookings por qualquer usuário autenticado (não apenas admin)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 07-01-PLAN.md — Data layer (BookingModel participants + SlotViewModel bookerName) + schedule display (SOCIAL-01)
+- [ ] 07-02-PLAN.md — UI wiring: participants input in booking sheet, edit in MyBookings, admin display (SOCIAL-02, ADMN-09)
 
 ### Phase 8: Compartilhamento & Perfil
 **Goal**: Usuários podem compartilhar reservas via WhatsApp e manter dados de contato atualizados no perfil
@@ -104,7 +107,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 4. Booking | v1.0 | 2/2 | Complete | 2026-03-20 |
 | 5. Admin | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 6. PWA Hardening | v1.0 | 2/2 | Complete | 2026-03-23 |
-| 7. Visibilidade Social | v2.0 | 0/? | Not started | - |
+| 7. Visibilidade Social | v2.0 | 0/2 | Not started | - |
 | 8. Compartilhamento & Perfil | v2.0 | 0/? | Not started | - |
 | 9. Gestão de Usuários Admin | v2.0 | 0/? | Not started | - |
 | 10. Monitoramento de Erros | v2.0 | 0/? | Not started | - |
