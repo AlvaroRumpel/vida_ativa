@@ -54,7 +54,10 @@ Plans:
   1. Após reserva confirmada, cliente vê botão "Compartilhar" que abre WhatsApp com mensagem pré-formatada contendo data, horário e quadra
   2. Durante o cadastro com email/senha, cliente pode inserir número de celular (campo opcional)
   3. Na tela de Perfil, cliente pode abrir um BottomSheet para editar nome e telefone e salvar as alterações
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 08-01-PLAN.md — PhoneInputFormatter + AuthCubit phone support + RegisterScreen phone field (PROF-01, PROF-02)
+- [ ] 08-02-PLAN.md — WhatsApp share in BookingCard + ProfileScreen phone edit BottomSheet (SOCIAL-03, PROF-02)
 
 ### Phase 9: Gestão de Usuários Admin
 **Goal**: Admin pode operar em contexto de cliente sem sair da conta e promover outros usuários no painel
@@ -108,7 +111,7 @@ Plans:
 | 5. Admin | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 6. PWA Hardening | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 7. Visibilidade Social | 2/2 | Complete   | 2026-03-25 | - |
-| 8. Compartilhamento & Perfil | v2.0 | 0/? | Not started | - |
+| 8. Compartilhamento & Perfil | v2.0 | 0/2 | Not started | - |
 | 9. Gestão de Usuários Admin | v2.0 | 0/? | Not started | - |
 | 10. Monitoramento de Erros | v2.0 | 0/? | Not started | - |
 | 11. Melhorias Visuais | v2.0 | 0/? | Not started | - |
