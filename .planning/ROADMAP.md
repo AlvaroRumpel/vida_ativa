@@ -23,7 +23,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 
 ### v2.0 Funcionalidades Sociais & Admin
 
-- [ ] **Phase 7: Visibilidade Social** - Reservas visíveis na agenda para todos os usuários; campo de participantes; admin vê participantes na listagem
+- [x] **Phase 7: Visibilidade Social** - Reservas visíveis na agenda para todos os usuários; campo de participantes; admin vê participantes na listagem (completed 2026-03-25)
 - [ ] **Phase 8: Compartilhamento & Perfil** - Compartilhar reserva via WhatsApp; campo de telefone no cadastro e edição de perfil
 - [ ] **Phase 9: Gestão de Usuários Admin** - Toggle admin/cliente sem troca de conta; promoção de usuários a admin pelo painel
 - [ ] **Phase 10: Monitoramento de Erros** - Captura e registro de erros em produção via ferramenta de monitoramento
@@ -41,7 +41,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   2. Ao confirmar uma reserva, cliente pode opcionalmente adicionar um campo de texto listando participantes (ex: "João, Maria, Pedro")
   3. Admin que abre a listagem de reservas vê nome do cliente e participantes diretamente na linha, sem precisar abrir cada item
   4. Regras de segurança do Firestore permitem leitura de bookings por qualquer usuário autenticado (não apenas admin)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 07-01-PLAN.md — Data layer (BookingModel participants + SlotViewModel bookerName) + schedule display (SOCIAL-01)
 - [ ] 07-02-PLAN.md — UI wiring: participants input in booking sheet, edit in MyBookings, admin display (SOCIAL-02, ADMN-09)
@@ -107,7 +107,7 @@ Plans:
 | 4. Booking | v1.0 | 2/2 | Complete | 2026-03-20 |
 | 5. Admin | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 6. PWA Hardening | v1.0 | 2/2 | Complete | 2026-03-23 |
-| 7. Visibilidade Social | 1/2 | In Progress|  | - |
+| 7. Visibilidade Social | 2/2 | Complete   | 2026-03-25 | - |
 | 8. Compartilhamento & Perfil | v2.0 | 0/? | Not started | - |
 | 9. Gestão de Usuários Admin | v2.0 | 0/? | Not started | - |
 | 10. Monitoramento de Erros | v2.0 | 0/? | Not started | - |

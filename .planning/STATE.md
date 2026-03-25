@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-25T07:39:52.709Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-25T07:45:13.780Z"
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 07 (visibilidade-social) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 1 of 2
 
 *v2.0 metrics will be tracked starting Phase 07*
 | Phase 07-visibilidade-social P01 | 3 | 2 tasks | 5 files |
+| Phase 07-visibilidade-social P02 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 07-01]: bookerName set only for SlotStatus.booked (not myBooking) — user sees own badge, not their own name
 - [Phase 07-01]: _resolveStatus removed — inlined in _recompute() for single-pass O(n) booking lookup
 - [Phase 07-01]: updateParticipants uses FieldValue.delete() for null/empty — no empty-string fields stored in Firestore
+- [Phase 07-02]: BookingCard.bookingCubit is optional (nullable) — preserves backward compatibility, all current call sites pass the cubit
+- [Phase 07-02]: Edit icon shown for all non-cancelled bookings (future and past) — retroactive participant editing is valid UX
 
 ### Pending Todos
 
@@ -112,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T07:39:52.705Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-03-25T07:45:13.776Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
