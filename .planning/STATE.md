@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
-status: unknown
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-25T08:32:54.363Z"
+status: phase_complete
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-25T09:30:00Z"
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 3
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 08 — compartilhamento-perfil
+**Current focus:** Phase 09 — gestao-usuarios-admin
 
 ## Current Position
 
-Phase: 08 (compartilhamento-perfil) — EXECUTING
-Plan: 1 of 2
+Phase: 08 (compartilhamento-perfil) — COMPLETE
+Next: Phase 09 — gestao-usuarios-admin
 
 ## Performance Metrics
 
@@ -105,6 +105,11 @@ Recent decisions affecting current work:
 - [Phase 08-01]: PhoneInputFormatter max 11 digits (Brazilian mobile: DDD 2 + number 9) — truncates excess, no error
 - [Phase 08-01]: updatePhone uses FieldValue.delete() for null/empty — consistent with updateParticipants pattern from Phase 07
 - [Phase 08-01]: Phone field optional in RegisterScreen — empty value passes null to cubit, no phone field stored in Firestore
+- [Phase 08-02]: WhatsApp share uses wa.me/?text= URL (no phone number) — universal link, no WhatsApp install required for web fallback
+- [Phase 08-02]: context.read<AuthCubit>() captured before showModalBottomSheet builder — avoids context access in sheet subtree
+- [Phase 08-02]: _showEditPhoneSheet is a top-level function (not a method) — ProfileScreen is StatelessWidget, consistent with existing pattern
+- [Phase 08-02]: Share button omits 👥 line entirely when participants null/empty — cleaner message for solo bookings
+- [Phase 08]: PROF-02 scoped to phone-only (not name+phone) — user decided "só telefone" during discuss-phase; ROADMAP SC #3 corrected accordingly
 
 ### Pending Todos
 
@@ -119,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T08:32:44.800Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-25T09:30:00Z
+Stopped at: Completed Phase 08 — compartilhamento-perfil
 Resume file: None
