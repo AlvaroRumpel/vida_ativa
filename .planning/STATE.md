@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-25T07:48:30.921Z"
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-25T08:32:54.363Z"
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 07 — visibilidade-social
+**Current focus:** Phase 08 — compartilhamento-perfil
 
 ## Current Position
 
-Phase: 07 (visibilidade-social) — EXECUTING
-Plan: 2 of 2
+Phase: 08 (compartilhamento-perfil) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: 2 of 2
 *v2.0 metrics will be tracked starting Phase 07*
 | Phase 07-visibilidade-social P01 | 3 | 2 tasks | 5 files |
 | Phase 07-visibilidade-social P02 | 5 | 2 tasks | 4 files |
+| Phase 08-compartilhamento-perfil P01 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 07-01]: updateParticipants uses FieldValue.delete() for null/empty — no empty-string fields stored in Firestore
 - [Phase 07-02]: BookingCard.bookingCubit is optional (nullable) — preserves backward compatibility, all current call sites pass the cubit
 - [Phase 07-02]: Edit icon shown for all non-cancelled bookings (future and past) — retroactive participant editing is valid UX
+- [Phase 08-01]: PhoneInputFormatter max 11 digits (Brazilian mobile: DDD 2 + number 9) — truncates excess, no error
+- [Phase 08-01]: updatePhone uses FieldValue.delete() for null/empty — consistent with updateParticipants pattern from Phase 07
+- [Phase 08-01]: Phone field optional in RegisterScreen — empty value passes null to cubit, no phone field stored in Firestore
 
 ### Pending Todos
 
@@ -115,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T07:45:13.776Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-03-25T08:32:44.800Z
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
