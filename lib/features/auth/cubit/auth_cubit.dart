@@ -139,11 +139,25 @@ class AuthCubit extends Cubit<AuthState> {
       'phone': phone ?? FieldValue.delete(),
     });
 
-    // Re-read user doc to update state
+    // Re-read user doc to update state, preserving viewMode
     final doc = await _firestore.collection('users').doc(uid).get();
     if (doc.exists) {
-      emit(AuthAuthenticated(UserModel.fromFirestore(doc)));
+      emit(AuthAuthenticated(
+        UserModel.fromFirestore(doc),
+        viewMode: currentState.viewMode,
+      ));
     }
+  }
+
+  void toggleViewMode() {
+    final currentState = state;
+    if (currentState is! AuthAuthenticated) return;
+    if (!currentState.user.isAdmin) return;
+
+    final newMode = currentState.viewMode == ViewMode.admin
+        ? ViewMode.client
+        : ViewMode.admin;
+    emit(AuthAuthenticated(currentState.user, viewMode: newMode));
   }
 
   Future<void> signOut() async {

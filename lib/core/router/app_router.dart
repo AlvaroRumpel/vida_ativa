@@ -62,9 +62,11 @@ GoRouter createRouter(AuthCubit authCubit) {
       // Authenticated but on auth page — go home
       if (isAuthenticated && isOnAuthPage) return '/home';
 
-      // Admin guard: authenticated client trying /admin
+      // Admin guard: non-admin or admin in client mode cannot access /admin
       if (authState is AuthAuthenticated && location.startsWith('/admin')) {
-        if (!authState.user.isAdmin) return '/access-denied';
+        if (!authState.user.isAdmin || authState.viewMode == ViewMode.client) {
+          return '/home';
+        }
       }
 
       // Splash after auth resolved — route to destination
