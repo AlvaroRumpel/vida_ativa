@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
@@ -93,7 +94,16 @@ class BookingCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (!booking.isCancelled && bookingCubit != null)
+                            if (!booking.isCancelled && booking.status != 'rejected')
+                              IconButton(
+                                icon: const Icon(Icons.share, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Compartilhar via WhatsApp',
+                                onPressed: _shareWhatsApp,
+                              ),
+                            if (!booking.isCancelled && bookingCubit != null) ...[
+                              const SizedBox(width: 8),
                               IconButton(
                                 icon: const Icon(Icons.edit, size: 18),
                                 padding: EdgeInsets.zero,
@@ -101,6 +111,7 @@ class BookingCard extends StatelessWidget {
                                 onPressed: () =>
                                     _showEditParticipantsDialog(context),
                               ),
+                            ],
                             if (isFuture && !booking.isCancelled)
                               TextButton(
                                 onPressed: onCancel,
@@ -121,6 +132,26 @@ class BookingCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _shareWhatsApp() async {
+    final nome = booking.userDisplayName ?? '';
+    final data = _formatDate(booking.date);
+    final horario = booking.startTime ?? '';
+
+    final buffer = StringBuffer();
+    buffer.writeln('\u{1F3D0} Reserva confirmada para $nome \u2014 Academia Vida Ativa');
+    buffer.writeln();
+    buffer.writeln('\u{1F4C5} $data, \xe0s $horario');
+    if (booking.participants != null && booking.participants!.isNotEmpty) {
+      buffer.writeln('\u{1F465} ${booking.participants}');
+    }
+    buffer.writeln();
+    buffer.write('Nos vemos na quadra! \u{1F334}');
+
+    final encoded = Uri.encodeComponent(buffer.toString());
+    final url = Uri.parse('https://wa.me/?text=$encoded');
+    await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
   void _showEditParticipantsDialog(BuildContext context) async {
