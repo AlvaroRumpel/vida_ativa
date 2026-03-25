@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
-status: roadmap_ready
-stopped_at: Roadmap v2.0 created — ready to plan Phase 07
-last_updated: "2026-03-25"
+status: Roadmap ready — awaiting plan-phase
+stopped_at: Phase 7 context gathered
+last_updated: "2026-03-25T07:13:44.994Z"
+last_activity: 2026-03-25 — Roadmap v2.0 created (Phases 07–12)
 progress:
   total_phases: 6
   completed_phases: 0
@@ -114,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25
-Stopped at: Roadmap v2.0 created
-Resume file: .planning/ROADMAP.md — Phase 07 is next
+Last session: 2026-03-25T07:13:44.987Z
+Stopped at: Phase 7 context gathered
+Resume file: .planning/phases/07-visibilidade-social/07-CONTEXT.md
