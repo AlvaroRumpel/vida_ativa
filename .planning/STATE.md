@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
-status: Roadmap ready — awaiting plan-phase
-stopped_at: Phase 7 planned — ready to execute
-last_updated: "2026-03-25T07:31:52.924Z"
-last_activity: 2026-03-25 — Roadmap v2.0 created (Phases 07–12)
+status: unknown
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-25T07:39:52.709Z"
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -20,18 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** v2.0 milestone — Phase 07: Visibilidade Social
+**Current focus:** Phase 07 — visibilidade-social
 
 ## Current Position
 
-Phase: 07 — Visibilidade Social (not started)
-Plan: —
-Status: Roadmap ready — awaiting plan-phase
-Last activity: 2026-03-25 — Roadmap v2.0 created (Phases 07–12)
-
-```
-v2.0 Progress: [░░░░░░] 0/6 phases
-```
+Phase: 07 (visibilidade-social) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -53,6 +46,7 @@ v2.0 Progress: [░░░░░░] 0/6 phases
 | 06-pwa-hardening | 2/2 | — | — |
 
 *v2.0 metrics will be tracked starting Phase 07*
+| Phase 07-visibilidade-social P01 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -101,6 +95,9 @@ Recent decisions affecting current work:
 - [v2.0 Roadmap]: SOCIAL-02 and ADMN-09 are in the same phase — participants field written during booking creation must appear in admin listing
 - [v2.0 Roadmap]: UI-01 (rebrand) placed last (Phase 12) and BLOCKED — cannot start until client delivers logo + color palette
 - [v2.0 Roadmap]: OPS-01 placed in standalone Phase 10 — no feature dependencies, can be implemented independently
+- [Phase 07-01]: bookerName set only for SlotStatus.booked (not myBooking) — user sees own badge, not their own name
+- [Phase 07-01]: _resolveStatus removed — inlined in _recompute() for single-pass O(n) booking lookup
+- [Phase 07-01]: updateParticipants uses FieldValue.delete() for null/empty — no empty-string fields stored in Firestore
 
 ### Pending Todos
 
@@ -115,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T07:31:52.919Z
-Stopped at: Phase 7 planned — ready to execute
-Resume file: .planning/phases/07-visibilidade-social/07-01-PLAN.md
+Last session: 2026-03-25T07:39:52.705Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: None
