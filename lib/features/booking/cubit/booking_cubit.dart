@@ -42,6 +42,7 @@ class BookingCubit extends Cubit<BookingState> {
     required double price,
     required String startTime,
     required String userDisplayName,
+    String? participants,
   }) async {
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
@@ -67,6 +68,7 @@ class BookingCubit extends Cubit<BookingState> {
         startTime: startTime,
         price: price,
         userDisplayName: userDisplayName,
+        participants: participants,
       );
       tx.set(ref, booking.toFirestore());
     });
@@ -78,6 +80,14 @@ class BookingCubit extends Cubit<BookingState> {
       'status': 'cancelled',
       'cancelledAt': Timestamp.fromDate(DateTime.now()),
     });
+    // Stream subscription picks up the change reactively — no state emit here.
+  }
+
+  Future<void> updateParticipants(String bookingId, String? participants) async {
+    final data = participants != null && participants.isNotEmpty
+        ? {'participants': participants}
+        : {'participants': FieldValue.delete()};
+    await _firestore.collection('bookings').doc(bookingId).update(data);
     // Stream subscription picks up the change reactively — no state emit here.
   }
 

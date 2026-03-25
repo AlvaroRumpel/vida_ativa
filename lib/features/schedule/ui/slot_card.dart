@@ -46,7 +46,7 @@ class SlotCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    _StatusLabel(status: viewModel.status),
+                    _StatusLabel(status: viewModel.status, bookerName: viewModel.bookerName),
                   ],
                 ),
               ),
@@ -71,8 +71,9 @@ class SlotCard extends StatelessWidget {
 
 class _StatusLabel extends StatelessWidget {
   final SlotStatus status;
+  final String? bookerName;
 
-  const _StatusLabel({required this.status});
+  const _StatusLabel({required this.status, this.bookerName});
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +82,14 @@ class _StatusLabel extends StatelessWidget {
           'Dispon\u00edvel',
           style: TextStyle(color: AppTheme.primaryGreen),
         ),
-      SlotStatus.booked => const Text(
-          'Ocupado',
-          style: TextStyle(color: Colors.grey),
+      SlotStatus.booked => Text(
+          bookerName ?? 'Ocupado',
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          overflow: TextOverflow.ellipsis,
         ),
       SlotStatus.myBooking => Container(
           decoration: BoxDecoration(
