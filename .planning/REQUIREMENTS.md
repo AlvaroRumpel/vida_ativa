@@ -71,16 +71,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SOCIAL-01 | Phase 07 | Pending |
 | SOCIAL-02 | Phase 07 | Pending |
+| ADMN-09 | Phase 07 | Pending |
 | SOCIAL-03 | Phase 08 | Pending |
 | PROF-01 | Phase 08 | Pending |
 | PROF-02 | Phase 08 | Pending |
 | ADMN-07 | Phase 09 | Pending |
 | ADMN-08 | Phase 09 | Pending |
-| ADMN-09 | Phase 07 | Pending |
-| UI-01 | Phase 12 | Pending |
+| OPS-01 | Phase 10 | Pending |
 | UI-02 | Phase 11 | Pending |
 | UI-03 | Phase 11 | Pending |
-| OPS-01 | Phase 10 | Pending |
+| UI-01 | Phase 12 | Pending (BLOCKED) |
 
 **Coverage:**
 - v2 requirements: 12 total
@@ -89,4 +89,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after initial v2.0 definition*
+*Last updated: 2026-03-25 — Traceability updated after roadmap v2.0 creation*

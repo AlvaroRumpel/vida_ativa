@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
-status: defining_requirements
-stopped_at: Milestone v2.0 started — defining requirements
+status: roadmap_ready
+stopped_at: Roadmap v2.0 created — ready to plan Phase 07
 last_updated: "2026-03-25"
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,45 +19,39 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** v2.0 milestone — defining requirements
+**Current focus:** v2.0 milestone — Phase 07: Visibilidade Social
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 07 — Visibilidade Social (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-25 — Milestone v2.0 started
+Status: Roadmap ready — awaiting plan-phase
+Last activity: 2026-03-25 — Roadmap v2.0 created (Phases 07–12)
+
+```
+v2.0 Progress: [░░░░░░] 0/6 phases
+```
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v1.0 reference):**
 
-- Total plans completed: 3
-- Average duration: 6 min
-- Total execution time: 0.29 hours
+- Total plans completed: 13
+- Average duration: 5 min
+- Total execution time: ~1.08 hours
 
-**By Phase:**
+**By Phase (v1.0):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 12 min | 6 min |
+| 02-auth | 3/3 | — | — |
+| 03-schedule | 2/2 | — | — |
+| 04-booking | 2/2 | — | — |
+| 05-admin | 2/2 | — | — |
+| 06-pwa-hardening | 2/2 | — | — |
 
-**Recent Trend:**
-
-- Last 5 plans: 8 min, 4 min, 5 min
-- Trend: stable
-
-*Updated after each plan completion*
-| Phase 01-foundation P01 | 8 | 3 tasks | 9 files |
-| Phase 01-foundation P02 | 4 | 2 tasks | 10 files |
-| Phase 02-auth P03 | 5 | 3 tasks | 5 files |
-| Phase 03-schedule P01 | 3 | 2 tasks | 3 files |
-| Phase 03-schedule P02 | 3 | 2 tasks | 8 files |
-| Phase 04-booking P01 | 4 | 2 tasks | 5 files |
-| Phase 04-booking P02 | 12 | 2 tasks | 6 files |
-| Phase 05-admin P01 | 6 | 2 tasks | 10 files |
-| Phase 06-pwa-hardening P01 | 2 | 3 tasks | 4 files |
-| Phase 06-pwa-hardening P02 | 5 | 2 tasks | 1 files |
+*v2.0 metrics will be tracked starting Phase 07*
 
 ## Accumulated Context
 
@@ -102,6 +96,10 @@ Recent decisions affecting current work:
 - [Phase 06-pwa-hardening]: isAdmin() checks .data.role == 'admin' string field in Firestore, not .data.isAdmin bool — avoids silent failure for all users
 - [Phase 06-pwa-hardening]: dart:ui_web used for iOS detection in install banner — avoids dart:js_interop complexity, navigator.standalone check omitted as redundant
 - [Phase 06-pwa-hardening]: firebase deploy --only hosting,firestore:rules deploys web app and rules atomically in a single command
+- [v2.0 Roadmap]: SOCIAL-01 requires Firestore Security Rules update — bookings collection must be readable by any authenticated user (was admin-only in v1)
+- [v2.0 Roadmap]: SOCIAL-02 and ADMN-09 are in the same phase — participants field written during booking creation must appear in admin listing
+- [v2.0 Roadmap]: UI-01 (rebrand) placed last (Phase 12) and BLOCKED — cannot start until client delivers logo + color palette
+- [v2.0 Roadmap]: OPS-01 placed in standalone Phase 10 — no feature dependencies, can be implemented independently
 
 ### Pending Todos
 
@@ -109,11 +107,13 @@ None yet.
 
 ### Blockers/Concerns
 
+- [Phase 7]: SOCIAL-01 requires Firestore Security Rules update — bookings were private (admin-only) in v1; must open reads to authenticated users without exposing write operations
+- [Phase 12]: UI-01 BLOCKED — client has not yet provided logo and color palette assets; phase cannot be planned or executed until assets are received
 - [Phase 2]: Flutter Web HTML vs. CanvasKit renderer choice affects auth form autofill — must be tested on deployed URL, not localhost
 - [Phase 4]: Firestore offline persistence on Flutter Web interacts with booking transactions — must be tested in real browser early; disable web persistence for booking writes
 
 ## Session Continuity
 
-Last session: 2026-03-23T18:35:41.647Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: None
+Last session: 2026-03-25
+Stopped at: Roadmap v2.0 created
+Resume file: .planning/ROADMAP.md — Phase 07 is next
