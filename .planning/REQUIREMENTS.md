@@ -15,8 +15,8 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 
 ### PROF — Perfil
 
-- [ ] **PROF-01**: Usuário pode cadastrar número de celular no fluxo de registro
-- [ ] **PROF-02**: Usuário pode editar dados do perfil (nome, telefone) via BottomSheet dedicado
+- [x] **PROF-01**: Usuário pode cadastrar número de celular no fluxo de registro
+- [x] **PROF-02**: Usuário pode editar dados do perfil (nome, telefone) via BottomSheet dedicado
 
 ### ADMN — Admin (continua de ADMN-06 do v1.0)
 
@@ -73,8 +73,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SOCIAL-02 | Phase 07 | Complete |
 | ADMN-09 | Phase 07 | Complete |
 | SOCIAL-03 | Phase 08 | Pending |
-| PROF-01 | Phase 08 | Pending |
-| PROF-02 | Phase 08 | Pending |
+| PROF-01 | Phase 08 | Complete |
+| PROF-02 | Phase 08 | Complete |
 | ADMN-07 | Phase 09 | Pending |
 | ADMN-08 | Phase 09 | Pending |
 | OPS-01 | Phase 10 | Pending |
