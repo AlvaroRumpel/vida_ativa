@@ -67,7 +67,7 @@ Plans:
   1. Admin logado vê toggle "Visão Cliente / Visão Admin" na tela de Perfil e pode alternar entre os dois modos sem fazer logout
   2. No modo cliente, admin enxerga exatamente o que um cliente vê — sem acesso ao painel admin
   3. No painel admin, existe tela para buscar usuário cadastrado por nome ou email e promovê-lo a administrador com um clique
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 09-01-PLAN.md — ViewMode toggle: auth state + cubit + router guard + ProfileScreen UI (ADMN-07)
 - [ ] 09-02-PLAN.md — User promotion: Firestore rules + UsersManagementTab + AdminScreen 4th tab (ADMN-08)
@@ -115,7 +115,7 @@ Plans:
 | 6. PWA Hardening | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 7. Visibilidade Social | 2/2 | Complete   | 2026-03-25 | - |
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
-| 9. Gestão de Usuários Admin | v2.0 | 0/2 | Planned | - |
+| 9. Gestão de Usuários Admin | 1/2 | In Progress|  | - |
 | 10. Monitoramento de Erros | v2.0 | 0/? | Not started | - |
 | 11. Melhorias Visuais | v2.0 | 0/? | Not started | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |

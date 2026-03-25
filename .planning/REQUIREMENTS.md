@@ -20,7 +20,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 
 ### ADMN — Admin (continua de ADMN-06 do v1.0)
 
-- [ ] **ADMN-07**: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
+- [x] **ADMN-07**: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
 - [ ] **ADMN-08**: Admin pode buscar usuário cadastrado e promovê-lo a administrador no painel admin
 - [x] **ADMN-09**: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas (sem abrir cada item)
 
@@ -75,7 +75,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SOCIAL-03 | Phase 08 | Pending |
 | PROF-01 | Phase 08 | Complete |
 | PROF-02 | Phase 08 | Complete |
-| ADMN-07 | Phase 09 | Pending |
+| ADMN-07 | Phase 09 | Complete |
 | ADMN-08 | Phase 09 | Pending |
 | OPS-01 | Phase 10 | Pending |
 | UI-02 | Phase 11 | Pending |

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Phase 9 context gathered
-last_updated: "2026-03-25T13:04:01.539Z"
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-25T19:56:21.103Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 09 — gestao-usuarios-admin
+**Current focus:** Phase 09 — gestao-de-usuarios-admin
 
 ## Current Position
 
-Phase: 08 (compartilhamento-perfil) — COMPLETE
-Next: Phase 09 — gestao-usuarios-admin
+Phase: 09 (gestao-de-usuarios-admin) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Next: Phase 09 — gestao-usuarios-admin
 | Phase 07-visibilidade-social P01 | 3 | 2 tasks | 5 files |
 | Phase 07-visibilidade-social P02 | 5 | 2 tasks | 4 files |
 | Phase 08-compartilhamento-perfil P01 | 2 | 2 tasks | 3 files |
+| Phase 09-gest-o-de-usu-rios-admin P01 | 25min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,9 @@ Recent decisions affecting current work:
 - [Phase 08-02]: _showEditPhoneSheet is a top-level function (not a method) — ProfileScreen is StatelessWidget, consistent with existing pattern
 - [Phase 08-02]: Share button omits 👥 line entirely when participants null/empty — cleaner message for solo bookings
 - [Phase 08]: PROF-02 scoped to phone-only (not name+phone) — user decided "só telefone" during discuss-phase; ROADMAP SC #3 corrected accordingly
+- [Phase 09-01]: ViewMode is ephemeral (BLoC in-memory only) — not persisted to Firestore; fresh login always starts in admin mode
+- [Phase 09-01]: Admin in client mode redirects to /home (not /access-denied) — cleaner UX for intentional mode switch
+- [Phase 09-01]: AppShell BottomNav unchanged (3 tabs) — admin access is via ProfileScreen button, not a dedicated nav tab
 
 ### Pending Todos
 
@@ -124,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T13:04:01.533Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-gest-o-de-usu-rios-admin/09-CONTEXT.md
+Last session: 2026-03-25T19:56:21.099Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: None
