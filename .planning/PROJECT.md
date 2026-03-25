@@ -4,7 +4,22 @@
 
 PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp, permitindo que clientes vejam horários disponíveis e reservem pelo celular, enquanto admins controlam a agenda, confirmam reservas e configuram o fluxo de aprovação.
 
-**Status:** v1.0 shipped — live at `vida-ativa-94ba0.web.app`
+**Status:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`
+
+## Current Milestone: v2.0 Funcionalidades Sociais & Admin
+
+**Goal:** Adicionar visibilidade social entre jogadores, melhorar UX do admin, e integrar monitoramento de erros em produção.
+
+**Target features:**
+- Visibilidade de reservas entre clientes (nomes visíveis na agenda)
+- Campo de participantes na reserva
+- Compartilhar reserva via WhatsApp
+- Campo de telefone no cadastro
+- Alternância Admin ↔ Cliente sem trocar de conta
+- Promoção de usuários a admin no painel
+- Agenda estilo Google Calendar
+- Refatoração visual com logo e cores do cliente (bloqueado até receber assets)
+- Monitoramento de erros em produção
 
 ## Core Value
 
@@ -40,13 +55,26 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ ADMN-05: Admin pode confirmar ou recusar reservas pendentes — v1.0
 - ✓ ADMN-06: Admin pode configurar modo de confirmação (automático ou manual) — v1.0
 
-### Active (v2.0 candidates)
+### Active (v2.0)
 
-- [ ] Login com número de telefone (OTP via SMS) — AUTH-v2-01
-- [ ] Notificação push quando reserva é confirmada/recusada — NOTF-v2-01
-- [ ] Lembrete automático antes do horário reservado — NOTF-v2-02
-- [ ] Prazo mínimo de cancelamento configurável pelo admin — BOOK-v2-01
-- [ ] Domínio customizado (ex: vidaativa.com.br) via Firebase Hosting console
+- [ ] SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda
+- [ ] SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva
+- [ ] SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada
+- [ ] PROF-01: Usuário pode cadastrar número de telefone no fluxo de registro/perfil
+- [ ] ADMN-07: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
+- [ ] ADMN-08: Admin pode promover usuário cadastrado a administrador via painel admin
+- [ ] ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas
+- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas (⚠️ bloqueado até receber assets)
+- [ ] UI-02: Agenda exibe horários com layout inspirado no Google Calendar
+- [ ] OPS-01: Erros em produção são capturados e registrados em ferramenta de monitoramento
+
+### Future (v3.0+)
+
+- Login com número de telefone (OTP via SMS) — complexidade web reCAPTCHA; deferido de v1
+- Notificação push quando reserva é confirmada/recusada — infra significativa; v3
+- Lembrete automático antes do horário reservado — v3
+- Prazo mínimo de cancelamento configurável pelo admin — v3
+- Domínio customizado (ex: vidaativa.com.br) — pode ser configurado manualmente no console Firebase Hosting
 
 ### Out of Scope
 
@@ -54,7 +82,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - Múltiplas academias / multi-tenant — v1 é exclusivo para Academia Vida Ativa
 - Chat / mensagens entre usuário e admin — WhatsApp já cobre isso
 - App nativo iOS/Android — PWA é suficiente para v1
-- Ver nome de outros clientes no slot — privacidade; não necessário
+- Ver nome de outros clientes no slot — era privacidade em v1; decisão revertida em v2.0 a pedido do dono da academia (SOCIAL-01)
 - Suporte offline completo — conflita com booking transactions; deferido
 
 ## Context
@@ -67,7 +95,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - **Estrutura de pastas:** `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router,pwa}`
 - **Codebase:** ~3,831 linhas de Dart (v1.0)
 
-**Current state:** v1.0 complete — app live em `vida-ativa-94ba0.web.app`. Todas as 21 requirements v1 entregues. Próximo passo: v2.0 com notificações push, phone auth, e domínio customizado.
+**Current state:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`. 21 requirements v1 entregues. v2.0 foca em funcionalidades sociais, UX admin, e monitoramento de erros (10 requirements, 6 fases a partir da 07).
 
 ## Constraints
 
@@ -88,4 +116,4 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | dart:ui_web para iOS detection | dart:js deprecated; dart:ui_web nativo ao Flutter | ✓ Sem JS interop necessário |
 
 ---
-*Last updated: 2026-03-23 after v1.0 milestone complete*
+*Last updated: 2026-03-25 after v2.0 milestone started*
