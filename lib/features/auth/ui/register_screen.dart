@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/core/utils/phone_input_formatter.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   String? _nameError;
   String? _emailError;
@@ -30,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -54,6 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
+    final phone = _phoneController.text.trim();
 
     setState(() {
       _nameError = name.isEmpty ? 'Informe seu nome' : null;
@@ -70,6 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: name,
           email: email,
           password: password,
+          phone: phone.isEmpty ? null : phone,
         );
   }
 
@@ -152,6 +157,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             labelText: 'Confirmar senha',
                             errorText: _confirmError,
                             border: const OutlineInputBorder(),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Phone field (optional)
+                        TextField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [PhoneInputFormatter()],
+                          decoration: const InputDecoration(
+                            labelText: 'Celular (opcional)',
+                            hintText: '(11) 99999-9999',
+                            border: OutlineInputBorder(),
                           ),
                         ),
 
