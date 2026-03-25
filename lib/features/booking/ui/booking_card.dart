@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 
 class BookingCard extends StatelessWidget {
   final BookingModel booking;
   final bool isFuture;
   final VoidCallback? onCancel;
+  final BookingCubit? bookingCubit;
 
   const BookingCard({
     super.key,
     required this.booking,
     required this.isFuture,
     required this.onCancel,
+    this.bookingCubit,
   });
 
   @override
@@ -61,19 +64,53 @@ class BookingCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                    if (booking.participants != null &&
+                        booking.participants!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.group,
+                                size: 16, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                booking.participants!,
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _statusBadge(booking.status),
-                        if (isFuture && !booking.isCancelled)
-                          TextButton(
-                            onPressed: onCancel,
-                            child: const Text(
-                              'Cancelar',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!booking.isCancelled && bookingCubit != null)
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () =>
+                                    _showEditParticipantsDialog(context),
+                              ),
+                            if (isFuture && !booking.isCancelled)
+                              TextButton(
+                                onPressed: onCancel,
+                                child: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -84,6 +121,43 @@ class BookingCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showEditParticipantsDialog(BuildContext context) async {
+    final controller =
+        TextEditingController(text: booking.participants ?? '');
+    final result = await showDialog<String?>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Participantes'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Ex: Joao, Maria, Pedro',
+            border: OutlineInputBorder(),
+          ),
+          maxLength: 200,
+          maxLines: 2,
+          textCapitalization: TextCapitalization.words,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      await bookingCubit!.updateParticipants(
+        booking.id,
+        result.isEmpty ? null : result,
+      );
+    }
   }
 
   String _formatDate(String dateString) {

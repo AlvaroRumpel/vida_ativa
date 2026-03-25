@@ -25,6 +25,7 @@ class BookingConfirmationSheet extends StatefulWidget {
 class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
   bool _isSubmitting = false;
   String? _errorMessage;
+  final TextEditingController _participantsController = TextEditingController();
 
   Future<void> _handleConfirm() async {
     setState(() {
@@ -39,6 +40,9 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
         userDisplayName: authState.user.displayName,
+        participants: _participantsController.text.trim().isEmpty
+            ? null
+            : _participantsController.text.trim(),
       );
       if (mounted) {
         Navigator.pop(context);
@@ -57,6 +61,12 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         });
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _participantsController.dispose();
+    super.dispose();
   }
 
   @override
@@ -117,6 +127,18 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                     .format(widget.viewModel.slot.price),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _participantsController,
+            decoration: const InputDecoration(
+              labelText: 'Quem vai jogar? (opcional)',
+              hintText: 'Ex: Joao, Maria, Pedro',
+              border: OutlineInputBorder(),
+            ),
+            maxLength: 200,
+            maxLines: 2,
+            textCapitalization: TextCapitalization.words,
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 12),

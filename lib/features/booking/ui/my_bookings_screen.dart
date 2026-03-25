@@ -82,6 +82,7 @@ class MyBookingsScreen extends StatelessWidget {
                 booking: b,
                 isFuture: true,
                 onCancel: () => _confirmCancel(context, b),
+                bookingCubit: context.read<BookingCubit>(),
               ),
             ),
           ),
@@ -98,7 +99,12 @@ class MyBookingsScreen extends StatelessWidget {
             (b) => Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: BookingCard(booking: b, isFuture: false, onCancel: null),
+              child: BookingCard(
+                booking: b,
+                isFuture: false,
+                onCancel: null,
+                bookingCubit: context.read<BookingCubit>(),
+              ),
             ),
           ),
         ],
