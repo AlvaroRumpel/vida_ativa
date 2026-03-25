@@ -160,6 +160,12 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthAuthenticated(currentState.user, viewMode: newMode));
   }
 
+  Future<void> promoteUser(String uid) async {
+    await _firestore.collection('users').doc(uid).update({
+      'role': 'admin',
+    });
+  }
+
   Future<void> signOut() async {
     await _auth.signOut();
     // authStateChanges will fire null and emit AuthUnauthenticated
