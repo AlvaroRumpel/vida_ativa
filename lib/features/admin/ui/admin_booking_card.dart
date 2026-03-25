@@ -141,6 +141,25 @@ class AdminBookingCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (booking.participants != null &&
+                        booking.participants!.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.group, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              booking.participants!,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     if (booking.startTime != null) ...[
                       const SizedBox(height: 4),
                       Row(
