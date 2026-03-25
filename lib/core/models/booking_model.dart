@@ -12,6 +12,7 @@ class BookingModel extends Equatable {
   final String? startTime; // "HH:mm" — stored at booking time for display
   final double? price; // Stored at booking time for display
   final String? userDisplayName; // Stored at booking time for admin display
+  final String? participants; // Optional list of participant names (free-text)
 
   const BookingModel({
     required this.id,
@@ -24,6 +25,7 @@ class BookingModel extends Equatable {
     this.startTime,
     this.price,
     this.userDisplayName,
+    this.participants,
   });
 
   /// Generates the deterministic document ID for anti-double-booking.
@@ -45,6 +47,7 @@ class BookingModel extends Equatable {
       startTime: data['startTime'] as String?,
       price: data['price'] != null ? (data['price'] as num).toDouble() : null,
       userDisplayName: data['userDisplayName'] as String?,
+      participants: data['participants'] as String?,
     );
   }
 
@@ -59,6 +62,7 @@ class BookingModel extends Equatable {
       if (startTime != null) 'startTime': startTime,
       if (price != null) 'price': price,
       if (userDisplayName != null) 'userDisplayName': userDisplayName,
+      if (participants != null) 'participants': participants,
     };
   }
 
@@ -68,5 +72,5 @@ class BookingModel extends Equatable {
   bool get isRejected => status == 'rejected';
 
   @override
-  List<Object?> get props => [id, slotId, date, userId, status, createdAt, cancelledAt, startTime, price, userDisplayName];
+  List<Object?> get props => [id, slotId, date, userId, status, createdAt, cancelledAt, startTime, price, userDisplayName, participants];
 }

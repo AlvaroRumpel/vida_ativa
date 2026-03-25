@@ -110,11 +110,21 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     final dateString = _toDateString(_selectedDate!);
 
     final viewModels = _cachedSlots!.map((slot) {
-      final status = _resolveStatus(slot, dateString, currentUserId);
+      final booking = _cachedBookings!.cast<BookingModel?>().firstWhere(
+        (b) => b!.slotId == slot.id,
+        orElse: () => null,
+      );
+      final status = booking == null
+          ? SlotStatus.available
+          : booking.userId == currentUserId
+              ? SlotStatus.myBooking
+              : SlotStatus.booked;
+      final bookerName = (status == SlotStatus.booked) ? booking?.userDisplayName : null;
       return SlotViewModel(
         slot: slot,
         status: status,
         dateString: dateString,
+        bookerName: bookerName,
       );
     }).toList();
 
@@ -126,17 +136,6 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       selectedDate: _selectedDate!,
       isBlocked: false,
     ));
-  }
-
-  SlotStatus _resolveStatus(
-      SlotModel slot, String dateString, String currentUserId) {
-    final booking = _cachedBookings!.cast<BookingModel?>().firstWhere(
-          (b) => b!.slotId == slot.id,
-          orElse: () => null,
-        );
-    if (booking == null) return SlotStatus.available;
-    if (booking.userId == currentUserId) return SlotStatus.myBooking;
-    return SlotStatus.booked;
   }
 
   void _cancelSubscriptions() {
