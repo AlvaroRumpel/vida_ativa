@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/core/utils/phone_input_formatter.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 
@@ -43,6 +44,26 @@ class ProfileScreen extends StatelessWidget {
                       .bodyMedium
                       ?.copyWith(color: Colors.grey),
                 ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.phone, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      user.phone ?? 'Sem telefone',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Colors.grey),
+                    ),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () => _showEditPhoneSheet(context, user.phone),
+                      child: const Icon(Icons.edit, size: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 32),
                 const Divider(),
                 const SizedBox(height: 16),
@@ -69,6 +90,65 @@ class ProfileScreen extends StatelessWidget {
       },
     );
   }
+}
+
+void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
+  final controller = TextEditingController(text: currentPhone ?? '');
+  final authCubit = context.read<AuthCubit>();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (sheetContext) => Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Editar telefone',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: controller,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [PhoneInputFormatter()],
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Celular',
+              hintText: '(11) 99999-9999',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () async {
+              final phone = controller.text.trim();
+              await authCubit.updatePhone(phone.isEmpty ? null : phone);
+              if (sheetContext.mounted) {
+                Navigator.pop(sheetContext);
+              }
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Telefone salvo')),
+                );
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryGreen,
+            ),
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _Avatar extends StatefulWidget {
