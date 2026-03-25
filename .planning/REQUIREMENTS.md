@@ -9,8 +9,8 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 
 ### SOCIAL — Social & Compartilhamento
 
-- [ ] **SOCIAL-01**: Usuário pode ver o nome do cliente que reservou cada horário na agenda
-- [ ] **SOCIAL-02**: Usuário pode adicionar campo de texto livre com participantes ao confirmar reserva
+- [x] **SOCIAL-01**: Usuário pode ver o nome do cliente que reservou cada horário na agenda
+- [x] **SOCIAL-02**: Usuário pode adicionar campo de texto livre com participantes ao confirmar reserva
 - [ ] **SOCIAL-03**: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada (data, horário, quadra)
 
 ### PROF — Perfil
@@ -22,7 +22,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 
 - [ ] **ADMN-07**: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
 - [ ] **ADMN-08**: Admin pode buscar usuário cadastrado e promovê-lo a administrador no painel admin
-- [ ] **ADMN-09**: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas (sem abrir cada item)
+- [x] **ADMN-09**: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas (sem abrir cada item)
 
 ### UI — Visual
 
@@ -69,9 +69,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SOCIAL-01 | Phase 07 | Pending |
-| SOCIAL-02 | Phase 07 | Pending |
-| ADMN-09 | Phase 07 | Pending |
+| SOCIAL-01 | Phase 07 | Complete |
+| SOCIAL-02 | Phase 07 | Complete |
+| ADMN-09 | Phase 07 | Complete |
 | SOCIAL-03 | Phase 08 | Pending |
 | PROF-01 | Phase 08 | Pending |
 | PROF-02 | Phase 08 | Pending |
