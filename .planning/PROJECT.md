@@ -57,13 +57,13 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ### Active (v2.0)
 
-- [ ] SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda
-- [ ] SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva
+- ✓ SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda — Validated in Phase 07: Visibilidade Social
+- ✓ SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva — Validated in Phase 07: Visibilidade Social
+- ✓ ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas — Validated in Phase 07: Visibilidade Social
 - [ ] SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada
 - [ ] PROF-01: Usuário pode cadastrar número de telefone no fluxo de registro/perfil
 - [ ] ADMN-07: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
 - [ ] ADMN-08: Admin pode promover usuário cadastrado a administrador via painel admin
-- [ ] ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas (⚠️ bloqueado até receber assets)
 - [ ] UI-02: Agenda exibe horários com layout inspirado no Google Calendar
 - [ ] OPS-01: Erros em produção são capturados e registrados em ferramenta de monitoramento
@@ -95,7 +95,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - **Estrutura de pastas:** `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router,pwa}`
 - **Codebase:** ~3,831 linhas de Dart (v1.0)
 
-**Current state:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`. 21 requirements v1 entregues. v2.0 foca em funcionalidades sociais, UX admin, e monitoramento de erros (10 requirements, 6 fases a partir da 07).
+**Current state:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`. 21 requirements v1 entregues. Phase 07 complete — visibilidade social (SOCIAL-01, SOCIAL-02, ADMN-09) entregues. v2.0 foca em funcionalidades sociais, UX admin, e monitoramento de erros (10 requirements, 6 fases a partir da 07).
 
 ## Constraints
 
