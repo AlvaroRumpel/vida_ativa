@@ -96,6 +96,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String name,
     required String email,
     required String password,
+    String? phone,
   }) async {
     emit(const AuthLoading());
     try {
@@ -111,6 +112,7 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         displayName: name,
         role: 'client',
+        phone: phone,
       );
       await _firestore
           .collection('users')
@@ -126,6 +128,22 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> sendPasswordReset(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> updatePhone(String? phone) async {
+    final currentState = state;
+    if (currentState is! AuthAuthenticated) return;
+
+    final uid = currentState.user.uid;
+    await _firestore.collection('users').doc(uid).update({
+      'phone': phone ?? FieldValue.delete(),
+    });
+
+    // Re-read user doc to update state
+    final doc = await _firestore.collection('users').doc(uid).get();
+    if (doc.exists) {
+      emit(AuthAuthenticated(UserModel.fromFirestore(doc)));
+    }
   }
 
   Future<void> signOut() async {
