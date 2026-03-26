@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_state.dart';
 import 'package:vida_ativa/features/schedule/ui/day_chip_row.dart';
-import 'package:vida_ativa/features/schedule/ui/slot_list.dart';
+import 'package:vida_ativa/features/schedule/ui/slot_day_view.dart';
 import 'package:vida_ativa/features/schedule/ui/week_header.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -79,7 +79,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: BlocBuilder<ScheduleCubit, ScheduleState>(
-              builder: (context, state) => SlotList(state: state),
+              builder: (context, state) => SlotDayView(
+                    state: state,
+                    selectedDay: _selectedDay,
+                  ),
             ),
           ),
         ],
