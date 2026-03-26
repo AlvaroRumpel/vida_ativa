@@ -77,9 +77,12 @@ Plans:
 **Depends on**: Nothing (pode ser implementado em qualquer fase; nenhuma dependência de feature)
 **Requirements**: OPS-01
 **Success Criteria** (what must be TRUE):
-  1. Quando uma exceção não tratada ocorre no app em produção, ela aparece registrada no painel de monitoramento (Firebase Crashlytics ou Sentry)
+  1. Quando uma exceção não tratada ocorre no app em produção, ela aparece registrada no painel de monitoramento (Sentry)
   2. Erros incluem contexto suficiente (stack trace, plataforma, versão do app) para diagnóstico sem reprodução manual
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 10-01-PLAN.md — sentry_flutter dependency + main.dart SentryFlutter.init + AuthCubit scope/captureException (OPS-01)
+- [ ] 10-02-PLAN.md — Instrument remaining 5 cubits: BookingCubit, AdminBookingCubit, ScheduleCubit, AdminSlotCubit, AdminBlockedDateCubit (OPS-01)
 
 ### Phase 11: Melhorias Visuais
 **Goal**: Agenda tem layout baseado em Google Calendar e a UI geral está visualmente consistente
@@ -116,6 +119,6 @@ Plans:
 | 7. Visibilidade Social | 2/2 | Complete   | 2026-03-25 | - |
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
 | 9. Gestão de Usuários Admin | 2/2 | Complete   | 2026-03-26 | - |
-| 10. Monitoramento de Erros | v2.0 | 0/? | Not started | - |
+| 10. Monitoramento de Erros | v2.0 | 0/2 | Not started | - |
 | 11. Melhorias Visuais | v2.0 | 0/? | Not started | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |
