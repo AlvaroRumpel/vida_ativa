@@ -92,7 +92,10 @@ Plans:
   1. A tela de agenda exibe slots em colunas verticais por hora no estilo Google Calendar, com navegação por dias visível
   2. Todas as telas do app usam espaçamentos, tipografia e componentes visuais consistentes entre si
   3. Nenhuma tela apresenta overflow, texto cortado ou botões fora de alinhamento em telas mobile comuns (375px e 390px de largura)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — DayView timeline: calendar_view integration, SlotEventTile, SlotDayView replacing SlotList (UI-02)
+- [ ] 11-02-PLAN.md — AppSpacing tokens + audit: spacing constants applied across all 9 screens (UI-03)
 
 ### Phase 12: Rebrand Visual
 **Goal**: App exibe identidade visual oficial do cliente (logo + paleta de cores) de forma consistente em todas as telas
@@ -120,5 +123,5 @@ Plans:
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
 | 9. Gestão de Usuários Admin | 2/2 | Complete   | 2026-03-26 | - |
 | 10. Monitoramento de Erros | 2/2 | Complete    | 2026-03-26 | - |
-| 11. Melhorias Visuais | v2.0 | 0/? | Not started | - |
+| 11. Melhorias Visuais | v2.0 | 0/2 | Planned | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |
