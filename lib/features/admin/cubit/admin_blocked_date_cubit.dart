@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:vida_ativa/core/models/blocked_date_model.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_blocked_date_state.dart';
@@ -25,8 +26,10 @@ class AdminBlockedDateCubit extends Cubit<AdminBlockedDateState> {
           ..sort((a, b) => a.date.compareTo(b.date));
         emit(AdminBlockedDateLoaded(dates));
       },
-      onError: (e) =>
-          emit(const AdminBlockedDateError('Erro ao carregar datas bloqueadas.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const AdminBlockedDateError('Erro ao carregar datas bloqueadas.'));
+      },
     );
   }
 

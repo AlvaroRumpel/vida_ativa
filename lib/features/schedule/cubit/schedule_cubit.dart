@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/models/slot_model.dart';
@@ -54,7 +55,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
             snapshot.docs.map((d) => SlotModel.fromFirestore(d)).toList();
         _recompute();
       },
-      onError: (e) => emit(const ScheduleError('Erro ao carregar horários.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const ScheduleError('Erro ao carregar horários.'));
+      },
     );
 
     // Stream 2 — Non-cancelled bookings for this date
@@ -69,7 +73,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
             snapshot.docs.map((d) => BookingModel.fromFirestore(d)).toList();
         _recompute();
       },
-      onError: (e) => emit(const ScheduleError('Erro ao carregar reservas.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const ScheduleError('Erro ao carregar reservas.'));
+      },
     );
 
     // Stream 3 — Blocked date check (single document)
@@ -82,8 +89,10 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         _cachedIsBlocked = snapshot.exists;
         _recompute();
       },
-      onError: (e) =>
-          emit(const ScheduleError('Erro ao verificar bloqueios.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const ScheduleError('Erro ao verificar bloqueios.'));
+      },
     );
   }
 
