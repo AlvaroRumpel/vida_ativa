@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-03-26T21:05:37.428Z"
+stopped_at: Completed 11-02-PLAN.md (AppSpacing tokens)
+last_updated: "2026-03-26T21:07:40.211Z"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Plan: 2 of 2
 | Phase 10-monitoramento-de-erros P01 | 3min | 2 tasks | 3 files |
 | Phase 10-monitoramento-de-erros P02 | 5min | 2 tasks | 5 files |
 | Phase 11-melhorias-visuais P01 | 5min | 2 tasks | 5 files |
+| Phase 11-melhorias-visuais P02 | 6min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,8 @@ Recent decisions affecting current work:
 - [Phase 10-monitoramento-de-erros]: onError lambdas are synchronous — captureException called without await (stream listener context, not async method)
 - [Phase 11-melhorias-visuais]: calendar_view: 2.0.0 exact pin — pub.dev warns 2.x may have breaking changes per minor version
 - [Phase 11-melhorias-visuais]: BookingCubit captured as _bookingCubit instance field in build() — DayView subtree has no BlocProvider access, follows Phase 4 pattern
+- [Phase 11-melhorias-visuais]: AppSpacing file paths in plan were wrong; applied tokens to actual files (auth/ui/profile_screen.dart and admin/ui/*_management_tab.dart)
+- [Phase 11-melhorias-visuais]: users_management_tab.dart has only EdgeInsets.all(12) not on token scale — no substitutions made
 
 ### Pending Todos
 
@@ -141,6 +144,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:05:37.420Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-03-26T21:07:40.206Z
+Stopped at: Completed 11-02-PLAN.md (AppSpacing tokens)
 Resume file: None

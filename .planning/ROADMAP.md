@@ -27,7 +27,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 - [x] **Phase 8: Compartilhamento & Perfil** - Compartilhar reserva via WhatsApp; campo de telefone no cadastro e edição de perfil (completed 2026-03-25)
 - [x] **Phase 9: Gestão de Usuários Admin** - Toggle admin/cliente sem troca de conta; promoção de usuários a admin pelo painel (completed 2026-03-26)
 - [x] **Phase 10: Monitoramento de Erros** - Captura e registro de erros em produção via ferramenta de monitoramento (completed 2026-03-26)
-- [ ] **Phase 11: Melhorias Visuais** - Agenda com layout Google Calendar; ajustes gerais de UI (espaçamentos, tipografia, consistência)
+- [x] **Phase 11: Melhorias Visuais** - Agenda com layout Google Calendar; ajustes gerais de UI (espaçamentos, tipografia, consistência) (completed 2026-03-26)
 - [ ] **Phase 12: Rebrand Visual** - Logo e paleta de cores do cliente aplicados em todas as telas *(BLOQUEADO — aguardando assets do cliente)*
 
 ## Phase Details
@@ -92,7 +92,7 @@ Plans:
   1. A tela de agenda exibe slots em colunas verticais por hora no estilo Google Calendar, com navegação por dias visível
   2. Todas as telas do app usam espaçamentos, tipografia e componentes visuais consistentes entre si
   3. Nenhuma tela apresenta overflow, texto cortado ou botões fora de alinhamento em telas mobile comuns (375px e 390px de largura)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 11-01-PLAN.md — DayView timeline: calendar_view integration, SlotEventTile, SlotDayView replacing SlotList (UI-02)
 - [ ] 11-02-PLAN.md — AppSpacing tokens + audit: spacing constants applied across all 9 screens (UI-03)
@@ -123,5 +123,5 @@ Plans:
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
 | 9. Gestão de Usuários Admin | 2/2 | Complete   | 2026-03-26 | - |
 | 10. Monitoramento de Erros | 2/2 | Complete    | 2026-03-26 | - |
-| 11. Melhorias Visuais | 1/2 | In Progress|  | - |
+| 11. Melhorias Visuais | 2/2 | Complete   | 2026-03-26 | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |
