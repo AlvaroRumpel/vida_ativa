@@ -21,7 +21,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 ### ADMN — Admin (continua de ADMN-06 do v1.0)
 
 - [x] **ADMN-07**: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil)
-- [ ] **ADMN-08**: Admin pode buscar usuário cadastrado e promovê-lo a administrador no painel admin
+- [x] **ADMN-08**: Admin pode buscar usuário cadastrado e promovê-lo a administrador no painel admin
 - [x] **ADMN-09**: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas (sem abrir cada item)
 
 ### UI — Visual
@@ -32,7 +32,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 
 ### OPS — Operações
 
-- [ ] **OPS-01**: Erros em produção são capturados e registrados em ferramenta de monitoramento (Firebase Crashlytics ou Sentry)
+- [x] **OPS-01**: Erros em produção são capturados e registrados em ferramenta de monitoramento (Firebase Crashlytics ou Sentry)
 
 ## v3 Requirements
 
@@ -76,8 +76,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROF-01 | Phase 08 | Complete |
 | PROF-02 | Phase 08 | Complete |
 | ADMN-07 | Phase 09 | Complete |
-| ADMN-08 | Phase 09 | Pending |
-| OPS-01 | Phase 10 | Pending |
+| ADMN-08 | Phase 09 | Complete |
+| OPS-01 | Phase 10 | Complete |
 | UI-02 | Phase 11 | Pending |
 | UI-03 | Phase 11 | Pending |
 | UI-01 | Phase 12 | Pending (BLOCKED) |
