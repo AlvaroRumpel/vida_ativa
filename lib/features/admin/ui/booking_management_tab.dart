@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
@@ -57,7 +58,7 @@ class _BookingManagementView extends StatelessWidget {
       children: [
         // Date selector row
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -104,7 +105,7 @@ class _BookingManagementView extends StatelessWidget {
           child: state.bookings.isEmpty
               ? const Center(child: Text('Nenhuma reserva para esta data.'))
               : ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   itemCount: state.bookings.length,
                   itemBuilder: (context, index) {
                     return AdminBookingCard(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/core/utils/phone_input_formatter.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
@@ -31,12 +32,12 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 40),
                 _Avatar(photoURL: photoURL, displayName: user.displayName),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   user.displayName,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   user.email,
                   style: Theme.of(context)
@@ -44,12 +45,12 @@ class ProfileScreen extends StatelessWidget {
                       .bodyMedium
                       ?.copyWith(color: Colors.grey),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.phone, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       user.phone ?? 'Sem telefone',
                       style: Theme.of(context)
@@ -57,16 +58,16 @@ class ProfileScreen extends StatelessWidget {
                           .bodyMedium
                           ?.copyWith(color: Colors.grey),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     GestureDetector(
                       onTap: () => _showEditPhoneSheet(context, user.phone),
                       child: const Icon(Icons.edit, size: 16, color: Colors.grey),
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
                 const Divider(),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
                 if (user.isAdmin) ...[
                   if (state.viewMode == ViewMode.admin) ...[
                     FilledButton.icon(
@@ -74,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                       icon: const Icon(Icons.admin_panel_settings),
                       label: const Text('Painel Admin'),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     OutlinedButton.icon(
                       onPressed: () {
                         context.read<AuthCubit>().toggleViewMode();
@@ -95,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.md),
                 ],
                 OutlinedButton.icon(
                   onPressed: () => context.read<AuthCubit>().signOut(),
@@ -123,10 +124,10 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
     isScrollControlled: true,
     builder: (sheetContext) => Padding(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: MediaQuery.of(sheetContext).viewInsets.bottom + AppSpacing.lg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -136,7 +137,7 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
             'Editar telefone',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           TextField(
             controller: controller,
             keyboardType: TextInputType.phone,
@@ -148,7 +149,7 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           FilledButton(
             onPressed: () async {
               final phone = controller.text.trim();

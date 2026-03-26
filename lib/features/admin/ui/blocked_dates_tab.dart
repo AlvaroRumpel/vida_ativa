@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 import 'package:vida_ativa/core/models/blocked_date_model.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_blocked_date_cubit.dart';
@@ -91,7 +92,7 @@ class _BlockedDatesList extends StatelessWidget {
       body: dates.isEmpty
           ? const Center(child: Text('Nenhuma data bloqueada.'))
           : ListView.builder(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               itemCount: dates.length,
               itemBuilder: (context, index) {
                 final model = dates[index];

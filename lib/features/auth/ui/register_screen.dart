@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/core/utils/phone_input_formatter.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
@@ -100,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           return SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xl),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: AutofillGroup(
@@ -119,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Email field
                         TextField(
@@ -133,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Password field
                         TextField(
@@ -147,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Confirm password field
                         TextField(
@@ -160,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Phone field (optional)
                         TextField(
@@ -174,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.lg),
 
                         // Register button
                         FilledButton(
@@ -195,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               : const Text('Criar conta'),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.md),
 
                         // Login link
                         Row(

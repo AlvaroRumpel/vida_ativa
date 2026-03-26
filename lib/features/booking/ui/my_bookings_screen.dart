@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
 import 'package:vida_ativa/features/booking/ui/booking_card.dart';
@@ -52,7 +53,7 @@ class MyBookingsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('Voce nao tem nenhuma reserva ainda.'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             FilledButton(
               onPressed: () =>
                   StatefulNavigationShell.of(context).goBranch(0),
@@ -64,11 +65,11 @@ class MyBookingsScreen extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         if (upcoming.isNotEmpty) ...[
           const Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
             child: Text(
               'Proximas',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -77,7 +78,7 @@ class MyBookingsScreen extends StatelessWidget {
           ...upcoming.map(
             (b) => Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
               child: BookingCard(
                 booking: b,
                 isFuture: true,
@@ -89,7 +90,7 @@ class MyBookingsScreen extends StatelessWidget {
         ],
         if (past.isNotEmpty) ...[
           const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
             child: Text(
               'Passadas',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -98,7 +99,7 @@ class MyBookingsScreen extends StatelessWidget {
           ...past.map(
             (b) => Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
               child: BookingCard(
                 booking: b,
                 isFuture: false,

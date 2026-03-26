@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 class SlotSkeleton extends StatefulWidget {
   const SlotSkeleton({super.key});
@@ -42,7 +43,7 @@ class _SlotSkeletonState extends State<SlotSkeleton>
               opacity: _opacity.value,
               child: Container(
                 height: 72,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(8),

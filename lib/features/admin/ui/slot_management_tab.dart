@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 import 'package:vida_ativa/core/models/slot_model.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_slot_cubit.dart';
@@ -56,7 +57,7 @@ class _SlotList extends StatelessWidget {
       body: slots.isEmpty
           ? const Center(child: Text('Nenhum slot cadastrado.'))
           : ListView.builder(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               itemCount: slots.length,
               itemBuilder: (context, index) {
                 final slot = slots[index];
