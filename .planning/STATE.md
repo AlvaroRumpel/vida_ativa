@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Phase 10 context gathered
-last_updated: "2026-03-26T03:59:45.207Z"
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-26T04:21:19.006Z"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 09 — gestao-de-usuarios-admin
+**Current focus:** Phase 10 — monitoramento-de-erros
 
 ## Current Position
 
-Phase: 09 (gestao-de-usuarios-admin) — EXECUTING
-Plan: 2 of 2
+Phase: 10 (monitoramento-de-erros) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 08-compartilhamento-perfil P01 | 2 | 2 tasks | 3 files |
 | Phase 09-gest-o-de-usu-rios-admin P01 | 25min | 2 tasks | 4 files |
 | Phase 09-gest-o-de-usu-rios-admin P02 | 10min | 2 tasks | 4 files |
+| Phase 10-monitoramento-de-erros P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,10 @@ Recent decisions affecting current work:
 - [Phase 09-01]: AppShell BottomNav unchanged (3 tabs) — admin access is via ProfileScreen button, not a dedicated nav tab
 - [Phase 09-gest-o-de-usu-rios-admin]: promoteUser emits no cubit state — promoted user picks up role change on next auth refresh; admin UI refreshes via _loadUsers() re-query
 - [Phase 09-gest-o-de-usu-rios-admin]: Firestore /users write split into create/update/delete — create restricted to self, update allows admin, delete permanently blocked
+- [Phase 10-monitoramento-de-erros]: Sentry DSN passed via --dart-define at build time — never stored in source code
+- [Phase 10-monitoramento-de-erros]: kReleaseMode guard bypasses Sentry entirely in debug/profile — no DSN noise in dashboard
+- [Phase 10-monitoramento-de-erros]: tracesSampleRate set to 0.0 — error-only monitoring, performance tracing disabled
+- [Phase 10-monitoramento-de-erros]: SentryUser set with Firebase UID only — no PII sent to Sentry
 
 ### Pending Todos
 
@@ -131,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T03:59:45.201Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-monitoramento-de-erros/10-CONTEXT.md
+Last session: 2026-03-26T04:21:19.001Z
+Stopped at: Completed 10-01-PLAN.md
+Resume file: None

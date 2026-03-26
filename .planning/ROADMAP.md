@@ -79,7 +79,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Quando uma exceção não tratada ocorre no app em produção, ela aparece registrada no painel de monitoramento (Sentry)
   2. Erros incluem contexto suficiente (stack trace, plataforma, versão do app) para diagnóstico sem reprodução manual
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 10-01-PLAN.md — sentry_flutter dependency + main.dart SentryFlutter.init + AuthCubit scope/captureException (OPS-01)
 - [ ] 10-02-PLAN.md — Instrument remaining 5 cubits: BookingCubit, AdminBookingCubit, ScheduleCubit, AdminSlotCubit, AdminBlockedDateCubit (OPS-01)
@@ -119,6 +119,6 @@ Plans:
 | 7. Visibilidade Social | 2/2 | Complete   | 2026-03-25 | - |
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
 | 9. Gestão de Usuários Admin | 2/2 | Complete   | 2026-03-26 | - |
-| 10. Monitoramento de Erros | v2.0 | 0/2 | Not started | - |
+| 10. Monitoramento de Erros | 1/2 | In Progress|  | - |
 | 11. Melhorias Visuais | v2.0 | 0/? | Not started | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |
