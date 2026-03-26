@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:sentry_flutter/sentry_flutter.dart';
+
 import 'package:vida_ativa/core/models/user_model.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 
@@ -24,6 +26,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) {
       emit(const AuthUnauthenticated());
+      Sentry.configureScope((scope) => scope.setUser(null));
       return;
     }
 
@@ -35,6 +38,9 @@ class AuthCubit extends Cubit<AuthState> {
 
       if (doc.exists) {
         emit(AuthAuthenticated(UserModel.fromFirestore(doc)));
+        Sentry.configureScope(
+          (scope) => scope.setUser(SentryUser(id: firebaseUser.uid)),
+        );
       } else {
         // Fallback: create doc if missing (race condition guard)
         final user = UserModel(
@@ -48,8 +54,12 @@ class AuthCubit extends Cubit<AuthState> {
             .doc(firebaseUser.uid)
             .set(user.toFirestore());
         emit(AuthAuthenticated(user));
+        Sentry.configureScope(
+          (scope) => scope.setUser(SentryUser(id: firebaseUser.uid)),
+        );
       }
-    } catch (e) {
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError('Erro ao carregar dados do usuário.'));
     }
   }
@@ -73,9 +83,11 @@ class AuthCubit extends Cubit<AuthState> {
         await docRef.set(user.toFirestore());
       }
       // authStateChanges will fire and emit AuthAuthenticated
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError(_mapEmailError(e.code)));
-    } catch (e) {
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError('Erro de autenticação. Tente novamente.'));
     }
   }
@@ -85,9 +97,11 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       // authStateChanges will fire and emit AuthAuthenticated
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError(_mapEmailError(e.code)));
-    } catch (e) {
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError('Erro de autenticação. Tente novamente.'));
     }
   }
@@ -119,9 +133,11 @@ class AuthCubit extends Cubit<AuthState> {
           .doc(firebaseUser.uid)
           .set(user.toFirestore());
       // authStateChanges will fire and emit AuthAuthenticated
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError(_mapEmailError(e.code)));
-    } catch (e) {
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AuthError('Erro ao criar conta. Tente novamente.'));
     }
   }
