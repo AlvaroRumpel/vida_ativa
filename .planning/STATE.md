@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Funcionalidades Sociais & Admin
 status: unknown
-stopped_at: Phase 11 UI-SPEC approved
-last_updated: "2026-03-26T20:46:38.848Z"
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-03-26T21:05:37.428Z"
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 10 — monitoramento-de-erros
+**Current focus:** Phase 11 — melhorias-visuais
 
 ## Current Position
 
-Phase: 10 (monitoramento-de-erros) — EXECUTING
-Plan: 1 of 2
+Phase: 11 (melhorias-visuais) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Plan: 1 of 2
 | Phase 09-gest-o-de-usu-rios-admin P02 | 10min | 2 tasks | 4 files |
 | Phase 10-monitoramento-de-erros P01 | 3min | 2 tasks | 3 files |
 | Phase 10-monitoramento-de-erros P02 | 5min | 2 tasks | 5 files |
+| Phase 11-melhorias-visuais P01 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 10-monitoramento-de-erros]: tracesSampleRate set to 0.0 — error-only monitoring, performance tracing disabled
 - [Phase 10-monitoramento-de-erros]: SentryUser set with Firebase UID only — no PII sent to Sentry
 - [Phase 10-monitoramento-de-erros]: onError lambdas are synchronous — captureException called without await (stream listener context, not async method)
+- [Phase 11-melhorias-visuais]: calendar_view: 2.0.0 exact pin — pub.dev warns 2.x may have breaking changes per minor version
+- [Phase 11-melhorias-visuais]: BookingCubit captured as _bookingCubit instance field in build() — DayView subtree has no BlocProvider access, follows Phase 4 pattern
 
 ### Pending Todos
 
@@ -138,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T20:46:38.843Z
-Stopped at: Phase 11 UI-SPEC approved
-Resume file: .planning/phases/11-melhorias-visuais/11-UI-SPEC.md
+Last session: 2026-03-26T21:05:37.420Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: None

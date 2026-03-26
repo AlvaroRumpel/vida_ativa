@@ -27,7 +27,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases (starting at Phase 
 ### UI — Visual
 
 - [ ] **UI-01**: App exibe logo e paleta de cores fornecidas pelo cliente de forma consistente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
-- [ ] **UI-02**: Agenda exibe horários com layout inspirado no Google Calendar
+- [x] **UI-02**: Agenda exibe horários com layout inspirado no Google Calendar
 - [ ] **UI-03**: Ajustes gerais de UI — consistência visual, espaçamentos, tipografia e componentes em todas as telas
 
 ### OPS — Operações
@@ -78,7 +78,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADMN-07 | Phase 09 | Complete |
 | ADMN-08 | Phase 09 | Complete |
 | OPS-01 | Phase 10 | Complete |
-| UI-02 | Phase 11 | Pending |
+| UI-02 | Phase 11 | Complete |
 | UI-03 | Phase 11 | Pending |
 | UI-01 | Phase 12 | Pending (BLOCKED) |
 

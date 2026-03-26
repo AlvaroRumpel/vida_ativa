@@ -92,7 +92,7 @@ Plans:
   1. A tela de agenda exibe slots em colunas verticais por hora no estilo Google Calendar, com navegação por dias visível
   2. Todas as telas do app usam espaçamentos, tipografia e componentes visuais consistentes entre si
   3. Nenhuma tela apresenta overflow, texto cortado ou botões fora de alinhamento em telas mobile comuns (375px e 390px de largura)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 11-01-PLAN.md — DayView timeline: calendar_view integration, SlotEventTile, SlotDayView replacing SlotList (UI-02)
 - [ ] 11-02-PLAN.md — AppSpacing tokens + audit: spacing constants applied across all 9 screens (UI-03)
@@ -123,5 +123,5 @@ Plans:
 | 8. Compartilhamento & Perfil | 2/2 | Complete | 2026-03-25 | - |
 | 9. Gestão de Usuários Admin | 2/2 | Complete   | 2026-03-26 | - |
 | 10. Monitoramento de Erros | 2/2 | Complete    | 2026-03-26 | - |
-| 11. Melhorias Visuais | v2.0 | 0/2 | Planned | - |
+| 11. Melhorias Visuais | 1/2 | In Progress|  | - |
 | 12. Rebrand Visual | v2.0 | 0/? | BLOCKED | - |
