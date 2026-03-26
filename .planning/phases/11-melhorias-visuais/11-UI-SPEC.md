@@ -53,13 +53,13 @@ Exceptions:
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 16px | 400 (regular) | 1.5 | General text, slot start time label in timeline tile |
-| Label | 14px | 500 (medium) | 1.4 | Price display, booker name in tile, secondary metadata |
+| Label | 14px | 400 (regular) | 1.4 | Price display, secondary metadata |
 | Heading | 20px | 600 (semibold) | 1.2 | Screen app bar titles, section headings |
-| Caption | 13px | 500 (medium) | 1.3 | Status badge text ("Disponível", "Minha reserva", "Bloqueado") inside timeline tiles |
+| Caption | 13px | 400 (regular) | 1.3 | Status badge text ("Disponível", "Minha reserva", "Bloqueado") inside timeline tiles |
 
-Source: `slot_card.dart` lines 35–37 (16px w600 for startTime), lines 41–44 (14px w500 for price), lines 88–90 (13px w500 for bookerName). Heading 20px is Material 3 titleMedium default confirmed in `app_theme.dart`.
+Font weights in use: regular (400) and semibold (600). Two weights only.
 
-Font weights in use: regular (400), medium (500), semibold (600). Three weights are acceptable for this codebase — semibold is the existing pattern for primary labels, medium for secondary.
+Source: `slot_card.dart` — startTime at 16px w600 (primary label); price at 14px, bookerName at 13px use default weight (w400 per Flutter default when no weight specified); "Disponível" and "Bloqueado" labels carry no explicit weight (w400). Heading 20px is Material 3 titleMedium default confirmed in `app_theme.dart`. Medium (500) weight declared in original slot_card.dart for price/bookerName has been consolidated to regular (400) — one step on the weight scale, minimal visual impact.
 
 ---
 
@@ -92,10 +92,10 @@ Each slot in the DayView renders as a `SlotEventTile` widget. This section presc
 
 | Status | Background | Left Strip | Primary Text | Secondary Text | Tappable |
 |--------|-----------|------------|--------------|----------------|----------|
-| available | `primaryGreen.withOpacity(0.2)` | `primaryGreen` (4px) | startTime (16px, w600) | price formatted as `R$ X,XX` (14px, w500) | YES — opens BookingConfirmationSheet |
-| booked | `Colors.grey.shade200` | `Colors.grey` (4px) | startTime (16px, w600) | bookerName or "Ocupado" (13px, w500, ellipsis) | NO |
+| available | `primaryGreen.withOpacity(0.2)` | `primaryGreen` (4px) | startTime (16px, w600) | price formatted as `R$ X,XX` (14px, w400) | YES — opens BookingConfirmationSheet |
+| booked | `Colors.grey.shade200` | `Colors.grey` (4px) | startTime (16px, w600) | bookerName or "Ocupado" (13px, w400, ellipsis) | NO |
 | myBooking | `primaryGreen` (solid) | none (full fill) | startTime (16px, w600, white text) | "Minha reserva" badge (13px, w600, white) | NO |
-| blocked | `Color(0xFFE53935).withOpacity(0.2)` | `Color(0xFFE53935)` (4px) | "Bloqueado" (14px, w500, `Color(0xFFE53935)`) | — | NO |
+| blocked | `Color(0xFFE53935).withOpacity(0.2)` | `Color(0xFFE53935)` (4px) | "Bloqueado" (14px, w400, `Color(0xFFE53935)`) | — | NO |
 
 Source: CONTEXT.md `## Visual dos blocos na timeline`, `slot_card.dart` `_statusColor()` and `_StatusLabel` implementations.
 
