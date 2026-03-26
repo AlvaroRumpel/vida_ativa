@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
@@ -32,7 +33,10 @@ class BookingCubit extends Cubit<BookingState> {
             snapshot.docs.map((d) => BookingModel.fromFirestore(d)).toList();
         emit(BookingLoaded(bookings));
       },
-      onError: (e) => emit(const BookingError('Erro ao carregar reservas.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const BookingError('Erro ao carregar reservas.'));
+      },
     );
   }
 

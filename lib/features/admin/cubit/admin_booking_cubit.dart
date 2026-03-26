@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
@@ -46,8 +47,10 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
           confirmationMode: _confirmationMode,
         ));
       },
-      onError: (e) =>
-          emit(const AdminBookingError('Erro ao carregar reservas.')),
+      onError: (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+        emit(const AdminBookingError('Erro ao carregar reservas.'));
+      },
     );
   }
 
