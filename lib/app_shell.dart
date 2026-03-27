@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'core/pwa/ios_install_detector.dart';
+import 'core/utils/snack_helper.dart';
 
 class AppShell extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -18,17 +19,14 @@ class _AppShellState extends State<AppShell> {
     if (isIosInstallBannerNeeded()) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Instale o app: toque em Compartilhar › Adicionar à Tela de Início',
-            ),
-            duration: const Duration(seconds: 15),
-            action: SnackBarAction(
-              label: 'X',
-              onPressed: () =>
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-            ),
+        SnackHelper.info(
+          context,
+          'Instale o app: toque em Compartilhar › Adicionar à Tela de Início',
+          duration: const Duration(seconds: 15),
+          action: SnackBarAction(
+            label: 'X',
+            onPressed: () =>
+                ScaffoldMessenger.of(context).hideCurrentSnackBar(),
           ),
         );
       });

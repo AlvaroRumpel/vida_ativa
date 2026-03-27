@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/price_tier_model.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_slot_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_state.dart';
@@ -142,12 +143,11 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
       final skipped = allSlots.length - created;
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(skipped > 0
-                ? '$created slots criados, $skipped já existiam.'
-                : '$created slots criados.'),
-          ),
+        SnackHelper.success(
+          context,
+          skipped > 0
+              ? '$created slots criados, $skipped já existiam.'
+              : '$created slots criados.',
         );
       }
     } catch (_) {

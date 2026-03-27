@@ -45,9 +45,11 @@ dependencies:
   url_launcher: ^6.2.0
   calendar_view: 2.0.0
   google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   sentry_dart_plugin: ^3.2.1
+  flutter_launcher_icons: ^0.14.3
   flutter_test:
     sdk: flutter
 

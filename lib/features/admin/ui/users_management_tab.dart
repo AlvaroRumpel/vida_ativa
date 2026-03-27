@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:vida_ativa/core/models/user_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 
 class UsersManagementTab extends StatefulWidget {
@@ -78,11 +79,7 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
               await authCubit.promoteUser(user.uid);
               await _loadUsers();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${user.displayName} agora e administrador'),
-                  ),
-                );
+                SnackHelper.success(context, '${user.displayName} agora é administrador');
               }
             },
             style: FilledButton.styleFrom(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -46,9 +47,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       );
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reserva feita!')),
-        );
+        SnackHelper.success(context, 'Reserva feita!');
       }
     } on Exception catch (e) {
       final msg = e.toString().contains('slot_already_booked')

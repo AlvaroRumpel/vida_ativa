@@ -150,11 +150,21 @@ class _SlotDayViewState extends State<_SlotDayView> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ChoiceChip(
-                    label: Text(_dayLabels[i]),
+                    label: Text(_dayLabels[i],
+                        style: const TextStyle(fontSize: 12)),
                     selected: isSelected,
+                    showCheckmark: false,
                     selectedColor: AppTheme.primaryGreen,
+                    backgroundColor: const Color(0xFFF0EDE8),
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : null,
+                      color: isSelected ? Colors.white : const Color(0xFF4A4A4A),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    side: isSelected
+                        ? BorderSide.none
+                        : const BorderSide(color: Color(0xFFCFC5B0), width: 0.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     onSelected: (_) =>
                         setState(() => _selectedDayOfWeek = dow),

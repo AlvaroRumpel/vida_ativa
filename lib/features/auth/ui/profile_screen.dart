@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/core/utils/phone_input_formatter.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 
@@ -136,9 +137,7 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
                 Navigator.pop(sheetContext);
               }
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Telefone salvo')),
-                );
+                SnackHelper.success(context, 'Telefone salvo');
               }
             },
             style: FilledButton.styleFrom(

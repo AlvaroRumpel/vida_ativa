@@ -5,6 +5,7 @@ import 'package:vida_ativa/core/models/price_tier_model.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_cubit.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_state.dart';
 
 const _dayAbbrev = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -114,9 +115,7 @@ class _PricingEditorState extends State<_PricingEditor> {
           .toList();
       await context.read<PricingCubit>().saveTiers(tiers);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preços salvos.')),
-        );
+        SnackHelper.success(context, 'Preços salvos.');
       }
     } catch (_) {
       if (mounted) setState(() => _error = 'Erro ao salvar. Tente novamente.');
@@ -292,11 +291,20 @@ class _TierRow extends StatelessWidget {
                 final selected = draft.daysOfWeek.contains(dow);
                 return FilterChip(
                   label: Text(_dayAbbrev[i],
-                      style: const TextStyle(fontSize: 11)),
+                      style: const TextStyle(fontSize: 12)),
                   selected: selected,
+                  showCheckmark: false,
                   selectedColor: AppTheme.primaryGreen,
+                  backgroundColor: const Color(0xFFF0EDE8),
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : null,
+                    color: selected ? Colors.white : const Color(0xFF4A4A4A),
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                  side: selected
+                      ? BorderSide.none
+                      : const BorderSide(color: Color(0xFFCFC5B0), width: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   onSelected: (v) {
                     final updated = v
@@ -306,8 +314,6 @@ class _TierRow extends StatelessWidget {
                             .toList();
                     onChanged(draft.copyWith(daysOfWeek: updated));
                   },
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: EdgeInsets.zero,
                 );
               }),
             ),

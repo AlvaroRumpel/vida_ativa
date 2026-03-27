@@ -5,8 +5,8 @@ class AppTheme {
   AppTheme._(); // Private constructor -- use static members only
 
   // Brand colors -- change these to rebrand the entire app
-  static const Color primaryGreen = Color(0xFF1B5E3A); // Arena Vida Ativa deep green
-  static const Color brandAmber = Color(0xFFD4860A);   // Sandy amber accent
+  static const Color primaryGreen = Color(0xFF7B5D0A); // Arena Vida Ativa deep arena gold
+  static const Color brandAmber = Color(0xFFD4A800);   // Bright arena gold (ARENA text)
 
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -19,6 +19,15 @@ class AppTheme {
       brightness: Brightness.light,
     ),
     textTheme: GoogleFonts.nunitoTextTheme(),
+    snackBarTheme: const SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
+      backgroundColor: Color(0xFF2D2318),
+      contentTextStyle: TextStyle(color: Colors.white, fontSize: 14),
+      actionTextColor: Color(0xFFD4A800),
+    ),
     appBarTheme: AppBarTheme(
       centerTitle: true,
       elevation: 0,

@@ -5,6 +5,7 @@ import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
+import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/booking/ui/booking_card.dart';
 
 class MyBookingsScreen extends StatelessWidget {
@@ -131,16 +132,11 @@ class MyBookingsScreen extends StatelessWidget {
               try {
                 await context.read<BookingCubit>().cancelBooking(booking.id);
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Reserva cancelada.')),
-                  );
+                  SnackHelper.success(context, 'Reserva cancelada.');
                 }
               } catch (_) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Erro ao cancelar. Tente novamente.')),
-                  );
+                  SnackHelper.error(context, 'Erro ao cancelar. Tente novamente.');
                 }
               }
             },

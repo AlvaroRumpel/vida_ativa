@@ -47,24 +47,38 @@ class DayChipRow extends StatelessWidget {
                     label: Text(
                       '${_dayAbbrev[i]} ${day.day}',
                       style: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFF4A4A4A),
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : isToday
+                                ? AppTheme.brandAmber
+                                : const Color(0xFF4A4A4A),
+                        fontWeight: (isSelected || isToday)
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                         fontSize: 13,
                       ),
                     ),
                     selected: isSelected,
+                    showCheckmark: false,
                     selectedColor: AppTheme.primaryGreen,
                     backgroundColor: const Color(0xFFF0EDE8),
-                    side: BorderSide.none,
+                    side: isSelected
+                        ? BorderSide.none
+                        : BorderSide(
+                            color: isToday
+                                ? AppTheme.brandAmber.withValues(alpha: 0.5)
+                                : const Color(0xFFCFC5B0),
+                            width: isToday ? 1.5 : 0.5,
+                          ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onSelected: (_) => onDaySelected(day),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Container(
-                    width: 4,
-                    height: 4,
+                    width: 5,
+                    height: 5,
                     decoration: BoxDecoration(
                       color: isToday ? AppTheme.brandAmber : Colors.transparent,
                       shape: BoxShape.circle,
