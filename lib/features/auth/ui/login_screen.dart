@@ -105,13 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Branding
-                        Text(
-                          'Vida Ativa',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                color: AppTheme.primaryGreen,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        Image.asset(
+                          'assets/images/logo.png',
+                          height: 120,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(

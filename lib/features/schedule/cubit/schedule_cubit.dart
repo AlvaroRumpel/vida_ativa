@@ -140,8 +140,22 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     // Lexicographic sort on "HH:mm" strings is correct
     viewModels.sort((a, b) => a.slot.startTime.compareTo(b.slot.startTime));
 
+    // Filter out slots whose time has already passed when viewing today
+    final now = DateTime.now();
+    final isToday = _selectedDate!.year == now.year &&
+        _selectedDate!.month == now.month &&
+        _selectedDate!.day == now.day;
+    final filtered = isToday
+        ? viewModels.where((vm) {
+            final parts = vm.slot.startTime.split(':');
+            final h = int.parse(parts[0]);
+            final m = int.parse(parts[1]);
+            return h > now.hour || (h == now.hour && m > now.minute);
+          }).toList()
+        : viewModels;
+
     emit(ScheduleLoaded(
-      slots: viewModels,
+      slots: filtered,
       selectedDate: _selectedDate!,
       isBlocked: false,
     ));

@@ -48,6 +48,19 @@ class BookingCubit extends Cubit<BookingState> {
     required String userDisplayName,
     String? participants,
   }) async {
+    // Guard: prevent booking a slot that has already passed today
+    final now = DateTime.now();
+    final todayString =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    if (dateString == todayString) {
+      final parts = startTime.split(':');
+      final slotDt = DateTime(
+        now.year, now.month, now.day,
+        int.parse(parts[0]), int.parse(parts[1]),
+      );
+      if (slotDt.isBefore(now)) throw Exception('slot_already_passed');
+    }
+
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
 

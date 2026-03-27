@@ -134,7 +134,11 @@ class _SlotDayViewState extends State<SlotDayView> {
   }
 
   Widget _buildDayView(List<SlotViewModel> slots) {
-    _updateEvents(slots, widget.selectedDay);
+    // Defer event sync to after this frame so DayView has time to attach the
+    // controller and initialize _handledContextLostEvent (calendar_view 2.0.0).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _updateEvents(slots, widget.selectedDay);
+    });
     final startHour = _computeStartHour(slots);
     final endHour = _computeEndHour(slots);
 

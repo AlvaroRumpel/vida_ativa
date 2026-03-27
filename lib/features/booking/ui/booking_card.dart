@@ -154,14 +154,14 @@ class BookingCard extends StatelessWidget {
     final horario = booking.startTime ?? '';
 
     final buffer = StringBuffer();
-    buffer.writeln('🏐 Reserva confirmada para $nome — Academia Vida Ativa');
+    buffer.writeln('Reserva confirmada para $nome — Arena Vida Ativa');
     buffer.writeln();
-    buffer.writeln('📅 $data, às $horario');
+    buffer.writeln('$data, as $horario');
     if (booking.participants != null && booking.participants!.isNotEmpty) {
-      buffer.writeln('👥 ${booking.participants}');
+      buffer.writeln('Participantes: ${booking.participants}');
     }
     buffer.writeln();
-    buffer.write('Nos vemos na quadra! 🌴');
+    buffer.write('Nos vemos na quadra!');
 
     final url = Uri(
       scheme: 'https',

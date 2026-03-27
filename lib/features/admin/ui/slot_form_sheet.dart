@@ -87,9 +87,11 @@ class _SlotFormSheetState extends State<SlotFormSheet> {
         );
       }
       if (mounted) Navigator.pop(context);
-    } catch (_) {
+    } catch (e) {
       setState(() {
-        _error = 'Erro ao salvar. Tente novamente.';
+        _error = e == 'slot_already_exists'
+            ? 'Já existe um slot neste dia e horário.'
+            : 'Erro ao salvar. Tente novamente.';
         _isSubmitting = false;
       });
     }

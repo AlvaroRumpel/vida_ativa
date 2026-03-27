@@ -4,7 +4,7 @@ class AppTheme {
   AppTheme._(); // Private constructor -- use static members only
 
   // Brand colors -- change these to rebrand the entire app
-  static const Color primaryGreen = Color(0xFF2E7D32); // Material Green 800
+  static const Color primaryGreen = Color(0xFFC9A020); // Arena Vida Ativa gold
   static const Color primaryBlue = Color(0xFF0175C2);
 
   static final ThemeData lightTheme = ThemeData(

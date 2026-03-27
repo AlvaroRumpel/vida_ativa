@@ -42,12 +42,45 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
     required String startTime,
     required double price,
   }) async {
+    final loaded = state;
+    if (loaded is AdminSlotLoaded) {
+      final dup = loaded.slots
+          .any((s) => s.dayOfWeek == dayOfWeek && s.startTime == startTime);
+      if (dup) throw 'slot_already_exists';
+    }
     await _firestore.collection('slots').add({
       'dayOfWeek': dayOfWeek,
       'startTime': startTime,
       'price': price,
       'isActive': true,
     });
+  }
+
+  Future<int> createBatchSlots(
+    List<({int dayOfWeek, String startTime, double price})> slots,
+  ) async {
+    final loaded = state;
+    final existing = loaded is AdminSlotLoaded
+        ? loaded.slots
+            .map((s) => '${s.dayOfWeek}_${s.startTime}')
+            .toSet()
+        : <String>{};
+
+    final toCreate = slots
+        .where((s) => !existing.contains('${s.dayOfWeek}_${s.startTime}'))
+        .toList();
+
+    final batch = _firestore.batch();
+    for (final s in toCreate) {
+      batch.set(_firestore.collection('slots').doc(), {
+        'dayOfWeek': s.dayOfWeek,
+        'startTime': s.startTime,
+        'price': s.price,
+        'isActive': true,
+      });
+    }
+    await batch.commit();
+    return toCreate.length;
   }
 
   Future<void> updateSlot(

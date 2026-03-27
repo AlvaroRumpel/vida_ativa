@@ -53,7 +53,9 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     } on Exception catch (e) {
       final msg = e.toString().contains('slot_already_booked')
           ? 'Este horario acabou de ser reservado.'
-          : 'Falha na conexao. Tente novamente.';
+          : e.toString().contains('slot_already_passed')
+              ? 'Este horario ja passou.'
+              : 'Falha na conexao. Tente novamente.';
       if (mounted) {
         setState(() {
           _isSubmitting = false;
