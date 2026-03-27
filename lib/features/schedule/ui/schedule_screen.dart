@@ -63,7 +63,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Agenda')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.sports_volleyball, size: 20, color: Color(0xFFD4860A)),
+            SizedBox(width: 8),
+            Text('Agenda'),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           WeekHeader(

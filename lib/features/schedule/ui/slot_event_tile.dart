@@ -14,7 +14,7 @@ class SlotEventTile extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: _backgroundColor(viewModel.status),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       clipBehavior: Clip.antiAlias,
       child: _buildContent(),
@@ -68,7 +68,7 @@ class SlotEventTile extends StatelessWidget {
           children: [
             Container(
               width: 4,
-              color: Colors.grey,
+              color: const Color(0xFF9E9E9E),
             ),
             Expanded(
               child: Padding(
@@ -82,6 +82,7 @@ class SlotEventTile extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: Color(0xFF757575),
                       ),
                     ),
                     Text(
@@ -89,6 +90,7 @@ class SlotEventTile extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
+                        color: Color(0xFF757575),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -102,26 +104,34 @@ class SlotEventTile extends StatelessWidget {
       case SlotStatus.myBooking:
         return Padding(
           padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                viewModel.slot.startTime,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      viewModel.slot.startTime,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const Text(
+                      'Minha reserva',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Text(
-                'Minha reserva',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
+              const Icon(Icons.check_circle, color: Colors.white70, size: 18),
             ],
           ),
         );
@@ -132,17 +142,17 @@ class SlotEventTile extends StatelessWidget {
           children: [
             Container(
               width: 4,
-              color: const Color(0xFFE53935),
+              color: const Color(0xFFC62828),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: Text(
+                child: const Text(
                   'Bloqueado',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFFE53935),
+                    color: Color(0xFFB71C1C),
                   ),
                 ),
               ),
@@ -153,10 +163,10 @@ class SlotEventTile extends StatelessWidget {
   }
 
   Color _backgroundColor(SlotStatus status) => switch (status) {
-        SlotStatus.available => AppTheme.primaryGreen.withValues(alpha: 0.2),
-        SlotStatus.booked => Colors.grey.shade200,
+        SlotStatus.available => AppTheme.primaryGreen.withValues(alpha: 0.10),
+        SlotStatus.booked => const Color(0xFFF0EDE8),
         SlotStatus.myBooking => AppTheme.primaryGreen,
-        SlotStatus.blocked => const Color(0xFFE53935).withValues(alpha: 0.2),
+        SlotStatus.blocked => const Color(0xFFFCECEC),
       };
 
   String _formatPrice(double price) =>

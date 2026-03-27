@@ -71,6 +71,23 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     super.dispose();
   }
 
+  Widget _infoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryGreen.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 16, color: AppTheme.primaryGreen),
+        ),
+        const SizedBox(width: 12),
+        Text(text),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final formatted = DateFormat('EEEE, d \'de\' MMMM', 'pt_BR')
@@ -90,7 +107,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: const Color(0xFFD0CAC0),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -98,37 +115,17 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
           const SizedBox(height: 16),
           const Text(
             'Confirmar Reserva',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 16),
-          // Date row
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, size: 16),
-              const SizedBox(width: 8),
-              Text(dateDisplay),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Time row
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16),
-              const SizedBox(width: 8),
-              Text(widget.viewModel.slot.startTime),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Price row
-          Row(
-            children: [
-              const Icon(Icons.attach_money, size: 16),
-              const SizedBox(width: 8),
-              Text(
-                NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
-                    .format(widget.viewModel.slot.price),
-              ),
-            ],
+          _infoRow(Icons.calendar_today, dateDisplay),
+          const SizedBox(height: 10),
+          _infoRow(Icons.access_time, widget.viewModel.slot.startTime),
+          const SizedBox(height: 10),
+          _infoRow(
+            Icons.attach_money,
+            NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
+                .format(widget.viewModel.slot.price),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -136,7 +133,15 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             decoration: const InputDecoration(
               labelText: 'Quem vai jogar? (opcional)',
               hintText: 'Ex: Joao, Maria, Pedro',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
             ),
             maxLength: 200,
             maxLines: 2,
@@ -146,15 +151,17 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             const SizedBox(height: 12),
             Text(
               _errorMessage!,
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: Color(0xFFC62828)),
             ),
           ],
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _isSubmitting ? null : _handleConfirm,
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primaryGreen,
-              minimumSize: const Size(double.infinity, 48),
+              minimumSize: const Size(double.infinity, 52),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: _isSubmitting
                 ? const SizedBox(

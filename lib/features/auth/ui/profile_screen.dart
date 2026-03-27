@@ -49,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.phone, size: 16, color: Colors.grey),
+                    const Icon(Icons.phone, size: 16, color: Color(0xFF9E9A95)),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       user.phone ?? 'Sem telefone',
@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(width: AppSpacing.xs),
                     GestureDetector(
                       onTap: () => _showEditPhoneSheet(context, user.phone),
-                      child: const Icon(Icons.edit, size: 16, color: Colors.grey),
+                      child: const Icon(Icons.edit_outlined, size: 16, color: Color(0xFF9E9A95)),
                     ),
                   ],
                 ),
@@ -81,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
                   icon: const Icon(Icons.logout),
                   label: const Text('Sair da conta'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
+                    foregroundColor: const Color(0xFFC62828),
                   ),
                 ),
               ],
@@ -142,7 +142,9 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primaryGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text('Salvar'),
           ),

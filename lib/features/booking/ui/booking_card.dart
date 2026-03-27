@@ -23,7 +23,7 @@ class BookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -49,7 +49,7 @@ class BookingCard extends StatelessWidget {
                           const Icon(
                             Icons.access_time,
                             size: 16,
-                            color: Colors.grey,
+                            color: Color(0xFF9E9A95),
                           ),
                           const SizedBox(width: 4),
                           Text(booking.startTime!),
@@ -61,7 +61,7 @@ class BookingCard extends StatelessWidget {
                           const Icon(
                             Icons.attach_money,
                             size: 16,
-                            color: Colors.grey,
+                            color: Color(0xFF9E9A95),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -81,14 +81,14 @@ class BookingCard extends StatelessWidget {
                             const Icon(
                               Icons.group,
                               size: 16,
-                              color: Colors.grey,
+                              color: Color(0xFF9E9A95),
                             ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 booking.participants!,
                                 style: const TextStyle(
-                                  color: Colors.grey,
+                                  color: Color(0xFF9E9A95),
                                   fontSize: 13,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -131,7 +131,7 @@ class BookingCard extends StatelessWidget {
                                 onPressed: onCancel,
                                 child: const Text(
                                   'Cancelar',
-                                  style: TextStyle(color: Colors.red),
+                                  style: TextStyle(color: Color(0xFFC62828)),
                                 ),
                               ),
                           ],
@@ -217,7 +217,7 @@ class BookingCard extends StatelessWidget {
   }
 
   Color _statusColor(String status) => switch (status) {
-    'pending' => Colors.orange,
+    'pending' => const Color(0xFFD4860A),
     'confirmed' => AppTheme.primaryGreen,
     'rejected' => Colors.red,
     _ => Colors.grey,
@@ -233,10 +233,10 @@ class BookingCard extends StatelessWidget {
   Widget _statusBadge(String status) {
     final color = _statusColor(status);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         _statusLabel(status),

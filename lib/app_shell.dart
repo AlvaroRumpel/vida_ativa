@@ -39,23 +39,26 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: widget.navigationShell.currentIndex,
-        onTap: (index) => widget.navigationShell.goBranch(
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: widget.navigationShell.currentIndex,
+        onDestinationSelected: (index) => widget.navigationShell.goBranch(
           index,
           initialLocation: index == widget.navigationShell.currentIndex,
         ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.sports_volleyball_outlined),
+            selectedIcon: Icon(Icons.sports_volleyball),
             label: 'Agenda',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_online),
-            label: 'Minhas Reservas',
+          NavigationDestination(
+            icon: Icon(Icons.bookmark_border),
+            selectedIcon: Icon(Icons.bookmark),
+            label: 'Reservas',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
             label: 'Perfil',
           ),
         ],
