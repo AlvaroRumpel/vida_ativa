@@ -46,8 +46,11 @@ class BookingCard extends StatelessWidget {
                     if (booking.startTime != null)
                       Row(
                         children: [
-                          const Icon(Icons.access_time,
-                              size: 16, color: Colors.grey),
+                          const Icon(
+                            Icons.access_time,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 4),
                           Text(booking.startTime!),
                         ],
@@ -55,13 +58,17 @@ class BookingCard extends StatelessWidget {
                     if (booking.price != null)
                       Row(
                         children: [
-                          const Icon(Icons.attach_money,
-                              size: 16, color: Colors.grey),
+                          const Icon(
+                            Icons.attach_money,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             NumberFormat.currency(
-                                    locale: 'pt_BR', symbol: 'R\$')
-                                .format(booking.price!),
+                              locale: 'pt_BR',
+                              symbol: 'R\$',
+                            ).format(booking.price!),
                           ),
                         ],
                       ),
@@ -71,14 +78,19 @@ class BookingCard extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 4),
                         child: Row(
                           children: [
-                            const Icon(Icons.group,
-                                size: 16, color: Colors.grey),
+                            const Icon(
+                              Icons.group,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 booking.participants!,
                                 style: const TextStyle(
-                                    color: Colors.grey, fontSize: 13),
+                                  color: Colors.grey,
+                                  fontSize: 13,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                               ),
@@ -94,7 +106,8 @@ class BookingCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (!booking.isCancelled && booking.status != 'rejected')
+                            if (!booking.isCancelled &&
+                                booking.status != 'rejected')
                               IconButton(
                                 icon: const Icon(Icons.share, size: 18),
                                 padding: EdgeInsets.zero,
@@ -102,7 +115,8 @@ class BookingCard extends StatelessWidget {
                                 tooltip: 'Compartilhar via WhatsApp',
                                 onPressed: _shareWhatsApp,
                               ),
-                            if (!booking.isCancelled && bookingCubit != null) ...[
+                            if (!booking.isCancelled &&
+                                bookingCubit != null) ...[
                               const SizedBox(width: 8),
                               IconButton(
                                 icon: const Icon(Icons.edit, size: 18),
@@ -140,23 +154,26 @@ class BookingCard extends StatelessWidget {
     final horario = booking.startTime ?? '';
 
     final buffer = StringBuffer();
-    buffer.writeln('\u{1F3D0} Reserva confirmada para $nome \u2014 Academia Vida Ativa');
+    buffer.writeln('🏐 Reserva confirmada para $nome — Academia Vida Ativa');
     buffer.writeln();
-    buffer.writeln('\u{1F4C5} $data, \xe0s $horario');
+    buffer.writeln('📅 $data, às $horario');
     if (booking.participants != null && booking.participants!.isNotEmpty) {
-      buffer.writeln('\u{1F465} ${booking.participants}');
+      buffer.writeln('👥 ${booking.participants}');
     }
     buffer.writeln();
-    buffer.write('Nos vemos na quadra! \u{1F334}');
+    buffer.write('Nos vemos na quadra! 🌴');
 
-    final encoded = Uri.encodeComponent(buffer.toString());
-    final url = Uri.parse('https://wa.me/?text=$encoded');
+    final url = Uri(
+      scheme: 'https',
+      host: 'wa.me',
+      path: '/',
+      queryParameters: {'text': buffer.toString()},
+    );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
   void _showEditParticipantsDialog(BuildContext context) async {
-    final controller =
-        TextEditingController(text: booking.participants ?? '');
+    final controller = TextEditingController(text: booking.participants ?? '');
     final result = await showDialog<String?>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -192,24 +209,26 @@ class BookingCard extends StatelessWidget {
   }
 
   String _formatDate(String dateString) {
-    final formatted = DateFormat('EEEE, d \'de\' MMMM', 'pt_BR')
-        .format(DateTime.parse(dateString));
+    final formatted = DateFormat(
+      'EEEE, d \'de\' MMMM',
+      'pt_BR',
+    ).format(DateTime.parse(dateString));
     return '${formatted[0].toUpperCase()}${formatted.substring(1)}';
   }
 
   Color _statusColor(String status) => switch (status) {
-        'pending' => Colors.orange,
-        'confirmed' => AppTheme.primaryGreen,
-        'rejected' => Colors.red,
-        _ => Colors.grey,
-      };
+    'pending' => Colors.orange,
+    'confirmed' => AppTheme.primaryGreen,
+    'rejected' => Colors.red,
+    _ => Colors.grey,
+  };
 
   String _statusLabel(String status) => switch (status) {
-        'pending' => 'Aguardando',
-        'confirmed' => 'Confirmado',
-        'rejected' => 'Recusado',
-        _ => 'Cancelado',
-      };
+    'pending' => 'Aguardando',
+    'confirmed' => 'Confirmado',
+    'rejected' => 'Recusado',
+    _ => 'Cancelado',
+  };
 
   Widget _statusBadge(String status) {
     final color = _statusColor(status);

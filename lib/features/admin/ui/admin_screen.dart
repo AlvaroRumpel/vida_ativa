@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:vida_ativa/features/admin/ui/blocked_dates_tab.dart';
 import 'package:vida_ativa/features/admin/ui/booking_management_tab.dart';
@@ -15,6 +16,16 @@ class AdminScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Painel Admin'),
+          actions: [
+            TextButton.icon(
+              onPressed: () => context.go('/home'),
+              icon: const Icon(Icons.person_outline, size: 18),
+              label: const Text('Área do Cliente'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Slots'),

@@ -69,33 +69,11 @@ class ProfileScreen extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: AppSpacing.md),
                 if (user.isAdmin) ...[
-                  if (state.viewMode == ViewMode.admin) ...[
-                    FilledButton.icon(
-                      onPressed: () => GoRouter.of(context).go('/admin'),
-                      icon: const Icon(Icons.admin_panel_settings),
-                      label: const Text('Painel Admin'),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        context.read<AuthCubit>().toggleViewMode();
-                        GoRouter.of(context).go('/home');
-                      },
-                      icon: const Icon(Icons.visibility_off),
-                      label: const Text('Visao Cliente'),
-                    ),
-                  ] else ...[
-                    FilledButton.icon(
-                      onPressed: () {
-                        context.read<AuthCubit>().toggleViewMode();
-                      },
-                      icon: const Icon(Icons.admin_panel_settings),
-                      label: const Text('Voltar a visao admin'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.primaryGreen,
-                      ),
-                    ),
-                  ],
+                  FilledButton.icon(
+                    onPressed: () => GoRouter.of(context).go('/admin'),
+                    icon: const Icon(Icons.admin_panel_settings),
+                    label: const Text('Painel Admin'),
+                  ),
                   const SizedBox(height: AppSpacing.md),
                 ],
                 OutlinedButton.icon(

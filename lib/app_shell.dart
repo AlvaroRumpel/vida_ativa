@@ -21,7 +21,7 @@ class _AppShellState extends State<AppShell> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'Instale o app: toque em Compartilhar \u203a Adicionar \u00e0 Tela de In\u00edcio',
+              'Instale o app: toque em Compartilhar › Adicionar à Tela de Início',
             ),
             duration: const Duration(seconds: 15),
             action: SnackBarAction(
