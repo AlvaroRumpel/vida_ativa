@@ -26,7 +26,7 @@ class _AppShellState extends State<AppShell> {
           action: SnackBarAction(
             label: 'X',
             onPressed: () =>
-                ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+                ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar(),
           ),
         );
       });

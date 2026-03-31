@@ -19,7 +19,9 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
   })  : _firestore = firestore,
         _adminUid = adminUid,
         super(const AdminBookingInitial()) {
-    _loadConfig().then((_) => selectDate(DateTime.now()));
+    _loadConfig().then((_) {
+      if (!isClosed) selectDate(DateTime.now());
+    });
   }
 
   Future<void> _loadConfig() async {
@@ -37,6 +39,7 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
         .snapshots()
         .listen(
       (snapshot) {
+        if (isClosed) return;
         final bookings = snapshot.docs
             .map((d) => BookingModel.fromFirestore(d))
             .toList()
@@ -48,6 +51,7 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
         ));
       },
       onError: (e, s) {
+        if (isClosed) return;
         Sentry.captureException(e, stackTrace: s);
         emit(const AdminBookingError('Erro ao carregar reservas.'));
       },
