@@ -35,9 +35,62 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
 </details>
 
-### 📋 v3.0 (Planned)
+### 🔄 v3.0 Aprimoramentos de Reserva & Notificações
 
-- [ ] **Phase 12: Rebrand Visual** - Logo e paleta de cores do cliente aplicados em todas as telas *(BLOQUEADO — aguardando assets do cliente)*
+- [x] **Phase 12: Rebrand Visual** - Logo e paleta de cores do cliente aplicados em todas as telas (completed 2026-03-31)
+- [ ] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (ADMN-10, ADMN-11)
+- [ ] **Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento** - Cliente abre bottomsheet com detalhe completo; aviso de pagamento na confirmação (BOOK-04, BOOK-06)
+- [ ] **Phase 15: Agendamento Recorrente** - Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos (BOOK-05)
+- [ ] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (NOTF-01)
+
+Full details: `.planning/milestones/v3.0-ROADMAP.md`
+
+## Phase Details
+
+### Phase 13: Admin Semana Contextualizada
+**Goal:** Admin vê qual semana está exibida nos slots, navega entre semanas e acessa detalhe de qualquer reserva
+**Depends on:** v2.0 complete
+**Requirements**: ADMN-10, ADMN-11
+**Plans:** 2 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Week navigation e date chips na aba Slots (ADMN-10)
+- [ ] 13-02-PLAN.md — AdminBookingDetailSheet + wire em BookingManagementTab (ADMN-11)
+
+**Success Criteria:**
+1. Aba Slots exibe label "31 mar – 6 abr" com botões ← → para navegar entre semanas
+2. Day chips mostram dia + data real (ex: "Seg\n01")
+3. Admin toca qualquer reserva (em Reservas ou em Slots) → bottomsheet com nome, status, horário, preço, participantes
+4. Bottomsheet tem botões confirmar/recusar para reservas pendentes
+
+### Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento
+**Goal:** Cliente acessa detalhe de reserva com um toque; aviso de pagamento visível na confirmação
+**Depends on:** Phase 13
+**Requirements**: BOOK-04, BOOK-06
+**Success Criteria:**
+1. Toque em qualquer card em "Minhas Reservas" abre bottomsheet com detalhe completo
+2. Bottomsheet exibe: data formatada, horário, preço, participantes, status badge, botões cancelar + compartilhar
+3. Tela de confirmação de reserva exibe banner com aviso de pagamento antes do botão "Reservar"
+
+### Phase 15: Agendamento Recorrente
+**Goal:** Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos
+**Depends on:** Phase 14
+**Requirements**: BOOK-05
+**Success Criteria:**
+1. Tela de confirmação tem opção "Reserva recorrente" com date picker de término
+2. Preview lista todas as datas que serão reservadas
+3. Após confirmar, todas as datas são criadas; conflitos listados em dialog de resultado
+4. Sem novo modelo Firestore — cada reserva é um doc `bookings/{slotId}_{date}` normal
+
+### Phase 16: Push Notifications Admin
+**Goal:** Admin recebe notificação push no browser quando nova reserva é feita
+**Depends on:** Phase 13
+**Requirements**: NOTF-01
+**Success Criteria:**
+1. Admin autoriza notificações no browser → token FCM registrado
+2. Nova reserva criada por cliente → admin recebe push notification
+3. Notificação exibe nome do cliente e horário da reserva
+4. Funciona com browser fechado (service worker)
 
 ## Progress
 
@@ -54,4 +107,8 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 | 9. Gestão de Usuários Admin | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 10. Monitoramento de Erros | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 11. Melhorias Visuais | v2.0 | 2/2 | Complete | 2026-03-26 |
-| 12. Rebrand Visual | v3.0 | 0/? | BLOCKED | - |
+| 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
+| 13. Admin Semana Contextualizada | v3.0 | 0/2 | Pending | - |
+| 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 0/? | Pending | - |
+| 15. Agendamento Recorrente | v3.0 | 0/? | Pending | - |
+| 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |
