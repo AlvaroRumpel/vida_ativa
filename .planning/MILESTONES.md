@@ -1,5 +1,26 @@
 # Milestones
 
+## v2.0 Funcionalidades Sociais & Admin (Shipped: 2026-03-31)
+
+**Phases completed:** 5 phases (7–11), 10 plans
+**Timeline:** 2026-03-23 → 2026-03-31 (8 days)
+**Codebase:** ~6,236 lines of Dart (+2,405 from v1.0)
+
+**Key accomplishments:**
+
+1. Agenda social: nome do reservante visível em cada slot ocupado; campo de participantes adicionado à reserva e exibido no painel admin
+2. Compartilhamento de reserva confirmada via WhatsApp com mensagem pré-formatada; campo de telefone no cadastro e edição de perfil
+3. Admin pode alternar entre visão admin e visão cliente sem logout; promoção de usuários a admin via painel com busca por nome/email
+4. Monitoramento de erros em produção via Sentry — todos os cubits instrumentados com captureException e escopo de usuário
+5. Agenda estilo Google Calendar (DayView com colunas horárias por dia); tokens AppSpacing aplicados em todas as telas
+6. Polish visual: paleta arena (verde profundo), fonte Nunito, botão Google polido, snackbars, chips e ícones PWA atualizados
+
+**Known gaps:** UI-01 (rebrand visual) deferred to v3 — aguardando assets do cliente (logo + paleta oficial)
+
+**Archive:** `.planning/milestones/v2.0-ROADMAP.md`
+
+---
+
 ## v1.0 MVP (Shipped: 2026-03-23)
 
 **Phases completed:** 6 phases, 13 plans

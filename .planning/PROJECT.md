@@ -2,24 +2,9 @@
 
 ## What This Is
 
-PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp, permitindo que clientes vejam horários disponíveis e reservem pelo celular, enquanto admins controlam a agenda, confirmam reservas e configuram o fluxo de aprovação.
+PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp, permitindo que clientes vejam horários disponíveis e reservem pelo celular. Inclui visibilidade social entre jogadores (quem reservou, com quem vai jogar), compartilhamento via WhatsApp, toggle admin/cliente, promoção de usuários e monitoramento de erros em produção.
 
-**Status:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`
-
-## Current Milestone: v2.0 Funcionalidades Sociais & Admin
-
-**Goal:** Adicionar visibilidade social entre jogadores, melhorar UX do admin, e integrar monitoramento de erros em produção.
-
-**Target features:**
-- Visibilidade de reservas entre clientes (nomes visíveis na agenda)
-- Campo de participantes na reserva
-- Compartilhar reserva via WhatsApp
-- Campo de telefone no cadastro
-- Alternância Admin ↔ Cliente sem trocar de conta
-- Promoção de usuários a admin no painel
-- Agenda estilo Google Calendar
-- Refatoração visual com logo e cores do cliente (bloqueado até receber assets)
-- Monitoramento de erros em produção
+**Status:** v2.0 live em `vida-ativa-94ba0.web.app` — aguardando assets do cliente para v3.0 (rebrand visual)
 
 ## Core Value
 
@@ -55,18 +40,23 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ ADMN-05: Admin pode confirmar ou recusar reservas pendentes — v1.0
 - ✓ ADMN-06: Admin pode configurar modo de confirmação (automático ou manual) — v1.0
 
-### Active (v2.0)
+### Validated (v2.0)
 
-- ✓ SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda — Validated in Phase 07: Visibilidade Social
-- ✓ SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva — Validated in Phase 07: Visibilidade Social
-- ✓ ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas — Validated in Phase 07: Visibilidade Social
-- ✓ SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada — Validated in Phase 08: Compartilhamento & Perfil
-- ✓ PROF-01: Usuário pode cadastrar número de telefone no fluxo de registro/perfil — Validated in Phase 08: Compartilhamento & Perfil
-- ✓ ADMN-07: Admin pode alternar para visão de cliente sem sair da conta (toggle na tela de Perfil) — Validated in Phase 09: Gestão de Usuários Admin
-- ✓ ADMN-08: Admin pode promover usuário cadastrado a administrador via painel admin — Validated in Phase 09: Gestão de Usuários Admin
-- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas (⚠️ bloqueado até receber assets)
-- [ ] UI-02: Agenda exibe horários com layout inspirado no Google Calendar
-- ✓ OPS-01: Erros em produção são capturados e registrados em ferramenta de monitoramento — Validated in Phase 10: Monitoramento de Erros
+- ✓ SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda — v2.0
+- ✓ SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva — v2.0
+- ✓ ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas — v2.0
+- ✓ SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada — v2.0
+- ✓ PROF-01: Usuário pode cadastrar número de telefone no fluxo de registro — v2.0
+- ✓ PROF-02: Usuário pode editar telefone via BottomSheet no perfil — v2.0
+- ✓ ADMN-07: Admin pode alternar para visão de cliente sem sair da conta — v2.0
+- ✓ ADMN-08: Admin pode promover usuário cadastrado a administrador via painel admin — v2.0
+- ✓ OPS-01: Erros em produção são capturados e registrados via Sentry — v2.0
+- ✓ UI-02: Agenda exibe horários com layout inspirado no Google Calendar — v2.0
+- ✓ UI-03: Ajustes gerais de UI — consistência visual, espaçamentos, tipografia — v2.0
+
+### Active (v3.0)
+
+- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
 
 ### Future (v3.0+)
 
@@ -79,28 +69,30 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 ### Out of Scope
 
 - Pagamento online — pagamento é presencial; fora do escopo explícito
-- Múltiplas academias / multi-tenant — v1 é exclusivo para Academia Vida Ativa
+- Múltiplas academias / multi-tenant — v1/v2 é exclusivo para Academia Vida Ativa
 - Chat / mensagens entre usuário e admin — WhatsApp já cobre isso
-- App nativo iOS/Android — PWA é suficiente para v1
+- App nativo iOS/Android — PWA é suficiente
 - Ver nome de outros clientes no slot — era privacidade em v1; decisão revertida em v2.0 a pedido do dono da academia (SOCIAL-01)
 - Suporte offline completo — conflita com booking transactions; deferido
+- Dashboard de métricas/relatórios de ocupação — Alta complexidade; pode ser v3+
 
 ## Context
 
-- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, flutter_bloc, go_router
+- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view
 - **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/blockedDates`, `/config/booking` — serialização Firestore + Equatable
 - **Slots recorrentes** (ex: toda segunda às 08h); bookings são instâncias para uma data específica
 - **BookingModel.generateId(slotId, date)** → ID determinístico `{slotId}_{date}` — anti-double-booking via Transaction
 - **Perfis:** `client` (reserva) e `admin` (gerencia) — `role: String` no Firestore; go_router guard + Firestore rules
-- **Estrutura de pastas:** `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router,pwa}`
-- **Codebase:** ~3,831 linhas de Dart (v1.0)
-
-**Current state:** v2.0 em desenvolvimento — v1.0 live em `vida-ativa-94ba0.web.app`. 21 requirements v1 entregues. Phase 07 complete — visibilidade social (SOCIAL-01, SOCIAL-02, ADMN-09). Phase 08 complete — compartilhamento WhatsApp + telefone no perfil (SOCIAL-03, PROF-01). Phase 09 complete — toggle admin/cliente + promoção de usuários (ADMN-07, ADMN-08). Phase 10 complete — monitoramento de erros com Sentry (OPS-01). v2.0 foca em funcionalidades sociais, UX admin, e monitoramento de erros (10 requirements, 6 fases a partir da 07).
+- **ViewMode (admin/client):** estado in-memory no AuthAuthenticated; admin pode ver app como cliente sem logout
+- **Estrutura de pastas:** `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router,pwa,utils}`
+- **Codebase:** ~6,236 linhas de Dart (v2.0) — +2,405 desde v1.0
+- **Monitoramento:** Sentry com kReleaseMode guard; DSN via --dart-define; SentryUser com Firebase UID apenas (sem PII)
+- **Deploy:** `firebase deploy --only hosting,firestore:rules` — atomiza app + rules em único comando
 
 ## Constraints
 
 - **Stack:** Flutter Web / Firebase — já decidido e configurado
-- **Plataforma:** PWA only para v1 — web-first, mobile via browser/instalação
+- **Plataforma:** PWA only — web-first, mobile via browser/instalação
 - **Pagamento:** Fora do escopo — só agendamento
 
 ## Key Decisions
@@ -108,12 +100,17 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Flutter Web como PWA | Academia já usa dispositivos variados; PWA evita app store | ✓ Funcionou — app instalável no Android/iOS |
-| Firebase Auth com Google + email/password | Clientes têm Google; email como fallback | ✓ Implementado; phone auth deferido para v2 |
+| Firebase Auth com Google + email/password | Clientes têm Google; email como fallback | ✓ Implementado; phone auth deferido para v3 |
 | Confirmação de reserva configurável | Academia pode querer aprovação manual no início | ✓ Toggle automático/manual no painel admin |
 | Slots recorrentes + bookings por data | Separa configuração do horário da instância de reserva | ✓ Cleanly separados; generateId() previne double-booking |
 | isAdmin() via role field no Firestore | Sem custom claims, sem Admin SDK | ✓ role == "admin" — simples e funcional |
 | iOS install banner sempre que acessado via Safari | Sem localStorage "shown once" — simplicidade | ✓ SnackBar não intrusivo via addPostFrameCallback |
 | dart:ui_web para iOS detection | dart:js deprecated; dart:ui_web nativo ao Flutter | ✓ Sem JS interop necessário |
+| ViewMode como estado in-memory no BLoC | Admin toggle é UX preference, não dado persistido | ✓ Sem round-trip Firestore; reset no logout é comportamento correto |
+| Sentry com kReleaseMode guard | Evitar ruído no dashboard durante dev; DSN via --dart-define | ✓ Erros de produção capturados; 0 DSN no source code |
+| calendar_view: 2.0.0 pin exato | 2.x pode ter breaking changes por minor version | ✓ DayView estável; SlotEventTile integrado sem regressão |
+| WhatsApp share via wa.me/?text= (sem número) | Universal link — funciona sem WhatsApp instalado no web | ✓ Compartilhamento funciona em todos os browsers |
+| FieldValue.delete() para campos nullable no Firestore | Evitar strings vazias no banco; padrão consistente | ✓ Aplicado em participants (Phase 07), phone (Phase 08) |
 
 ---
-*Last updated: 2026-03-26 after Phase 10 complete*
+*Last updated: 2026-03-31 after v2.0 milestone*
