@@ -47,11 +47,15 @@ Declared values (from `lib/core/theme/app_spacing.dart`):
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 | 1.43 (system default) |
-| Label | 12px | 600 | 1.33 (system default) |
+| Label | 12px | 400 | 1.33 (system default) |
 | Heading | 18px | 700 | 1.33 (system default) |
 | Display | 22px | 700 | 1.32 (system default) |
 
 **Font family:** Google Fonts Nunito (via `GoogleFonts.nunitoTextTheme()`)
+
+**Font weights:** 2 weights declared:
+- **Regular (400):** Body text (14px) and labels (12px)
+- **Bold (700):** Headings (18px) and displays (22px)
 
 **Existing pattern reference:** BookingConfirmationSheet uses 22px w700 for sheet title, 14px body text, 12px labels. This phase follows the same pattern for the new admin booking detail sheet.
 
