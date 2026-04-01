@@ -4,7 +4,7 @@ milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
 stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-04-01T19:20:18.132Z"
+last_updated: "2026-04-01T19:22:26.834Z"
 progress:
   total_phases: 4
   completed_phases: 2
