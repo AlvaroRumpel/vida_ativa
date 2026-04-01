@@ -178,8 +178,19 @@ class _SlotDayViewState extends State<_SlotDayView> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ChoiceChip(
-                    label: Text(_dayLabels[i],
-                        style: const TextStyle(fontSize: 12)),
+                    label: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _dayLabels[i],
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        Text(
+                          _refDate(dow).day.toString(),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
                     selected: isSelected,
                     showCheckmark: false,
                     selectedColor: AppTheme.primaryGreen,
