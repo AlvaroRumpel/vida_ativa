@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-04-01T19:19:20.672Z"
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-04-01T19:20:18.132Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -58,6 +58,7 @@ Plan: 1 of 2
 | Phase 13-admin-semana-contextualizada P01 | 4min | 2 tasks | 1 files |
 | Phase 13-admin-semana-contextualizada P02 | 3min | 2 tasks | 2 files |
 | Phase 14-detalhe-reserva-cliente-aviso-pagamento P02 | 5min | 1 tasks | 1 files |
+| Phase 14-detalhe-reserva-cliente-aviso-pagamento P01 | 15min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,7 @@ Recent decisions affecting current work:
 - [Phase 13-02]: AdminBookingDetailSheet and card inline buttons coexist — card buttons for quick action, sheet for full details; inline buttons can be removed in future refactor
 - [Phase 13-02]: Only Confirmar button shows loading spinner when _isSubmitting — Recusar just disables (simplification)
 - [Phase 14]: Payment warning banner uses amber palette inline (no AppTheme constants) — single-use colors, not worth polluting the theme
+- [Phase 14-detalhe-reserva-cliente-aviso-pagamento]: ClientBookingDetailSheet receives BookingCubit as constructor param captured outside builder — same pattern as Phase 04 BookingConfirmationSheet
 
 ### Pending Todos
 
@@ -151,6 +153,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T19:19:20.668Z
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-04-01T19:20:18.127Z
+Stopped at: Completed 14-01-PLAN.md
 Resume file: None

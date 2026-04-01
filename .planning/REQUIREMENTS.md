@@ -14,8 +14,8 @@
 
 ### Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento
 
-- [ ] **BOOK-04**: Cliente pode tocar em qualquer reserva em "Minhas Reservas" e abrir bottomsheet com detalhe: data, horário, preço, participantes, status — com ações cancelar e compartilhar
-- [ ] **BOOK-06**: Na tela de confirmação de reserva, exibir aviso explícito de que a reserva só será confirmada mediante pagamento (banner/disclaimer visual)
+- [x] **BOOK-04**: Cliente pode tocar em qualquer reserva em "Minhas Reservas" e abrir bottomsheet com detalhe: data, horário, preço, participantes, status — com ações cancelar e compartilhar
+- [x] **BOOK-06**: Na tela de confirmação de reserva, exibir aviso explícito de que a reserva só será confirmada mediante pagamento (banner/disclaimer visual)
 
 ### Phase 15: Agendamento Recorrente
 
@@ -33,8 +33,8 @@
 |-------------|-------|--------|
 | ADMN-10 | Phase 13 | Complete |
 | ADMN-11 | Phase 13 | Complete |
-| BOOK-04 | Phase 14 | Pending |
-| BOOK-06 | Phase 14 | Pending |
+| BOOK-04 | Phase 14 | Complete |
+| BOOK-06 | Phase 14 | Complete |
 | BOOK-05 | Phase 15 | Pending |
 | NOTF-01 | Phase 16 | Pending |
 
