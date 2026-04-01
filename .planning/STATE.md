@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 13-01-PLAN.md and 13-02-PLAN.md
-last_updated: "2026-04-01T00:54:29.673Z"
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-04-01T19:19:20.672Z"
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 13 — Admin Semana Contextualizada
+**Current focus:** Phase 14 — Detalhe de Reserva (Cliente) + Aviso de Pagamento
 
 ## Current Position
 
-Phase: 13 (Admin Semana Contextualizada) — EXECUTING
-Plan: 2 of 2 (COMPLETE)
+Phase: 14 (Detalhe de Reserva (Cliente) + Aviso de Pagamento) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Plan: 2 of 2 (COMPLETE)
 | Phase 11-melhorias-visuais P02 | 6min | 2 tasks | 9 files |
 | Phase 13-admin-semana-contextualizada P01 | 4min | 2 tasks | 1 files |
 | Phase 13-admin-semana-contextualizada P02 | 3min | 2 tasks | 2 files |
+| Phase 14-detalhe-reserva-cliente-aviso-pagamento P02 | 5min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,7 @@ Recent decisions affecting current work:
 - [Phase 13-01]: Hide calendar_view WeekHeader via import hide to resolve name conflict with custom WeekHeader widget
 - [Phase 13-02]: AdminBookingDetailSheet and card inline buttons coexist — card buttons for quick action, sheet for full details; inline buttons can be removed in future refactor
 - [Phase 13-02]: Only Confirmar button shows loading spinner when _isSubmitting — Recusar just disables (simplification)
+- [Phase 14]: Payment warning banner uses amber palette inline (no AppTheme constants) — single-use colors, not worth polluting the theme
 
 ### Pending Todos
 
@@ -149,6 +151,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T00:00:00Z
-Stopped at: Completed 13-01-PLAN.md and 13-02-PLAN.md
-Resume file: .planning/phases/13-admin-semana-contextualizada/13-01-SUMMARY.md
+Last session: 2026-04-01T19:19:20.668Z
+Stopped at: Completed 14-02-PLAN.md
+Resume file: None
