@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 13-02-PLAN.md
-last_updated: "2026-04-01T00:39:35Z"
+stopped_at: Completed 13-01-PLAN.md and 13-02-PLAN.md
+last_updated: "2026-04-01T00:54:29.673Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
   completed_plans: 2
 ---

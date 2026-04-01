@@ -108,7 +108,7 @@ Plans:
 | 10. Monitoramento de Erros | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 11. Melhorias Visuais | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
-| 13. Admin Semana Contextualizada | 2/2 | Complete   | 2026-04-01 | - |
+| 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
 | 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 0/? | Pending | - |
 | 15. Agendamento Recorrente | v3.0 | 0/? | Pending | - |
 | 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |
