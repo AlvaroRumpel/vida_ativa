@@ -67,6 +67,12 @@ Plans:
 **Goal:** Cliente acessa detalhe de reserva com um toque; aviso de pagamento visível na confirmação
 **Depends on:** Phase 13
 **Requirements**: BOOK-04, BOOK-06
+**Plans:** 2 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — ClientBookingDetailSheet + tap em MyBookingsScreen (BOOK-04)
+- [ ] 14-02-PLAN.md — Payment warning banner em BookingConfirmationSheet (BOOK-06)
+
 **Success Criteria:**
 1. Toque em qualquer card em "Minhas Reservas" abre bottomsheet com detalhe completo
 2. Bottomsheet exibe: data formatada, horário, preço, participantes, status badge, botões cancelar + compartilhar
@@ -109,6 +115,6 @@ Plans:
 | 11. Melhorias Visuais | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
 | 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
-| 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 0/? | Pending | - |
+| 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 0/2 | Pending | - |
 | 15. Agendamento Recorrente | v3.0 | 0/? | Pending | - |
 | 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |
