@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:calendar_view/calendar_view.dart';
+import 'package:calendar_view/calendar_view.dart' hide WeekHeader;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -12,11 +12,10 @@ import 'package:vida_ativa/features/admin/cubit/admin_slot_state.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_cubit.dart';
 import 'package:vida_ativa/features/admin/ui/slot_batch_sheet.dart';
 import 'package:vida_ativa/features/admin/ui/slot_form_sheet.dart';
+import 'package:vida_ativa/features/schedule/ui/week_header.dart';
 
 const _dayLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
-// Fixed reference week — DayView needs real dates but we suppress the header
-final _referenceMonday = DateTime(2024, 1, 1);
 
 class SlotManagementTab extends StatelessWidget {
   const SlotManagementTab({super.key});
@@ -47,11 +46,17 @@ class _SlotDayView extends StatefulWidget {
 
 class _SlotDayViewState extends State<_SlotDayView> {
   int _selectedDayOfWeek = 1;
+  late DateTime _selectedWeekStart;
   late EventController<SlotModel> _controller;
+
+  DateTime _getMonday(DateTime date) {
+    return date.subtract(Duration(days: date.weekday - 1));
+  }
 
   @override
   void initState() {
     super.initState();
+    _selectedWeekStart = _getMonday(DateTime.now());
     _controller = EventController<SlotModel>();
     // Defer until after the first frame so DayView has attached the controller
     // before we call add/removeWhere (avoids LateInitializationError on
@@ -74,7 +79,7 @@ class _SlotDayViewState extends State<_SlotDayView> {
   }
 
   DateTime _refDate(int dayOfWeek) =>
-      _referenceMonday.add(Duration(days: dayOfWeek - 1));
+      _selectedWeekStart.add(Duration(days: dayOfWeek - 1));
 
   void _syncEvents() {
     _controller.removeWhere((_) => true);
@@ -118,6 +123,25 @@ class _SlotDayViewState extends State<_SlotDayView> {
     );
   }
 
+  void _onPreviousWeek() {
+    setState(() {
+      _selectedWeekStart =
+          _selectedWeekStart.subtract(const Duration(days: 7));
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncEvents();
+    });
+  }
+
+  void _onNextWeek() {
+    setState(() {
+      _selectedWeekStart = _selectedWeekStart.add(const Duration(days: 7));
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncEvents();
+    });
+  }
+
   int _startHour() {
     final times = widget.slots
         .where((s) => s.dayOfWeek == _selectedDayOfWeek)
@@ -139,7 +163,11 @@ class _SlotDayViewState extends State<_SlotDayView> {
     return Scaffold(
       body: Column(
         children: [
-          const SizedBox(height: AppSpacing.sm),
+          WeekHeader(
+            weekStart: _selectedWeekStart,
+            onPreviousWeek: _onPreviousWeek,
+            onNextWeek: _onNextWeek,
+          ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
