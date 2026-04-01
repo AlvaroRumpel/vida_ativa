@@ -38,7 +38,7 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 ### 🔄 v3.0 Aprimoramentos de Reserva & Notificações
 
 - [x] **Phase 12: Rebrand Visual** - Logo e paleta de cores do cliente aplicados em todas as telas (completed 2026-03-31)
-- [ ] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (ADMN-10, ADMN-11)
+- [x] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (ADMN-10, ADMN-11) (completed 2026-04-01)
 - [ ] **Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento** - Cliente abre bottomsheet com detalhe completo; aviso de pagamento na confirmação (BOOK-04, BOOK-06)
 - [ ] **Phase 15: Agendamento Recorrente** - Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos (BOOK-05)
 - [ ] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (NOTF-01)
@@ -51,7 +51,7 @@ Full details: `.planning/milestones/v3.0-ROADMAP.md`
 **Goal:** Admin vê qual semana está exibida nos slots, navega entre semanas e acessa detalhe de qualquer reserva
 **Depends on:** v2.0 complete
 **Requirements**: ADMN-10, ADMN-11
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 13-01-PLAN.md — Week navigation e date chips na aba Slots (ADMN-10)
@@ -108,7 +108,7 @@ Plans:
 | 10. Monitoramento de Erros | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 11. Melhorias Visuais | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
-| 13. Admin Semana Contextualizada | v3.0 | 0/2 | Pending | - |
+| 13. Admin Semana Contextualizada | 2/2 | Complete   | 2026-04-01 | - |
 | 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 0/? | Pending | - |
 | 15. Agendamento Recorrente | v3.0 | 0/? | Pending | - |
 | 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |

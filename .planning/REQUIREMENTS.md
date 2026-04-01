@@ -9,8 +9,8 @@
 
 ### Phase 13: Admin Semana Contextualizada
 
-- [ ] **ADMN-10**: Admin vê label da semana atual (ex: "31 mar – 6 abr") na aba Slots e pode navegar ← → entre semanas; day chips exibem data real (ex: "Seg 01")
-- [ ] **ADMN-11**: Admin pode tocar em qualquer reserva (aba Reservas ou aba Slots) e abrir bottomsheet com detalhe completo: nome do cliente, status, horário, preço, participantes + ações confirmar/recusar
+- [x] **ADMN-10**: Admin vê label da semana atual (ex: "31 mar – 6 abr") na aba Slots e pode navegar ← → entre semanas; day chips exibem data real (ex: "Seg 01")
+- [x] **ADMN-11**: Admin pode tocar em qualquer reserva (aba Reservas ou aba Slots) e abrir bottomsheet com detalhe completo: nome do cliente, status, horário, preço, participantes + ações confirmar/recusar
 
 ### Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento
 
@@ -31,8 +31,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADMN-10 | Phase 13 | Pending |
-| ADMN-11 | Phase 13 | Pending |
+| ADMN-10 | Phase 13 | Complete |
+| ADMN-11 | Phase 13 | Complete |
 | BOOK-04 | Phase 14 | Pending |
 | BOOK-06 | Phase 14 | Pending |
 | BOOK-05 | Phase 15 | Pending |
