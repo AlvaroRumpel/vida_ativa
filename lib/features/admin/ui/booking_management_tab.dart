@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
 import 'package:vida_ativa/features/admin/ui/admin_booking_card.dart';
+import 'package:vida_ativa/features/admin/ui/admin_booking_detail_sheet.dart';
 
 class BookingManagementTab extends StatelessWidget {
   const BookingManagementTab({super.key});
@@ -31,6 +33,18 @@ class _BookingManagementView extends StatelessWidget {
   final AdminBookingLoaded state;
 
   const _BookingManagementView({required this.state});
+
+  void _showBookingDetailSheet(BuildContext context, BookingModel booking) {
+    final cubit = context.read<AdminBookingCubit>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AdminBookingDetailSheet(
+        booking: booking,
+        adminBookingCubit: cubit,
+      ),
+    );
+  }
 
   String _formatDate(DateTime date) {
     final formatted = DateFormat("EEEE, d 'de' MMMM", 'pt_BR').format(date);
@@ -108,9 +122,13 @@ class _BookingManagementView extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   itemCount: state.bookings.length,
                   itemBuilder: (context, index) {
-                    return AdminBookingCard(
-                      booking: state.bookings[index],
-                      bookingCubit: cubit,
+                    final booking = state.bookings[index];
+                    return GestureDetector(
+                      onTap: () => _showBookingDetailSheet(context, booking),
+                      child: AdminBookingCard(
+                        booking: booking,
+                        bookingCubit: cubit,
+                      ),
                     );
                   },
                 ),
