@@ -7,6 +7,7 @@ import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
 import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/booking/ui/booking_card.dart';
+import 'package:vida_ativa/features/booking/ui/client_booking_detail_sheet.dart';
 
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
@@ -80,11 +81,15 @@ class MyBookingsScreen extends StatelessWidget {
             (b) => Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-              child: BookingCard(
-                booking: b,
-                isFuture: true,
-                onCancel: () => _confirmCancel(context, b),
-                bookingCubit: context.read<BookingCubit>(),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _showDetailSheet(context, b, true),
+                child: BookingCard(
+                  booking: b,
+                  isFuture: true,
+                  onCancel: () => _confirmCancel(context, b),
+                  bookingCubit: context.read<BookingCubit>(),
+                ),
               ),
             ),
           ),
@@ -101,16 +106,36 @@ class MyBookingsScreen extends StatelessWidget {
             (b) => Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-              child: BookingCard(
-                booking: b,
-                isFuture: false,
-                onCancel: null,
-                bookingCubit: context.read<BookingCubit>(),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _showDetailSheet(context, b, false),
+                child: BookingCard(
+                  booking: b,
+                  isFuture: false,
+                  onCancel: null,
+                  bookingCubit: context.read<BookingCubit>(),
+                ),
               ),
             ),
           ),
         ],
       ],
+    );
+  }
+
+  void _showDetailSheet(BuildContext context, BookingModel booking, bool isFuture) {
+    final bookingCubit = context.read<BookingCubit>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => ClientBookingDetailSheet(
+        booking: booking,
+        bookingCubit: bookingCubit,
+        isFuture: isFuture,
+      ),
     );
   }
 

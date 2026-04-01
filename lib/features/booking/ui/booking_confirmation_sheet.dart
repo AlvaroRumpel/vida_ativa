@@ -87,6 +87,35 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     );
   }
 
+  Widget _paymentWarningBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3E0),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFFFB300), width: 1),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 18, color: Color(0xFFE65100)),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Esta reserva so sera confirmada apos o pagamento. '
+              'Aguarde a confirmacao do estabelecimento.',
+              style: TextStyle(
+                fontSize: 13,
+                color: Color(0xFFE65100),
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final formatted = DateFormat('EEEE, d \'de\' MMMM', 'pt_BR')
@@ -126,6 +155,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
                 .format(widget.viewModel.slot.price),
           ),
+          const SizedBox(height: 16),
+          _paymentWarningBanner(),
           const SizedBox(height: 16),
           TextField(
             controller: _participantsController,
