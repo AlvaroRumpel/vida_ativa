@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v3.0
-milestone_name: Rebrand Visual
-status: planning_next
-stopped_at: v2.0 milestone complete
-last_updated: "2026-03-31T00:00:00.000Z"
+milestone_name: Aprimoramentos de Reserva & Notificações
+status: unknown
+stopped_at: Completed 13-02-PLAN.md
+last_updated: "2026-04-01T00:39:35Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 2
 ---
 
 # Project State
@@ -19,15 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Planning v3.0 — awaiting client logo + color palette assets before Phase 12 can begin
-
-**Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender do WhatsApp.
-**Current focus:** Phase 11 — melhorias-visuais
+**Current focus:** Phase 13 — Admin Semana Contextualizada
 
 ## Current Position
 
-Phase: 11 (melhorias-visuais) — EXECUTING
-Plan: 2 of 2
+Phase: 13 (Admin Semana Contextualizada) — EXECUTING
+Plan: 2 of 2 (COMPLETE)
 
 ## Performance Metrics
 
@@ -58,6 +55,8 @@ Plan: 2 of 2
 | Phase 10-monitoramento-de-erros P02 | 5min | 2 tasks | 5 files |
 | Phase 11-melhorias-visuais P01 | 5min | 2 tasks | 5 files |
 | Phase 11-melhorias-visuais P02 | 6min | 2 tasks | 9 files |
+| Phase 13-admin-semana-contextualizada P01 | 4min | 2 tasks | 1 files |
+| Phase 13-admin-semana-contextualizada P02 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -133,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase 11-melhorias-visuais]: BookingCubit captured as _bookingCubit instance field in build() — DayView subtree has no BlocProvider access, follows Phase 4 pattern
 - [Phase 11-melhorias-visuais]: AppSpacing file paths in plan were wrong; applied tokens to actual files (auth/ui/profile_screen.dart and admin/ui/*_management_tab.dart)
 - [Phase 11-melhorias-visuais]: users_management_tab.dart has only EdgeInsets.all(12) not on token scale — no substitutions made
+- [Phase 13-01]: Hide calendar_view WeekHeader via import hide to resolve name conflict with custom WeekHeader widget
+- [Phase 13-02]: AdminBookingDetailSheet and card inline buttons coexist — card buttons for quick action, sheet for full details; inline buttons can be removed in future refactor
+- [Phase 13-02]: Only Confirmar button shows loading spinner when _isSubmitting — Recusar just disables (simplification)
 
 ### Pending Todos
 
@@ -147,6 +149,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:07:40.206Z
-Stopped at: Completed 11-02-PLAN.md (AppSpacing tokens)
-Resume file: None
+Last session: 2026-04-01T00:00:00Z
+Stopped at: Completed 13-01-PLAN.md and 13-02-PLAN.md
+Resume file: .planning/phases/13-admin-semana-contextualizada/13-01-SUMMARY.md
