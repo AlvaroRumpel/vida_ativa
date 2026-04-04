@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 ## Current Position
 
-Phase: 15 (agendamento-recorrente) — COMPLETE
-Plan: 3 of 3
+Phase: 15 (agendamento-recorrente) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Plan: 3 of 3
 | Phase 14-detalhe-reserva-cliente-aviso-pagamento P02 | 5min | 1 tasks | 1 files |
 | Phase 14-detalhe-reserva-cliente-aviso-pagamento P01 | 15min | 2 tasks | 2 files |
 | Phase 15-agendamento-recorrente P01 | 8min | 3 tasks | 5 files |
+| Phase 15-agendamento-recorrente P02 | 8min | 2 tasks | 3 files |
 | Phase 15-agendamento-recorrente P03 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
@@ -143,6 +144,9 @@ Recent decisions affecting current work:
 - [Phase 14-detalhe-reserva-cliente-aviso-pagamento]: ClientBookingDetailSheet receives BookingCubit as constructor param captured outside builder — same pattern as Phase 04 BookingConfirmationSheet
 - [Phase 15-agendamento-recorrente]: RecurrenceEntry is public (not private _RecurrenceEntry) — bookRecurring() public API requires public parameter type
 - [Phase 15-agendamento-recorrente]: cancelGroupFuture filters by userId in Firestore query — prevents cross-user group cancellation
+- [Phase 15-02]: Switch uses activeThumbColor (not deprecated activeColor) for Flutter 3.31+ compatibility
+- [Phase 15-02]: RecurrenceResultSheet shown stacked on confirmation sheet; onClose pops both via two Navigator.pop calls
+- [Phase 15-02]: SingleChildScrollView wraps BookingConfirmationSheet body to handle overflow when RecurrenceSection expands
 
 ### Pending Todos
 
