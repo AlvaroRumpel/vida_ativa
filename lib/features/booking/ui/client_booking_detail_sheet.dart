@@ -58,6 +58,14 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
   }
 
   Future<void> _handleCancel() async {
+    if (widget.booking.recurrenceGroupId != null) {
+      await _handleCancelRecurrent();
+    } else {
+      await _handleCancelSingle();
+    }
+  }
+
+  Future<void> _handleCancelSingle() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -66,7 +74,7 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Nao'),
+            child: const Text('Não'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -76,12 +84,65 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
       ),
     );
     if (confirmed != true) return;
-    setState(() {
-      _isSubmitting = true;
-      _errorMessage = null;
-    });
+    setState(() { _isSubmitting = true; _errorMessage = null; });
     try {
       await widget.bookingCubit.cancelBooking(widget.booking.id);
+      if (mounted) Navigator.pop(context);
+    } on Exception {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _errorMessage = 'Erro ao cancelar. Tente novamente.';
+        });
+      }
+    }
+  }
+
+  Future<void> _handleCancelRecurrent() async {
+    // 'single' = cancel only this booking; 'group' = cancel this + all future
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancelar reserva recorrente?'),
+        content: const Text(
+          'Cancelar só esta reserva ou esta e todas as próximas?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Voltar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'single'),
+            child: const Text('Cancelar só esta'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFC62828),
+            ),
+            onPressed: () => Navigator.pop(ctx, 'group'),
+            child: const Text('Cancelar esta e as próximas'),
+          ),
+        ],
+      ),
+    );
+    if (choice == null) return;
+    setState(() { _isSubmitting = true; _errorMessage = null; });
+    try {
+      if (choice == 'single') {
+        await widget.bookingCubit.cancelBooking(widget.booking.id);
+      } else {
+        // Cancel this booking and all future bookings in the group.
+        // fromDateInclusive = today (YYYY-MM-DD) to include this booking's date and forward.
+        final now = DateTime.now();
+        final today = '${now.year}-'
+            '${now.month.toString().padLeft(2, '0')}-'
+            '${now.day.toString().padLeft(2, '0')}';
+        await widget.bookingCubit.cancelGroupFuture(
+          recurrenceGroupId: widget.booking.recurrenceGroupId!,
+          fromDateInclusive: today,
+        );
+      }
       if (mounted) Navigator.pop(context);
     } on Exception {
       if (mounted) {
