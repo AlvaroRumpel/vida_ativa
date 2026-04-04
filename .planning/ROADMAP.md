@@ -116,5 +116,5 @@ Plans:
 | 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
 | 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
 | 14. Detalhe de Reserva (Cliente) + Aviso | 2/2 | Complete    | 2026-04-01 | - |
-| 15. Agendamento Recorrente | 1/3 | In Progress|  | - |
+| 15. Agendamento Recorrente | 2/3 | In Progress|  | - |
 | 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |
