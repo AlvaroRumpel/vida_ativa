@@ -19,7 +19,7 @@
 
 ### Phase 15: Agendamento Recorrente
 
-- [ ] **BOOK-05**: Cliente pode criar reserva recorrente: seleciona padrão semanal + data de término; app cria todas as reservas individualmente; conflitos (slot já reservado) são exibidos em lista e ignorados silenciosamente
+- [x] **BOOK-05**: Cliente pode criar reserva recorrente: seleciona padrão semanal + data de término; app cria todas as reservas individualmente; conflitos (slot já reservado) são exibidos em lista e ignorados silenciosamente
 
 ### Phase 16: Push Notifications Admin
 
@@ -35,7 +35,7 @@
 | ADMN-11 | Phase 13 | Complete |
 | BOOK-04 | Phase 14 | Complete |
 | BOOK-06 | Phase 14 | Complete |
-| BOOK-05 | Phase 15 | Pending |
+| BOOK-05 | Phase 15 | Complete |
 | NOTF-01 | Phase 16 | Pending |
 
 ---

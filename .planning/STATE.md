@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Phase 15 context gathered
-last_updated: "2026-04-04T03:28:49.137Z"
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-04-04T20:37:26.784Z"
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 7
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 14 — Detalhe de Reserva (Cliente) + Aviso de Pagamento
+**Current focus:** Phase 15 — agendamento-recorrente
 
 ## Current Position
 
-Phase: 14 (Detalhe de Reserva (Cliente) + Aviso de Pagamento) — EXECUTING
-Plan: 1 of 2
+Phase: 15 (agendamento-recorrente) — EXECUTING
+Plan: 1 of 3
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Plan: 1 of 2
 | Phase 13-admin-semana-contextualizada P02 | 3min | 2 tasks | 2 files |
 | Phase 14-detalhe-reserva-cliente-aviso-pagamento P02 | 5min | 1 tasks | 1 files |
 | Phase 14-detalhe-reserva-cliente-aviso-pagamento P01 | 15min | 2 tasks | 2 files |
+| Phase 15-agendamento-recorrente P01 | 8min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -139,6 +140,8 @@ Recent decisions affecting current work:
 - [Phase 13-02]: Only Confirmar button shows loading spinner when _isSubmitting — Recusar just disables (simplification)
 - [Phase 14]: Payment warning banner uses amber palette inline (no AppTheme constants) — single-use colors, not worth polluting the theme
 - [Phase 14-detalhe-reserva-cliente-aviso-pagamento]: ClientBookingDetailSheet receives BookingCubit as constructor param captured outside builder — same pattern as Phase 04 BookingConfirmationSheet
+- [Phase 15-agendamento-recorrente]: RecurrenceEntry is public (not private _RecurrenceEntry) — bookRecurring() public API requires public parameter type
+- [Phase 15-agendamento-recorrente]: cancelGroupFuture filters by userId in Firestore query — prevents cross-user group cancellation
 
 ### Pending Todos
 
@@ -153,6 +156,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T03:28:49.133Z
-Stopped at: Phase 15 context gathered
-Resume file: .planning/phases/15-agendamento-recorrente/15-CONTEXT.md
+Last session: 2026-04-04T20:37:26.777Z
+Stopped at: Completed 15-01-PLAN.md
+Resume file: None
