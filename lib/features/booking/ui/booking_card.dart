@@ -138,6 +138,30 @@ class BookingCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (booking.recurrenceGroupId != null) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Text(
+                          'Recorrente',
+                          style: TextStyle(
+                            color: AppTheme.primaryGreen,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
