@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-04-01T19:22:26.834Z"
+stopped_at: Phase 15 context gathered
+last_updated: "2026-04-04T03:28:49.137Z"
 progress:
   total_phases: 4
   completed_phases: 2
@@ -153,6 +153,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T19:20:18.127Z
-Stopped at: Completed 14-01-PLAN.md
-Resume file: None
+Last session: 2026-04-04T03:28:49.133Z
+Stopped at: Phase 15 context gathered
+Resume file: .planning/phases/15-agendamento-recorrente/15-CONTEXT.md
