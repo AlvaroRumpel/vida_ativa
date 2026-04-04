@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
@@ -47,6 +48,7 @@ class BookingCubit extends Cubit<BookingState> {
     required String startTime,
     required String userDisplayName,
     String? participants,
+    String? recurrenceGroupId,
   }) async {
     // Guard: prevent booking a slot that has already passed today
     final now = DateTime.now();
@@ -86,10 +88,50 @@ class BookingCubit extends Cubit<BookingState> {
         price: price,
         userDisplayName: userDisplayName,
         participants: participants,
+        recurrenceGroupId: recurrenceGroupId,
       );
       tx.set(ref, booking.toFirestore());
     });
     // Stream subscription picks up the new booking reactively — no state emit here.
+  }
+
+  /// Creates multiple bookings in parallel under a shared recurrenceGroupId.
+  /// Each booking is created with the existing bookSlot transaction pattern.
+  /// Per-element try/catch ensures partial failures don't cancel other bookings.
+  /// Returns a list of outcomes (success + failures) for the result sheet.
+  Future<List<RecurrenceOutcome>> bookRecurring({
+    required List<RecurrenceEntry> entries,
+    required String startTime,
+    required String userDisplayName,
+    String? participants,
+  }) async {
+    final groupId = const Uuid().v4();
+
+    final settled = await Future.wait(
+      entries.map((entry) async {
+        try {
+          await bookSlot(
+            slotId: entry.slotId,
+            dateString: entry.dateString,
+            price: entry.price,
+            startTime: startTime,
+            userDisplayName: userDisplayName,
+            participants: participants,
+            recurrenceGroupId: groupId,
+          );
+          return RecurrenceOutcome.success(entry.dateString);
+        } on Exception catch (e) {
+          final msg = e.toString();
+          final reason = msg.contains('slot_already_booked')
+              ? 'slot_already_booked'
+              : msg.contains('slot_already_passed')
+                  ? 'slot_already_passed'
+                  : msg;
+          return RecurrenceOutcome.failed(entry.dateString, reason);
+        }
+      }),
+    );
+    return settled;
   }
 
   Future<void> cancelBooking(String bookingId) async {
@@ -98,6 +140,31 @@ class BookingCubit extends Cubit<BookingState> {
       'cancelledAt': Timestamp.fromDate(DateTime.now()),
     });
     // Stream subscription picks up the change reactively — no state emit here.
+  }
+
+  /// Batch-cancels all bookings in a recurrence group dated on or after [fromDateInclusive].
+  /// Uses Firestore WriteBatch for atomic commit of all cancellations.
+  /// Safety: filters by userId so user can only cancel their own bookings.
+  Future<void> cancelGroupFuture({
+    required String recurrenceGroupId,
+    required String fromDateInclusive, // "YYYY-MM-DD"
+  }) async {
+    final snap = await _firestore
+        .collection('bookings')
+        .where('recurrenceGroupId', isEqualTo: recurrenceGroupId)
+        .where('date', isGreaterThanOrEqualTo: fromDateInclusive)
+        .where('userId', isEqualTo: _userId)
+        .get();
+
+    final batch = _firestore.batch();
+    for (final doc in snap.docs) {
+      batch.update(doc.reference, {
+        'status': 'cancelled',
+        'cancelledAt': Timestamp.fromDate(DateTime.now()),
+      });
+    }
+    await batch.commit();
+    // Stream subscription picks up the changes reactively — no state emit here.
   }
 
   Future<void> updateParticipants(String bookingId, String? participants) async {
@@ -113,4 +180,36 @@ class BookingCubit extends Cubit<BookingState> {
     _sub?.cancel();
     return super.close();
   }
+}
+
+/// Data class for a single booking entry in a recurring batch.
+class RecurrenceEntry {
+  final String slotId;
+  final String dateString;
+  final double price;
+
+  const RecurrenceEntry({
+    required this.slotId,
+    required this.dateString,
+    required this.price,
+  });
+}
+
+/// Result of a single recurring booking attempt.
+class RecurrenceOutcome {
+  final String dateString;
+  final bool success;
+  final String? failureReason; // "slot_already_booked" | "slot_already_passed" | other
+
+  const RecurrenceOutcome._({
+    required this.dateString,
+    required this.success,
+    this.failureReason,
+  });
+
+  factory RecurrenceOutcome.success(String dateString) =>
+      RecurrenceOutcome._(dateString: dateString, success: true);
+
+  factory RecurrenceOutcome.failed(String dateString, String reason) =>
+      RecurrenceOutcome._(dateString: dateString, success: false, failureReason: reason);
 }
