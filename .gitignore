@@ -30,6 +30,15 @@ migrate_working_dir/
 # Firebase CLI cache
 .firebase/
 
+# Service account keys — never commit
+scripts/service-account.json
+scripts/*-firebase-adminsdk-*.json
+scripts/node_modules/
+
+# Local/generated files
+users_backup.json
+devtools_options.yaml
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id

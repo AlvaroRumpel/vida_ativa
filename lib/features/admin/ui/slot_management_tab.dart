@@ -1,15 +1,19 @@
 import 'dart:math';
 
 import 'package:calendar_view/calendar_view.dart' hide WeekHeader;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/models/slot_model.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_slot_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_slot_state.dart';
 import 'package:vida_ativa/features/admin/cubit/pricing_cubit.dart';
+import 'package:vida_ativa/features/admin/ui/admin_booking_detail_sheet.dart';
 import 'package:vida_ativa/features/admin/ui/slot_batch_sheet.dart';
 import 'package:vida_ativa/features/admin/ui/slot_form_sheet.dart';
 import 'package:vida_ativa/features/schedule/ui/week_header.dart';
@@ -48,9 +52,22 @@ class _SlotDayViewState extends State<_SlotDayView> {
   int _selectedDayOfWeek = 1;
   late DateTime _selectedWeekStart;
   late EventController<SlotModel> _controller;
+  late AdminSlotCubit _slotCubit;
+  late AdminBookingCubit _bookingCubit;
+  Set<String> _bookedSlotIds = {};
 
   DateTime _getMonday(DateTime date) {
     return date.subtract(Duration(days: date.weekday - 1));
+  }
+
+  String _toDateString(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _slotCubit = context.read<AdminSlotCubit>();
+    _bookingCubit = context.read<AdminBookingCubit>();
   }
 
   @override
@@ -62,14 +79,37 @@ class _SlotDayViewState extends State<_SlotDayView> {
     // before we call add/removeWhere (avoids LateInitializationError on
     // _handledContextLostEvent in calendar_view 2.0.0).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _syncEvents();
+      if (mounted) {
+        _syncEvents();
+        _loadBookingsForDay();
+      }
     });
   }
 
   @override
   void didUpdateWidget(_SlotDayView old) {
     super.didUpdateWidget(old);
-    if (old.slots != widget.slots) _syncEvents();
+    if (old.slots != widget.slots) {
+      _syncEvents();
+      _loadBookingsForDay();
+    }
+  }
+
+  Future<void> _loadBookingsForDay() async {
+    final dateStr = _toDateString(_refDate(_selectedDayOfWeek));
+    final snap = await FirebaseFirestore.instance
+        .collection('bookings')
+        .where('date', isEqualTo: dateStr)
+        .get();
+    if (!mounted) return;
+    final booked = snap.docs
+        .where((d) {
+          final status = d['status'] as String;
+          return status != 'cancelled' && status != 'rejected';
+        })
+        .map((d) => d['slotId'] as String)
+        .toSet();
+    setState(() => _bookedSlotIds = booked);
   }
 
   @override
@@ -83,42 +123,65 @@ class _SlotDayViewState extends State<_SlotDayView> {
 
   void _syncEvents() {
     _controller.removeWhere((_) => true);
-    for (int dow = 1; dow <= 7; dow++) {
-      final ref = _refDate(dow);
-      for (final slot in widget.slots.where((s) => s.dayOfWeek == dow)) {
-        final parts = slot.startTime.split(':');
-        final hour = int.parse(parts[0]);
-        final minute = int.parse(parts[1]);
-        final start = DateTime(ref.year, ref.month, ref.day, hour, minute);
-        _controller.add(CalendarEventData<SlotModel>(
-          date: ref,
-          startTime: start,
-          endTime: start.add(const Duration(hours: 1)),
-          title: slot.startTime,
-          color: slot.isActive ? AppTheme.primaryGreen : Colors.grey.shade400,
-          event: slot,
-        ));
-      }
+    for (final slot in widget.slots) {
+      final parts = slot.date.split('-');
+      final date = DateTime(
+          int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+      final timeParts = slot.startTime.split(':');
+      final start = DateTime(date.year, date.month, date.day,
+          int.parse(timeParts[0]), int.parse(timeParts[1]));
+      _controller.add(CalendarEventData<SlotModel>(
+        date: date,
+        startTime: start,
+        endTime: start.add(const Duration(hours: 1)),
+        title: slot.startTime,
+        color: slot.isActive ? AppTheme.primaryGreen : Colors.grey.shade400,
+        event: slot,
+      ));
     }
   }
 
-  void _openSheet(BuildContext context, SlotModel? existing) {
-    final cubit = context.read<AdminSlotCubit>();
+  Future<void> _openSheet(SlotModel? existing) async {
+    if (existing != null) {
+      final docId = BookingModel.generateId(existing.id, existing.date);
+      final snap = await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(docId)
+          .get();
+      if (!mounted) return;
+      if (snap.exists) {
+        final booking = BookingModel.fromFirestore(snap);
+        await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => AdminBookingDetailSheet(
+            booking: booking,
+            adminBookingCubit: _bookingCubit,
+          ),
+        );
+        if (mounted) _loadBookingsForDay();
+        return;
+      }
+    }
+    if (!mounted) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => SlotFormSheet(existing: existing, slotCubit: cubit),
+      builder: (_) => SlotFormSheet(
+        existing: existing,
+        slotCubit: _slotCubit,
+        initialDate: existing == null ? _refDate(_selectedDayOfWeek) : null,
+      ),
     );
   }
 
   void _openBatchSheet(BuildContext context) {
-    final cubit = context.read<AdminSlotCubit>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (ctx) => BlocProvider.value(
         value: context.read<PricingCubit>(),
-        child: SlotBatchSheet(slotCubit: cubit),
+        child: SlotBatchSheet(slotCubit: _slotCubit),
       ),
     );
   }
@@ -128,31 +191,29 @@ class _SlotDayViewState extends State<_SlotDayView> {
       _selectedWeekStart =
           _selectedWeekStart.subtract(const Duration(days: 7));
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _syncEvents();
-    });
+    _slotCubit.loadSlotsForWeek(_selectedWeekStart);
   }
 
   void _onNextWeek() {
     setState(() {
       _selectedWeekStart = _selectedWeekStart.add(const Duration(days: 7));
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _syncEvents();
-    });
+    _slotCubit.loadSlotsForWeek(_selectedWeekStart);
   }
 
   int _startHour() {
+    final selectedDate = _toDateString(_refDate(_selectedDayOfWeek));
     final times = widget.slots
-        .where((s) => s.dayOfWeek == _selectedDayOfWeek)
+        .where((s) => s.date == selectedDate)
         .map((s) => int.parse(s.startTime.split(':')[0]));
     if (times.isEmpty) return 8;
     return (times.reduce(min) - 1).clamp(0, 23);
   }
 
   int _endHour() {
+    final selectedDate = _toDateString(_refDate(_selectedDayOfWeek));
     final times = widget.slots
-        .where((s) => s.dayOfWeek == _selectedDayOfWeek)
+        .where((s) => s.date == selectedDate)
         .map((s) => int.parse(s.startTime.split(':')[0]) + 1);
     if (times.isEmpty) return 22;
     return (times.reduce(max) + 1).clamp(1, 24);
@@ -205,8 +266,10 @@ class _SlotDayViewState extends State<_SlotDayView> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    onSelected: (_) =>
-                        setState(() => _selectedDayOfWeek = dow),
+                    onSelected: (_) {
+                      setState(() => _selectedDayOfWeek = dow);
+                      _loadBookingsForDay();
+                    },
                   ),
                 );
               }),
@@ -231,13 +294,14 @@ class _SlotDayViewState extends State<_SlotDayView> {
                 final slot = events.first.event!;
                 return _AdminSlotTile(
                   slot: slot,
-                  onTap: () => _openSheet(context, slot),
+                  isBooked: _bookedSlotIds.contains(slot.id),
+                  onTap: () => _openSheet(slot),
                 );
               },
               onEventTap: (events, date) {
                 if (events.isEmpty) return;
                 final slot = events.first.event;
-                if (slot != null) _openSheet(context, slot);
+                if (slot != null) _openSheet(slot);
               },
             ),
           ),
@@ -255,7 +319,7 @@ class _SlotDayViewState extends State<_SlotDayView> {
           const SizedBox(height: 8),
           FloatingActionButton(
             heroTag: 'single',
-            onPressed: () => _openSheet(context, null),
+            onPressed: () => _openSheet(null),
             child: const Icon(Icons.add),
           ),
         ],
@@ -266,15 +330,23 @@ class _SlotDayViewState extends State<_SlotDayView> {
 
 class _AdminSlotTile extends StatelessWidget {
   final SlotModel slot;
+  final bool isBooked;
   final VoidCallback onTap;
 
-  const _AdminSlotTile({required this.slot, required this.onTap});
+  const _AdminSlotTile({
+    required this.slot,
+    required this.isBooked,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final priceText =
-        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(slot.price);
-    final color = slot.isActive ? AppTheme.primaryGreen : Colors.grey.shade500;
+    final Color color;
+    if (isBooked) {
+      color = const Color(0xFFB87333);
+    } else {
+      color = slot.isActive ? AppTheme.primaryGreen : Colors.grey.shade500;
+    }
 
     return GestureDetector(
       onTap: onTap,
@@ -282,7 +354,7 @@ class _AdminSlotTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 2),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
+          color: color.withValues(alpha: isBooked ? 0.18 : 0.12),
           border: Border(left: BorderSide(color: color, width: 3)),
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(4),
@@ -305,18 +377,24 @@ class _AdminSlotTile extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    priceText,
+                    isBooked
+                        ? 'Reservado'
+                        : NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
+                            .format(slot.price),
                     style: TextStyle(fontSize: 11, color: color),
                   ),
                 ],
               ),
             ),
-            Switch(
-              value: slot.isActive,
-              onChanged: (value) =>
-                  context.read<AdminSlotCubit>().setSlotActive(slot.id, value),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            if (isBooked)
+              Icon(Icons.person, size: 18, color: color)
+            else
+              Switch(
+                value: slot.isActive,
+                onChanged: (value) =>
+                    context.read<AdminSlotCubit>().setSlotActive(slot.id, value),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
           ],
         ),
       ),

@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 
 class SlotModel extends Equatable {
   final String id;
-  final int dayOfWeek; // 1=Monday..7=Sunday (Dart DateTime.weekday convention)
+  final String date; // "YYYY-MM-DD" — specific calendar date
   final String startTime; // "HH:mm" format, e.g. "08:00"
   final double price;
   final bool isActive;
 
   const SlotModel({
     required this.id,
-    required this.dayOfWeek,
+    required this.date,
     required this.startTime,
     required this.price,
     required this.isActive,
@@ -20,7 +20,7 @@ class SlotModel extends Equatable {
     final data = doc.data()!;
     return SlotModel(
       id: doc.id,
-      dayOfWeek: data['dayOfWeek'] as int,
+      date: data['date'] as String,
       startTime: data['startTime'] as String,
       price: (data['price'] as num).toDouble(),
       isActive: data['isActive'] as bool,
@@ -29,7 +29,7 @@ class SlotModel extends Equatable {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'dayOfWeek': dayOfWeek,
+      'date': date,
       'startTime': startTime,
       'price': price,
       'isActive': isActive,
@@ -37,5 +37,5 @@ class SlotModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, dayOfWeek, startTime, price, isActive];
+  List<Object?> get props => [id, date, startTime, price, isActive];
 }

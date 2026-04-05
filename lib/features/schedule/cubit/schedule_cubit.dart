@@ -25,6 +25,9 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   bool _cachedIsBlocked = false;
   DateTime? _selectedDate;
 
+  // Guards against firing duplicate Firestore writes for the same booking
+  final Set<String> _cancellingBookingIds = {};
+
   ScheduleCubit({
     required FirebaseFirestore firestore,
     required AuthCubit authCubit,
@@ -41,13 +44,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(const ScheduleLoading());
 
     final dateString = _toDateString(date);
-    final weekday = date.weekday; // 1=Mon..7=Sun, matches SlotModel.dayOfWeek
 
-    // Stream 1 — Active slots for this weekday
+    // Stream 1 — Active slots for this specific date
     _slotsSubscription = _firestore
         .collection('slots')
         .where('isActive', isEqualTo: true)
-        .where('dayOfWeek', isEqualTo: weekday)
+        .where('date', isEqualTo: dateString)
         .snapshots()
         .listen(
       (snapshot) {
@@ -119,10 +121,31 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     final dateString = _toDateString(_selectedDate!);
 
     final viewModels = _cachedSlots!.map((slot) {
-      final booking = _cachedBookings!.cast<BookingModel?>().firstWhere(
+      BookingModel? booking = _cachedBookings!.cast<BookingModel?>().firstWhere(
         (b) => b!.slotId == slot.id,
         orElse: () => null,
       );
+
+      // Auto-cancel pending bookings whose slot time has already passed
+      if (booking != null && booking.isPending) {
+        final parts = slot.date.split('-');
+        final timeParts = slot.startTime.split(':');
+        final slotDateTime = DateTime(
+          int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]),
+          int.parse(timeParts[0]), int.parse(timeParts[1]),
+        );
+        if (slotDateTime.isBefore(DateTime.now()) &&
+            !_cancellingBookingIds.contains(booking.id)) {
+          final bookingId = booking.id;
+          _cancellingBookingIds.add(bookingId);
+          _firestore.collection('bookings').doc(bookingId).update({
+            'status': 'cancelled',
+            'cancelledAt': Timestamp.now(),
+          }).then((_) => _cancellingBookingIds.remove(bookingId));
+          booking = null; // Treat as available locally while update propagates
+        }
+      }
+
       final status = booking == null
           ? SlotStatus.available
           : booking.userId == currentUserId
@@ -134,6 +157,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         status: status,
         dateString: dateString,
         bookerName: bookerName,
+        booking: status == SlotStatus.myBooking ? booking : null,
       );
     }).toList();
 

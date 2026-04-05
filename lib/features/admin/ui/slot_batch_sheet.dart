@@ -41,17 +41,42 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
   static final _dateFmt = DateFormat('dd/MM/yyyy (EEE)', 'pt_BR');
 
   /// Returns unique weekdays (1=Mon…7=Sun) covered by [_fromDate]..[_toDate].
+  /// Used only for the informational chips display.
   Set<int> _derivedDays() {
     if (_fromDate == null || _toDate == null) return {};
     if (_toDate!.isBefore(_fromDate!)) return {};
     final days = <int>{};
     var current = _fromDate!;
     while (!current.isAfter(_toDate!)) {
-      days.add(current.weekday); // DateTime.weekday: 1=Mon, 7=Sun
+      days.add(current.weekday);
       current = current.add(const Duration(days: 1));
       if (days.length == 7) break;
     }
     return days;
+  }
+
+  String _toDateString(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  /// Returns all date-specific slots to be created.
+  List<({String date, String startTime, double? price})> _allSlots(
+      List<PriceTierModel> tiers) {
+    if (_fromDate == null || _toDate == null) return [];
+    if (_toDate!.isBefore(_fromDate!) || _fromHour >= _toHour) return [];
+    final result = <({String date, String startTime, double? price})>[];
+    var current = _fromDate!;
+    while (!current.isAfter(_toDate!)) {
+      for (int h = _fromHour; h < _toHour; h++) {
+        final st = '${h.toString().padLeft(2, '0')}:00';
+        result.add((
+          date: _toDateString(current),
+          startTime: st,
+          price: _priceFor(h, current.weekday, tiers),
+        ));
+      }
+      current = current.add(const Duration(days: 1));
+    }
+    return result;
   }
 
   Future<void> _pickDate({required bool isFrom}) async {
@@ -86,24 +111,26 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
     return matches.map((t) => t.price).reduce(max);
   }
 
+  /// Groups _allSlots by weekday for the preview display.
   Map<int, List<({String startTime, double? price})>> _preview(
       List<PriceTierModel> tiers) {
-    final days = _derivedDays();
-    if (_fromHour >= _toHour || days.isEmpty) return {};
+    final slots = _allSlots(tiers);
+    if (slots.isEmpty) return {};
     final result = <int, List<({String startTime, double? price})>>{};
-    for (final dow in days.toList()..sort()) {
-      result[dow] = List.generate(_toHour - _fromHour, (i) {
-        final hour = _fromHour + i;
-        final st = '${hour.toString().padLeft(2, '0')}:00';
-        return (startTime: st, price: _priceFor(hour, dow, tiers));
-      });
+    for (final s in slots) {
+      final dow = DateTime.parse(s.date).weekday;
+      (result[dow] ??= []).add((startTime: s.startTime, price: s.price));
     }
-    return result;
+    // Remove duplicates per dow (same startTime shown once)
+    for (final dow in result.keys) {
+      final seen = <String>{};
+      result[dow] = result[dow]!.where((s) => seen.add(s.startTime)).toList();
+    }
+    return Map.fromEntries(result.entries.toList()..sort((a, b) => a.key.compareTo(b.key)));
   }
 
   Future<void> _create(List<PriceTierModel> tiers) async {
-    final days = _derivedDays();
-    if (_fromDate == null || _toDate == null || days.isEmpty) {
+    if (_fromDate == null || _toDate == null) {
       setState(() => _error = 'Selecione um intervalo de datas válido.');
       return;
     }
@@ -111,15 +138,12 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
       setState(() => _error = 'Intervalo de horas inválido.');
       return;
     }
-    final preview = _preview(tiers);
-    final allSlots = preview.entries
-        .expand((e) => e.value.map((s) => (
-              dayOfWeek: e.key,
-              startTime: s.startTime,
-              price: s.price,
-            )))
-        .toList();
-    if (allSlots.any((s) => s.price == null)) {
+    final slots = _allSlots(tiers);
+    if (slots.isEmpty) {
+      setState(() => _error = 'Selecione um intervalo de datas válido.');
+      return;
+    }
+    if (slots.any((s) => s.price == null)) {
       setState(() =>
           _error = 'Nenhuma faixa de preço cobre todos os horários selecionados.');
       return;
@@ -132,15 +156,9 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
 
     try {
       final created = await widget.slotCubit.createBatchSlots(
-        allSlots
-            .map((s) => (
-                  dayOfWeek: s.dayOfWeek,
-                  startTime: s.startTime,
-                  price: s.price!,
-                ))
-            .toList(),
+        slots.map((s) => (date: s.date, startTime: s.startTime, price: s.price!)).toList(),
       );
-      final skipped = allSlots.length - created;
+      final skipped = slots.length - created;
       if (mounted) {
         Navigator.pop(context);
         SnackHelper.success(
@@ -166,13 +184,11 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
       builder: (context, state) {
         final tiers =
             state is PricingLoaded ? state.tiers : <PriceTierModel>[];
+        final allSlots = _allSlots(tiers);
         final preview = _preview(tiers);
         final derivedDays = _derivedDays();
-        final hasNullPrice = preview.values
-            .expand((list) => list)
-            .any((s) => s.price == null);
-        final totalSlots =
-            preview.values.fold(0, (sum, list) => sum + list.length);
+        final hasNullPrice = allSlots.any((s) => s.price == null);
+        final totalSlots = allSlots.length;
 
         return Padding(
           padding: EdgeInsets.only(
@@ -327,10 +343,7 @@ class _SlotBatchSheetState extends State<SlotBatchSheet> {
                 const SizedBox(height: AppSpacing.md),
 
                 FilledButton(
-                  onPressed: (_isSubmitting ||
-                          hasNullPrice ||
-                          totalSlots == 0 ||
-                          derivedDays.isEmpty)
+                  onPressed: (_isSubmitting || hasNullPrice || totalSlots == 0)
                       ? null
                       : () => _create(tiers),
                   style: FilledButton.styleFrom(

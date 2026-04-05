@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
 import 'package:vida_ativa/features/booking/ui/booking_confirmation_sheet.dart';
+import 'package:vida_ativa/features/booking/ui/client_booking_detail_sheet.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_state.dart';
 import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 import 'package:vida_ativa/features/schedule/ui/slot_event_tile.dart';
@@ -84,6 +85,39 @@ class _SlotDayViewState extends State<SlotDayView> {
   void _showBookingSheet(SlotViewModel viewModel) {
     final bookingCubit = _bookingCubit;
     if (bookingCubit == null) return;
+
+    if (viewModel.status == SlotStatus.myBooking && viewModel.booking != null) {
+      final booking = viewModel.booking!;
+      final isFuture = DateTime.parse(booking.date).isAfter(
+        DateTime.now().subtract(const Duration(days: 1)),
+      );
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (_) => ClientBookingDetailSheet(
+          booking: booking,
+          bookingCubit: bookingCubit,
+          isFuture: isFuture,
+        ),
+      );
+      return;
+    }
+
+    if (viewModel.status == SlotStatus.booked) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (_) => _OccupiedSlotSheet(startTime: viewModel.slot.startTime),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -157,18 +191,22 @@ class _SlotDayViewState extends State<SlotDayView> {
       eventTileBuilder: (date, events, boundary, startDuration, endDuration) {
         if (events.isEmpty) return const SizedBox.shrink();
         final vm = events.first.event!;
+        final tappable = vm.status == SlotStatus.available ||
+            vm.status == SlotStatus.myBooking ||
+            vm.status == SlotStatus.booked;
         return SlotEventTile(
           viewModel: vm,
-          onTap: vm.status == SlotStatus.available
-              ? () => _showBookingSheet(vm)
-              : null,
+          onTap: tappable ? () => _showBookingSheet(vm) : null,
         );
       },
       onEventTap: (events, date) {
         if (events.isEmpty) return;
         final vm = events.first.event;
-        if (vm == null || vm.status != SlotStatus.available) return;
-        _showBookingSheet(vm);
+        if (vm == null) return;
+        final tappable = vm.status == SlotStatus.available ||
+            vm.status == SlotStatus.myBooking ||
+            vm.status == SlotStatus.booked;
+        if (tappable) _showBookingSheet(vm);
       },
     );
   }
@@ -231,6 +269,45 @@ class _TimelineSkeletonState extends State<_TimelineSkeleton>
           ),
         );
       },
+    );
+  }
+}
+
+class _OccupiedSlotSheet extends StatelessWidget {
+  final String startTime;
+  const _OccupiedSlotSheet({required this.startTime});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        24, 16, 24,
+        24 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD0CAC0),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Horário $startTime',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          const Text('Este horário já está reservado.'),
+          const SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }

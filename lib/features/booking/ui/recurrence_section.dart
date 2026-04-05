@@ -221,13 +221,7 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
                           (i) => _PreviewDateItem(item: _previewItems[i]),
                         ),
                         if (_previewItems.length > 6)
-                          Text(
-                            '+ ${_previewItems.length - 6} datas',
-                            style: const TextStyle(
-                              color: Color(0xFF9E9A95),
-                              fontSize: 12,
-                            ),
-                          ),
+                          _HiddenItemsSummary(items: _previewItems.sublist(6)),
                       ],
                     ),
         ),
@@ -277,6 +271,24 @@ class _PreviewDateItem extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _HiddenItemsSummary extends StatelessWidget {
+  final List<_PreviewItem> items;
+  const _HiddenItemsSummary({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    final available = items.where((i) => i.status == _PreviewStatus.available).length;
+    final unavailable = items.length - available;
+    final parts = <String>[];
+    if (available > 0) parts.add('+ $available disponíveis');
+    if (unavailable > 0) parts.add('$unavailable sem horário');
+    return Text(
+      parts.join(' · '),
+      style: const TextStyle(color: Color(0xFF9E9A95), fontSize: 12),
     );
   }
 }

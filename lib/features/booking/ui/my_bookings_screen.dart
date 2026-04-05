@@ -140,6 +140,10 @@ class MyBookingsScreen extends StatelessWidget {
   }
 
   void _confirmCancel(BuildContext context, BookingModel booking) {
+    if (booking.recurrenceGroupId != null) {
+      _showDetailSheet(context, booking, true);
+      return;
+    }
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(

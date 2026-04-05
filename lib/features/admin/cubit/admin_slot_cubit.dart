@@ -14,19 +14,28 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
   AdminSlotCubit({required FirebaseFirestore firestore})
       : _firestore = firestore,
         super(const AdminSlotInitial()) {
-    _startStream();
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    loadSlotsForWeek(DateTime(monday.year, monday.month, monday.day));
   }
 
-  void _startStream() {
-    _sub = _firestore.collection('slots').snapshots().listen(
+  void loadSlotsForWeek(DateTime weekStart) {
+    _sub?.cancel();
+    final start = _toDateString(weekStart);
+    final end = _toDateString(weekStart.add(const Duration(days: 7)));
+    _sub = _firestore
+        .collection('slots')
+        .where('date', isGreaterThanOrEqualTo: start)
+        .where('date', isLessThan: end)
+        .snapshots()
+        .listen(
       (snapshot) {
         final slots = snapshot.docs
             .map((d) => SlotModel.fromFirestore(d))
             .toList()
           ..sort((a, b) {
-            final dayCompare = a.dayOfWeek.compareTo(b.dayOfWeek);
-            if (dayCompare != 0) return dayCompare;
-            return a.startTime.compareTo(b.startTime);
+            final d = a.date.compareTo(b.date);
+            return d != 0 ? d : a.startTime.compareTo(b.startTime);
           });
         emit(AdminSlotLoaded(slots));
       },
@@ -38,18 +47,19 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
   }
 
   Future<void> createSlot({
-    required int dayOfWeek,
+    required String date,
     required String startTime,
     required double price,
   }) async {
-    final loaded = state;
-    if (loaded is AdminSlotLoaded) {
-      final dup = loaded.slots
-          .any((s) => s.dayOfWeek == dayOfWeek && s.startTime == startTime);
-      if (dup) throw 'slot_already_exists';
-    }
+    final snap = await _firestore
+        .collection('slots')
+        .where('date', isEqualTo: date)
+        .where('startTime', isEqualTo: startTime)
+        .limit(1)
+        .get();
+    if (snap.docs.isNotEmpty) throw 'slot_already_exists';
     await _firestore.collection('slots').add({
-      'dayOfWeek': dayOfWeek,
+      'date': date,
       'startTime': startTime,
       'price': price,
       'isActive': true,
@@ -57,23 +67,27 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
   }
 
   Future<int> createBatchSlots(
-    List<({int dayOfWeek, String startTime, double price})> slots,
+    List<({String date, String startTime, double price})> slots,
   ) async {
-    final loaded = state;
-    final existing = loaded is AdminSlotLoaded
-        ? loaded.slots
-            .map((s) => '${s.dayOfWeek}_${s.startTime}')
-            .toSet()
-        : <String>{};
+    final dates = slots.map((s) => s.date).toList()..sort();
+    final snap = await _firestore
+        .collection('slots')
+        .where('date', isGreaterThanOrEqualTo: dates.first)
+        .where('date', isLessThanOrEqualTo: dates.last)
+        .get();
+    final existing = snap.docs.map((d) {
+      final data = d.data();
+      return '${data['date']}_${data['startTime']}';
+    }).toSet();
 
     final toCreate = slots
-        .where((s) => !existing.contains('${s.dayOfWeek}_${s.startTime}'))
+        .where((s) => !existing.contains('${s.date}_${s.startTime}'))
         .toList();
 
     final batch = _firestore.batch();
     for (final s in toCreate) {
       batch.set(_firestore.collection('slots').doc(), {
-        'dayOfWeek': s.dayOfWeek,
+        'date': s.date,
         'startTime': s.startTime,
         'price': s.price,
         'isActive': true,
@@ -85,15 +99,19 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
 
   Future<void> updateSlot(
     String slotId, {
-    required int dayOfWeek,
+    required String date,
     required String startTime,
     required double price,
   }) async {
     await _firestore.collection('slots').doc(slotId).update({
-      'dayOfWeek': dayOfWeek,
+      'date': date,
       'startTime': startTime,
       'price': price,
     });
+  }
+
+  Future<void> deleteSlot(String slotId) async {
+    await _firestore.collection('slots').doc(slotId).delete();
   }
 
   Future<void> setSlotActive(String slotId, bool isActive) async {
@@ -101,6 +119,9 @@ class AdminSlotCubit extends Cubit<AdminSlotState> {
       'isActive': isActive,
     });
   }
+
+  String _toDateString(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
   @override
   Future<void> close() {

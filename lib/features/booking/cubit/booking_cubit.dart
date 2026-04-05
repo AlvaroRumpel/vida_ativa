@@ -153,7 +153,6 @@ class BookingCubit extends Cubit<BookingState> {
         .collection('bookings')
         .where('recurrenceGroupId', isEqualTo: recurrenceGroupId)
         .where('date', isGreaterThanOrEqualTo: fromDateInclusive)
-        .where('userId', isEqualTo: _userId)
         .get();
 
     final batch = _firestore.batch();

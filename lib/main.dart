@@ -8,9 +8,12 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'firebase_options.dart';
+import 'firebase_options_staging.dart' as staging;
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'features/auth/cubit/auth_cubit.dart';
+
+const _kEnv = String.fromEnvironment('ENV', defaultValue: 'prod');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +24,7 @@ Future<void> main() async {
     await SentryFlutter.init(
       (options) {
         options.dsn = sentryDsn;
-        options.environment = 'production';
+        options.environment = _kEnv == 'staging' ? 'staging' : 'production';
         options.tracesSampleRate = 0.0;
       },
       appRunner: _initAndRun,
@@ -33,13 +36,21 @@ Future<void> main() async {
 
 Future<void> _initAndRun() async {
   await Future.wait([
-    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+    Firebase.initializeApp(
+      options: _kEnv == 'staging'
+          ? staging.DefaultFirebaseOptions.currentPlatform
+          : DefaultFirebaseOptions.currentPlatform,
+    ),
     initializeDateFormatting('pt_BR'),
   ]);
   if (kIsWeb) {
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: false,
-    );
+    try {
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: false,
+      );
+    } catch (_) {
+      // Firestore already initialized on hot restart — settings unchanged, safe to ignore.
+    }
   }
   runApp(const VidaAtivaApp());
 }
