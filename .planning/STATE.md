@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-04-05T13:55:38.188Z"
+stopped_at: Completed 16-02-PLAN.md
+last_updated: "2026-04-04T00:00:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 ## Current Position
 
 Phase: 16 (push-notifications-admin) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Plan: 1 of 3
 | Phase 15-agendamento-recorrente P02 | 8min | 2 tasks | 3 files |
 | Phase 15-agendamento-recorrente P03 | 5min | 2 tasks | 2 files |
 | Phase 16-push-notifications-admin P01 | 5min | 3 tasks | 6 files |
+| Phase 16-push-notifications-admin P02 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,10 @@ Recent decisions affecting current work:
 - [Phase 16-push-notifications-admin]: firebase_messaging bumped to ^16.1.2 — version conflict with firebase_auth ^6.2.0 and firebase_core ^4.5.0
 - [Phase 16-push-notifications-admin]: web/firebase-messaging-sw.js added to .gitignore — generated artifact; scripts/generate-sw.js is source of truth
 - [Phase 16-push-notifications-admin]: Service worker uses compat SDK (importScripts) — dynamic import unavailable in service worker context
+- [Phase 16-02]: AdminFcmCubit owned by _AdminScreenState (not route-level) — cubit lifetime matches screen lifetime exactly
+- [Phase 16-02]: BlocProvider.value used to share already-created cubit with subtree without double-ownership
+- [Phase 16-02]: onForegroundMessage returns FirebaseMessaging.onMessage static stream — onMessage is not an instance member
+- [Phase 16-02]: VAPID key via String.fromEnvironment with empty defaultValue — getToken(vapidKey: null) works without VAPID for basic FCM
 
 ### Pending Todos
 
