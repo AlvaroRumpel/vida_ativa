@@ -41,7 +41,7 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 - [x] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (ADMN-10, ADMN-11) (completed 2026-04-01)
 - [x] **Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento** - Cliente abre bottomsheet com detalhe completo; aviso de pagamento na confirmação (BOOK-04, BOOK-06) (completed 2026-04-01)
 - [x] **Phase 15: Agendamento Recorrente** - Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos (BOOK-05) (completed 2026-04-04)
-- [ ] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (NOTF-01)
+- [x] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (NOTF-01) (completed 2026-04-05)
 
 Full details: `.planning/milestones/v3.0-ROADMAP.md`
 
@@ -92,7 +92,7 @@ Plans:
 **Goal:** Admin recebe notificação push no browser quando nova reserva é feita
 **Depends on:** Phase 13
 **Requirements**: NOTF-01
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 16-01-PLAN.md — FCM infrastructure: pubspec, service worker, Cloud Function trigger
@@ -124,4 +124,4 @@ Plans:
 | 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
 | 14. Detalhe de Reserva (Cliente) + Aviso | 2/2 | Complete    | 2026-04-01 | - |
 | 15. Agendamento Recorrente | 3/3 | Complete    | 2026-04-04 | - |
-| 16. Push Notifications Admin | 2/3 | In Progress|  | - |
+| 16. Push Notifications Admin | 3/3 | Complete   | 2026-04-05 | - |

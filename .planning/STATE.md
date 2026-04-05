@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 16-02-PLAN.md
-last_updated: "2026-04-04T00:00:00.000Z"
+stopped_at: Completed 16-03-PLAN.md (partial — Blaze upgrade required for functions)
+last_updated: "2026-04-05T14:07:46.235Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -64,6 +64,7 @@ Plan: 2 of 3
 | Phase 15-agendamento-recorrente P03 | 5min | 2 tasks | 2 files |
 | Phase 16-push-notifications-admin P01 | 5min | 3 tasks | 6 files |
 | Phase 16-push-notifications-admin P02 | 2min | 2 tasks | 3 files |
+| Phase 16-push-notifications-admin P03 | 5min | 1 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -156,6 +157,8 @@ Recent decisions affecting current work:
 - [Phase 16-02]: BlocProvider.value used to share already-created cubit with subtree without double-ownership
 - [Phase 16-02]: onForegroundMessage returns FirebaseMessaging.onMessage static stream — onMessage is not an instance member
 - [Phase 16-02]: VAPID key via String.fromEnvironment with empty defaultValue — getToken(vapidKey: null) works without VAPID for basic FCM
+- [Phase 16-push-notifications-admin]: flutter build web without VAPID key — String.fromEnvironment defaults to empty, getToken(vapidKey: null) works for basic FCM
+- [Phase 16-push-notifications-admin]: Staging Cloud Functions blocked by Blaze plan requirement — hosting deployed separately
 
 ### Pending Todos
 
@@ -170,6 +173,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T13:55:38.168Z
-Stopped at: Completed 16-01-PLAN.md
+Last session: 2026-04-05T14:07:40.926Z
+Stopped at: Completed 16-03-PLAN.md (partial — Blaze upgrade required for functions)
 Resume file: None
