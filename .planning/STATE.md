@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
 status: unknown
-stopped_at: Completed 15-03-PLAN.md
-last_updated: "2026-04-04T23:41:27.988Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-04-05T13:55:38.188Z"
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 15 — agendamento-recorrente
+**Current focus:** Phase 16 — push-notifications-admin
 
 ## Current Position
 
-Phase: 15 (agendamento-recorrente) — EXECUTING
-Plan: 2 of 3
+Phase: 16 (push-notifications-admin) — EXECUTING
+Plan: 1 of 3
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Plan: 2 of 3
 | Phase 15-agendamento-recorrente P01 | 8min | 3 tasks | 5 files |
 | Phase 15-agendamento-recorrente P02 | 8min | 2 tasks | 3 files |
 | Phase 15-agendamento-recorrente P03 | 5min | 2 tasks | 2 files |
+| Phase 16-push-notifications-admin P01 | 5min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,9 @@ Recent decisions affecting current work:
 - [Phase 15-02]: Switch uses activeThumbColor (not deprecated activeColor) for Flutter 3.31+ compatibility
 - [Phase 15-02]: RecurrenceResultSheet shown stacked on confirmation sheet; onClose pops both via two Navigator.pop calls
 - [Phase 15-02]: SingleChildScrollView wraps BookingConfirmationSheet body to handle overflow when RecurrenceSection expands
+- [Phase 16-push-notifications-admin]: firebase_messaging bumped to ^16.1.2 — version conflict with firebase_auth ^6.2.0 and firebase_core ^4.5.0
+- [Phase 16-push-notifications-admin]: web/firebase-messaging-sw.js added to .gitignore — generated artifact; scripts/generate-sw.js is source of truth
+- [Phase 16-push-notifications-admin]: Service worker uses compat SDK (importScripts) — dynamic import unavailable in service worker context
 
 ### Pending Todos
 
@@ -161,6 +165,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T20:45:00.000Z
-Stopped at: Completed 15-03-PLAN.md
+Last session: 2026-04-05T13:55:38.168Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None

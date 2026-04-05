@@ -23,7 +23,7 @@
 
 ### Phase 16: Push Notifications Admin
 
-- [ ] **NOTF-01**: Admin recebe web push notification (FCM) quando uma nova reserva é criada; requer permissão do browser; funciona com app em background via service worker
+- [x] **NOTF-01**: Admin recebe web push notification (FCM) quando uma nova reserva é criada; requer permissão do browser; funciona com app em background via service worker
 
 ---
 
@@ -36,7 +36,7 @@
 | BOOK-04 | Phase 14 | Complete |
 | BOOK-06 | Phase 14 | Complete |
 | BOOK-05 | Phase 15 | Complete |
-| NOTF-01 | Phase 16 | Pending |
+| NOTF-01 | Phase 16 | Complete |
 
 ---
 
