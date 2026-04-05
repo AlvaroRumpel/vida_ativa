@@ -92,6 +92,13 @@ Plans:
 **Goal:** Admin recebe notificação push no browser quando nova reserva é feita
 **Depends on:** Phase 13
 **Requirements**: NOTF-01
+**Plans:** 3 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — FCM infrastructure: pubspec, service worker, Cloud Function trigger
+- [ ] 16-02-PLAN.md — Flutter FCM cubit + AdminScreen permission banner and foreground messages
+- [ ] 16-03-PLAN.md — Deploy to staging + end-to-end human verification
+
 **Success Criteria:**
 1. Admin autoriza notificações no browser → token FCM registrado
 2. Nova reserva criada por cliente → admin recebe push notification
@@ -117,4 +124,4 @@ Plans:
 | 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
 | 14. Detalhe de Reserva (Cliente) + Aviso | 2/2 | Complete    | 2026-04-01 | - |
 | 15. Agendamento Recorrente | 3/3 | Complete    | 2026-04-04 | - |
-| 16. Push Notifications Admin | v3.0 | 0/? | Pending | - |
+| 16. Push Notifications Admin | v3.0 | 0/3 | Pending | - |
