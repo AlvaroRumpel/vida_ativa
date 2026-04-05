@@ -42,6 +42,9 @@ devtools_options.yaml
 # Generated service worker (env-specific, produced by scripts/generate-sw.js)
 web/firebase-messaging-sw.js
 
+# Cloud Functions dependencies
+functions/node_modules/
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
