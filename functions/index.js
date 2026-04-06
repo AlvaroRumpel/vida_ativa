@@ -1,28 +1,43 @@
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onDocumentWritten } = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 
 admin.initializeApp();
 
 /**
- * Triggered when a new booking document is created in the `bookings` collection.
- * Sends an FCM push notification to all admin users who have stored FCM tokens.
+ * Triggered when a booking document is created or updated in the `bookings` collection.
+ * Sends an FCM push notification to all admin users when a new active booking is registered.
+ *
+ * Fires on:
+ *   - Document created with status != 'cancelled'
+ *   - Document updated where status changed FROM 'cancelled' TO 'pending'|'confirmed'
  *
  * Firestore structure used:
  *   /users/{userId}                   — { role: "admin"|"client", displayName, ... }
  *   /users/{userId}/fcmTokens/{token} — { token, createdAt, platform }
- *   /bookings/{bookingId}             — { slotId, date, startTime, userDisplayName, ... }
+ *   /bookings/{bookingId}             — { slotId, date, startTime, userDisplayName, status, ... }
  */
-exports.notifyAdminNewBooking = onDocumentCreated('bookings/{bookingId}', async (event) => {
-  const bookingData = event.data.data();
+exports.notifyAdminNewBooking = onDocumentWritten('bookings/{bookingId}', async (event) => {
+  const before = event.data.before?.data();
+  const after = event.data.after?.data();
 
-  if (!bookingData) {
-    console.log('No booking data found — skipping');
+  if (!after) return; // document deleted — ignore
+
+  const isActive = after.status !== 'cancelled';
+
+  // Only notify on new active bookings:
+  // - Document just created (no before) with active status
+  // - Status changed from 'cancelled' to active (rebook)
+  const isNewBooking = !before && isActive;
+  const isRebook = before && before.status === 'cancelled' && isActive;
+
+  if (!isNewBooking && !isRebook) {
+    console.log(`Skipping — status: ${before?.status ?? 'new'} → ${after.status}`);
     return;
   }
 
-  const clientName = bookingData.userDisplayName || 'Cliente';
-  const startTime = bookingData.startTime || '';
-  const date = bookingData.date || '';
+  const clientName = after.userDisplayName || 'Cliente';
+  const startTime = after.startTime || '';
+  const date = after.date || '';
 
   // Only send to users with role == 'admin'
   const adminsSnap = await admin.firestore()
@@ -60,14 +75,24 @@ exports.notifyAdminNewBooking = onDocumentCreated('bookings/{bookingId}', async 
   const tokens = tokenEntries.map((e) => e.token);
   const dateFormatted = date ? ` (${date})` : '';
 
+  const bookingId = event.params.bookingId;
+  const projectId = process.env.GCLOUD_PROJECT || 'vida-ativa-staging';
+  const domain = projectId === 'vida-ativa-94ba0'
+    ? 'https://vida-ativa-94ba0.web.app'
+    : 'https://vida-ativa-staging.web.app';
+
   const multicastMessage = {
     notification: {
-      title: 'Nova Reserva',
+      title: isRebook ? 'Reserva Refeita' : 'Nova Reserva',
       body: `${clientName} — ${startTime}${dateFormatted}`,
+    },
+    data: {
+      bookingId,
+      date: date,
     },
     webpush: {
       fcmOptions: {
-        link: '/admin',
+        link: `${domain}/admin`,
       },
     },
     tokens,

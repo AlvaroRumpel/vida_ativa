@@ -60,19 +60,28 @@ GoRouter createRouter(AuthCubit authCubit) {
       // Not authenticated — must go to login
       if (!isAuthenticated && !isOnAuthPage) return '/login';
 
-      // Authenticated but on auth page — go home
-      if (isAuthenticated && isOnAuthPage) return '/home';
+      // Authenticated but on auth page — route to correct home
+      if (isAuthenticated && isOnAuthPage) {
+        return (authState.user.isAdmin && authState.viewMode == ViewMode.admin)
+            ? '/admin'
+            : '/home';
+      }
 
       // Admin guard: non-admin or admin in client mode cannot access /admin
-      if (authState is AuthAuthenticated && location.startsWith('/admin')) {
-        if (!authState.user.isAdmin || authState.viewMode == ViewMode.client) {
+      if (location.startsWith('/admin')) {
+        if (authState is! AuthAuthenticated ||
+            !authState.user.isAdmin ||
+            authState.viewMode == ViewMode.client) {
           return '/home';
         }
       }
 
-      // Splash after auth resolved — route to destination
+      // Splash after auth resolved — route to correct home
       if (location == '/splash') {
-        return isAuthenticated ? '/home' : '/login';
+        if (!isAuthenticated) return '/login';
+        return (authState.user.isAdmin && authState.viewMode == ViewMode.admin)
+            ? '/admin'
+            : '/home';
       }
 
       return null;

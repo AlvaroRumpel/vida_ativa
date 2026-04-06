@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,12 +18,16 @@ class AdminScreen extends StatefulWidget {
   State<AdminScreen> createState() => _AdminScreenState();
 }
 
-class _AdminScreenState extends State<AdminScreen> {
+class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
   late final AdminFcmCubit _fcmCubit;
+  late final TabController _tabController;
+
+  static const int _reservasTabIndex = 2;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 5, vsync: this);
     _fcmCubit = AdminFcmCubit();
     _fcmCubit.init();
 
@@ -37,17 +42,26 @@ class _AdminScreenState extends State<AdminScreen> {
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: 'Ver',
-            onPressed: () {
-              // Already in admin screen — dismiss only
-            },
+            onPressed: _goToReservas,
           ),
         ),
       );
     });
+
+    // Handle notification tap when app is in background
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      if (!mounted) return;
+      _goToReservas();
+    });
+  }
+
+  void _goToReservas() {
+    _tabController.animateTo(_reservasTabIndex);
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _fcmCubit.close();
     super.dispose();
   }
@@ -56,9 +70,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _fcmCubit,
-      child: DefaultTabController(
-        length: 5,
-        child: Scaffold(
+      child: Scaffold(
           appBar: AppBar(
             title: const Text('Painel Admin'),
             actions: [
@@ -71,9 +83,10 @@ class _AdminScreenState extends State<AdminScreen> {
                 ),
               ),
             ],
-            bottom: const TabBar(
+            bottom: TabBar(
+              controller: _tabController,
               isScrollable: true,
-              tabs: [
+              tabs: const [
                 Tab(text: 'Slots'),
                 Tab(text: 'Bloqueios'),
                 Tab(text: 'Reservas'),
@@ -92,12 +105,24 @@ class _AdminScreenState extends State<AdminScreen> {
                           context.read<AdminFcmCubit>().requestPermission(),
                     );
                   }
+                  if (state is AdminFcmError) {
+                    return Container(
+                      width: double.infinity,
+                      color: Colors.red.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Text(
+                        'FCM Error: ${state.message}',
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    );
+                  }
                   return const SizedBox.shrink();
                 },
               ),
-              const Expanded(
+              Expanded(
                 child: TabBarView(
-                  children: [
+                  controller: _tabController,
+                  children: const [
                     SlotManagementTab(),
                     BlockedDatesTab(),
                     BookingManagementTab(),
@@ -109,7 +134,6 @@ class _AdminScreenState extends State<AdminScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 }

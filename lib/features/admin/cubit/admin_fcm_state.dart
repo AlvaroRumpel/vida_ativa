@@ -17,3 +17,9 @@ final class AdminFcmActive extends AdminFcmState {
 
 /// Permission denied by the browser. Cannot request again programmatically.
 final class AdminFcmDenied extends AdminFcmState {}
+
+/// An error occurred during permission request or token fetch.
+final class AdminFcmError extends AdminFcmState {
+  final String message;
+  AdminFcmError(this.message);
+}

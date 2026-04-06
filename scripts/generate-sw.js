@@ -44,35 +44,10 @@ firebase.initializeApp({
   appId: '${config.appId}',
 });
 
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((message) => {
-  const notificationTitle = message.notification?.title || 'Nova Reserva';
-  const notificationOptions = {
-    body: message.notification?.body || '',
-    icon: '/icons/Icon-192.png',
-    badge: '/icons/Icon-192.png',
-    data: message.data || {},
-  };
-
-  return self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const link = event.notification.data?.link || '/admin';
-
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url.includes('/admin') && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      return clients.openWindow(link);
-    })
-  );
-});
+// Firebase handles background notifications and notificationclick automatically.
+// Do NOT add custom onBackgroundMessage or notificationclick handlers here —
+// they prevent onMessageOpenedApp from firing in the Flutter app.
+firebase.messaging();
 `;
 
 const outPath = path.resolve(__dirname, '../web/firebase-messaging-sw.js');

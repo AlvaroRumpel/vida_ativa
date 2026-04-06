@@ -36,42 +36,62 @@ class AdminFcmCubit extends Cubit<AdminFcmState> {
 
   /// Called when admin taps "Ativar Notificações" in the permission banner.
   Future<void> requestPermission() async {
-    final result = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      announcement: false,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-    );
+    try {
+      final result = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        announcement: false,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+      );
 
-    if (result.authorizationStatus == AuthorizationStatus.authorized ||
-        result.authorizationStatus == AuthorizationStatus.provisional) {
-      await _activateToken();
-    } else {
-      emit(AdminFcmDenied());
+      if (result.authorizationStatus == AuthorizationStatus.authorized ||
+          result.authorizationStatus == AuthorizationStatus.provisional) {
+        await _activateToken();
+      } else {
+        emit(AdminFcmDenied());
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[AdminFcmCubit] requestPermission error: $e');
+      emit(AdminFcmError('Erro ao solicitar permissão: $e'));
     }
   }
 
   Future<void> _activateToken() async {
-    const vapidKey = String.fromEnvironment(
-      'VAPID_PUBLIC_KEY',
-      defaultValue: '', // will be provided at build time
-    );
+    try {
+      const env = String.fromEnvironment('ENV', defaultValue: 'prod');
+      const vapidStaging = 'BKljao1LlvttrjI6nbvvVRfRD4VeZmMp32uyEaDqU3u6XoGIVkd9AdrnhCl_9-Q1rm2AHHMu9CUyrOvtzO5xQUw';
+      const vapidProd = String.fromEnvironment('VAPID_PUBLIC_KEY', defaultValue: '');
+      const vapidKey = env == 'staging' ? vapidStaging : vapidProd;
 
-    final token = await _messaging.getToken(
-      vapidKey: vapidKey.isNotEmpty ? vapidKey : null,
-    );
+      // ignore: avoid_print
+      print('[AdminFcmCubit] getToken vapidKey=${vapidKey.isNotEmpty ? "${vapidKey.substring(0, 10)}..." : "(empty)"}');
 
-    if (token != null) {
-      await _storeTokenInFirestore(token);
-      emit(AdminFcmActive(token));
+      final token = await _messaging.getToken(
+        vapidKey: vapidKey.isNotEmpty ? vapidKey : null,
+      );
+
+      // ignore: avoid_print
+      print('[AdminFcmCubit] token=${token != null ? "${token.substring(0, 20)}..." : "null"}');
+
+      if (token != null) {
+        await _storeTokenInFirestore(token);
+        emit(AdminFcmActive(token));
+      } else {
+        emit(AdminFcmError('Token FCM nulo — verifique VAPID key e service worker'));
+      }
+
+      // Listen for token refreshes (browser rotates token ~every 7 days)
+      _tokenRefreshSub?.cancel();
+      _tokenRefreshSub = _messaging.onTokenRefresh.listen(_storeTokenInFirestore);
+    } catch (e) {
+      // ignore: avoid_print
+      print('[AdminFcmCubit] _activateToken error: $e');
+      emit(AdminFcmError('Erro ao obter token FCM: $e'));
     }
-
-    // Listen for token refreshes (browser rotates token ~every 7 days)
-    _tokenRefreshSub?.cancel();
-    _tokenRefreshSub = _messaging.onTokenRefresh.listen(_storeTokenInFirestore);
   }
 
   Future<void> _storeTokenInFirestore(String token) async {

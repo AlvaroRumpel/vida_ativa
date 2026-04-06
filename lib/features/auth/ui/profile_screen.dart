@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -85,6 +87,9 @@ class ProfileScreen extends StatelessWidget {
                     foregroundColor: const Color(0xFFC62828),
                   ),
                 ),
+                const Spacer(),
+                const _AppFooter(),
+                const SizedBox(height: AppSpacing.lg),
               ],
             ),
           ),
@@ -151,6 +156,61 @@ void _showEditPhoneSheet(BuildContext context, String? currentPhone) {
       ),
     ),
   );
+}
+
+class _AppFooter extends StatelessWidget {
+  const _AppFooter();
+
+  Future<String> _version() async {
+    final info = await PackageInfo.fromPlatform();
+    return info.version;
+  }
+
+  Future<void> _launch(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const grey = TextStyle(fontSize: 12, color: Colors.grey);
+    const linkStyle = TextStyle(
+      fontSize: 12,
+      color: AppTheme.primaryGreen,
+      decoration: TextDecoration.underline,
+    );
+
+    return FutureBuilder<String>(
+      future: _version(),
+      builder: (context, snap) {
+        final version = snap.data ?? '—';
+        return Column(
+          children: [
+            const Divider(),
+            const SizedBox(height: AppSpacing.sm),
+            Text('Precisa de ajuda? Entre em contato:', style: grey),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () => _launch('mailto:alvaroRumpel@gmail.com'),
+                  child: const Text('alvaroRumpel@gmail.com', style: linkStyle),
+                ),
+                const Text('  |  ', style: grey),
+                GestureDetector(
+                  onTap: () => _launch('https://wa.me/5555999857941'),
+                  child: const Text('WhatsApp', style: linkStyle),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text('Desenvolvido por Álvaro Rumpel  •  v$version', style: grey),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _Avatar extends StatefulWidget {

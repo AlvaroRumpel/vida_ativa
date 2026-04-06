@@ -18,6 +18,11 @@ service cloud.firestore {
       allow update: if isAuthenticated() &&
         (request.auth.uid == userId || isAdmin());
       allow delete: if false;
+
+      match /fcmTokens/{tokenId} {
+        allow read, write: if isAuthenticated() && request.auth.uid == userId;
+        allow read: if isAdmin();
+      }
     }
 
     match /slots/{slotId} {
