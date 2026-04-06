@@ -54,21 +54,51 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ UI-02: Agenda exibe horários com layout inspirado no Google Calendar — v2.0
 - ✓ UI-03: Ajustes gerais de UI — consistência visual, espaçamentos, tipografia — v2.0
 
-### Active (v3.0)
+### Validated (v3.0)
+
+- ✓ ADMN-10: Admin vê label de semana contextualizada + navegação ← → entre semanas — v3.0
+- ✓ ADMN-11: Admin abre detalhe completo de qualquer reserva via bottomsheet — v3.0
+- ✓ BOOK-04: Cliente abre detalhe de reserva via bottomsheet em "Minhas Reservas" — v3.0
+- ✓ BOOK-06: Aviso explícito de pagamento exibido na confirmação de reserva — v3.0
+- ✓ BOOK-05: Agendamento recorrente semanal com data de término; conflitos ignorados — v3.0
+- ✓ NOTF-01: Push notifications FCM para admin quando nova reserva é criada — v3.0
+
+## Current Milestone: v4.0 Modularização & Pagamento Pix
+
+**Goal:** Tornar o app modular via feature toggles por academia e integrar pagamento Pix automático no fluxo de reserva.
+
+**Target features:**
+- Feature toggles por academia via Firestore config doc — habilitar/desabilitar features sem redeploy
+- Admin pode gerenciar feature flags no painel
+- Pagamento Pix automático — QR code gerado na reserva, confirmação via webhook
+
+### Active (v4.0)
+
+- [ ] FEAT-01: App lê config de features de Firestore na inicialização e habilita/desabilita UI conforme flags
+- [ ] FEAT-02: Admin pode ver e editar feature flags no painel admin
+- [ ] FEAT-03: Feature flags cobrem as principais features do app (notificações, recorrência, social, Pix)
+- [ ] PIX-01: Cliente pode pagar a reserva via Pix QR code gerado no app imediatamente após criar reserva
+- [ ] PIX-02: Reserva fica em status `pending_payment` até pagamento confirmado pelo gateway
+- [ ] PIX-03: App exibe QR code Pix + código copia-e-cola após criação da reserva
+- [ ] PIX-04: Cloud Function recebe webhook do gateway e atualiza status da reserva para `confirmed` ou `expired`
+- [ ] PIX-05: Cliente vê status de pagamento em "Minhas Reservas"
+- [ ] PIX-06: Admin vê status de pagamento no painel e pode confirmar manualmente se necessário
+
+### Active (v3.0 pendente)
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
 
-### Future (v3.0+)
+### Future (v4.0+)
 
 - Login com número de telefone (OTP via SMS) — complexidade web reCAPTCHA; deferido de v1
-- Notificação push quando reserva é confirmada/recusada — infra significativa; v3
-- Lembrete automático antes do horário reservado — v3
-- Prazo mínimo de cancelamento configurável pelo admin — v3
+- Lembrete automático antes do horário reservado
+- Prazo mínimo de cancelamento configurável pelo admin
 - Domínio customizado (ex: vidaativa.com.br) — pode ser configurado manualmente no console Firebase Hosting
+- Multi-tenant completo com seleção de academia no login — arquitetura base em v4.0, UI em v5+
 
 ### Out of Scope
 
-- Pagamento online — pagamento é presencial; fora do escopo explícito
+- Pagamento online com cartão de crédito/débito — Pix em v4.0; cartão é complexidade extra desnecessária agora
 - Múltiplas academias / multi-tenant — v1/v2 é exclusivo para Academia Vida Ativa
 - Chat / mensagens entre usuário e admin — WhatsApp já cobre isso
 - App nativo iOS/Android — PWA é suficiente
@@ -113,4 +143,4 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | FieldValue.delete() para campos nullable no Firestore | Evitar strings vazias no banco; padrão consistente | ✓ Aplicado em participants (Phase 07), phone (Phase 08) |
 
 ---
-*Last updated: 2026-03-31 after v2.0 milestone*
+*Last updated: 2026-04-06 after v4.0 milestone start*

@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.0
-milestone_name: Aprimoramentos de Reserva & Notificações
-status: complete
-stopped_at: v3.0 complete — Blaze plan upgraded, Cloud Functions deployed
-last_updated: "2026-04-05T14:07:46.235Z"
+milestone: v4.0
+milestone_name: Modularização & Pagamento Pix
+status: defining-requirements
+stopped_at: —
+last_updated: "2026-04-06T00:00:00.000Z"
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,12 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 16 — push-notifications-admin
+**Current focus:** v4.0 — Modularização & Pagamento Pix
 
 ## Current Position
 
-Phase: 16 (push-notifications-admin) — EXECUTING
-Plan: 2 of 3
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-06 — Milestone v4.0 started
 
 ## Performance Metrics
 
