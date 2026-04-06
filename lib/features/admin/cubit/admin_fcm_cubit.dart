@@ -64,7 +64,7 @@ class AdminFcmCubit extends Cubit<AdminFcmState> {
     try {
       const env = String.fromEnvironment('ENV', defaultValue: 'prod');
       const vapidStaging = 'BKljao1LlvttrjI6nbvvVRfRD4VeZmMp32uyEaDqU3u6XoGIVkd9AdrnhCl_9-Q1rm2AHHMu9CUyrOvtzO5xQUw';
-      const vapidProd = String.fromEnvironment('VAPID_PUBLIC_KEY', defaultValue: '');
+      const vapidProd = 'BE4IVHDfXnkE9o2xxSfYWpKxggsOlYKDI14_VW0wAEj_mWIx-K6lSDKQoLBbzFdgI8Ajrsv8FCen99oI-ST6qB4';
       const vapidKey = env == 'staging' ? vapidStaging : vapidProd;
 
       // ignore: avoid_print
