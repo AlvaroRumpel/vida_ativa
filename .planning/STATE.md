@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Aprimoramentos de Reserva & Notificações
-status: unknown
-stopped_at: Completed 16-03-PLAN.md (partial — Blaze upgrade required for functions)
+status: complete
+stopped_at: v3.0 complete — Blaze plan upgraded, Cloud Functions deployed
 last_updated: "2026-04-05T14:07:46.235Z"
 progress:
   total_phases: 4

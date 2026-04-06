@@ -1,5 +1,24 @@
 # Milestones
 
+## v3.0 Aprimoramentos de Reserva & Notificações (Shipped: 2026-04-06)
+
+**Phases completed:** 4 phases (13–16), 10 plans
+**Timeline:** 2026-03-31 → 2026-04-06
+**Codebase:** ~7,000+ lines of Dart
+
+**Key accomplishments:**
+
+1. Admin semana contextualizada: label da semana atual (ex: "31 mar – 6 abr") na aba Slots, navegação ← → entre semanas, day chips com data real
+2. Admin pode abrir detalhe completo de qualquer reserva via bottomsheet (nome, status, horário, preço, participantes + confirmar/recusar)
+3. Cliente pode abrir detalhe da reserva via bottomsheet em "Minhas Reservas" (data, horário, preço, status + cancelar/compartilhar)
+4. Aviso explícito de pagamento na confirmação de reserva (banner visual)
+5. Agendamento recorrente: cliente seleciona padrão semanal + data de término; conflitos ignorados silenciosamente
+6. Push notifications admin: FCM web push + service worker; admin recebe notificação quando nova reserva é criada; Cloud Functions deployed via Blaze plan
+
+**Archive:** `.planning/milestones/v3.0-ROADMAP.md`
+
+---
+
 ## v2.0 Funcionalidades Sociais & Admin (Shipped: 2026-03-31)
 
 **Phases completed:** 5 phases (7–11), 10 plans
