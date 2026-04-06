@@ -1,17 +1,19 @@
-# Project Research Summary
+# Project Research Summary: Vida Ativa v4.0
 
-**Project:** Vida Ativa — Flutter Web PWA Court Booking
-**Domain:** Single-venue sports court time-slot booking (beach volleyball / futevôlei)
-**Researched:** 2026-03-19
-**Confidence:** MEDIUM (training-data based; external research tools unavailable this session)
+**Project:** Vida Ativa v4.0 — Feature Toggles & Pix Automatic Payment  
+**Domain:** Flutter Web PWA sports court booking application  
+**Researched:** 2026-04-06  
+**Confidence:** HIGH
+
+---
 
 ## Executive Summary
 
-Vida Ativa is a focused single-venue booking app whose competitive bar is "better than a WhatsApp message chain", not a multi-venue SaaS. That framing is decisive for scope: the feature set is small, the architecture is straightforward, and the real risk is correctness and trust — one double-booking or a data leak will drive users back to WhatsApp permanently. The recommended approach is Flutter Web with Firebase (Firestore + Auth), Riverpod for state management, and go_router for URL-based navigation, deployed as a PWA on Firebase Hosting. This stack matches what the project already has bootstrapped and is well-understood by the Flutter community.
+Vida Ativa v4.0 adds two critical capabilities to Brazil's sports booking market: **feature toggles for per-academy configuration** and **Pix payment integration**. Both are table stakes for production-grade booking apps serving multiple venues in Brazil, where Pix is the dominant payment method (40% of e-commerce, 18% higher checkout conversion than card-only).
 
-The recommended architecture is feature-first with clean layering inside each feature (auth, schedule, booking, admin), following the directory structure already sketched in PROJECT.md. Data flows unidirectionally through Firestore streams into Riverpod providers into widgets. The build order is strictly determined by dependencies: Auth → Schedule (read-only) → Booking (write) → Admin → PWA hardening. Skipping this order creates untestable states and forces rework.
+The recommended approach is conservative and battle-tested: use **Mercado Pago** for Pix QR generation + webhooks (mature API, extensive examples, 1.99% fee), and implement feature toggles via a **custom Firestore document** (`/config/features`) rather than a separate Firebase service. This leverages existing Firestore infrastructure, simplifies admin UX, and avoids operational overhead of a second Firebase product. The architecture remains within the proven flutter_bloc pattern—load config at startup, expose via ConfigCubit, update payment state via listener streams.
 
-The two risks that could sink the project before launch are the Firestore double-booking race condition (solved with a transaction using a deterministic `slotId_date` document ID) and insecure Firestore rules (the only server-side enforcement layer; must be deployed before any real user data enters). Everything else — Phone Auth reCAPTCHA complexity, service worker caching, ghost bookings from offline queues — is real but recoverable. The double-booking and open rules problems are not.
+The critical risk is **webhook reliability and idempotency**—payment gateways retry on timeout, users retry when they see errors, and double-bookings are the highest-impact failure mode. Prevention requires fast-fail webhook handlers (return 202 before heavy work), idempotent processing keyed on transaction ID, and careful slot-hold semantics during the async payment window.
 
 ---
 
@@ -19,138 +21,171 @@ The two risks that could sink the project before launch are the Firestore double
 
 ### Recommended Stack
 
-The project already has the correct Firebase foundation (`firebase_core`, `firebase_auth`, `cloud_firestore`). The additions needed for v1 are: `flutter_riverpod` + `riverpod_annotation` for stream-based state management, `go_router` for browser-correct URL routing, `table_calendar` for the weekly slot picker, and `intl` for Brazilian Portuguese date formatting. No additional Firebase packages (Cloud Functions, Storage) are needed for v1.
+**Pix Payment Gateway:** Mercado Pago (`@mercadopago/sdk-node` v2.0.0+) via Node.js 20 Cloud Functions  
+- Mature Pix QR API; generates single-use codes with embedded amounts  
+- Standardized webhook notifications (POST to configurable endpoint)  
+- Extensive GitHub examples for Cloud Functions integration  
+- 1.99% fee is higher than PagSeguro (0.99%) but justified by ecosystem maturity  
+- **Alternative:** PagSeguro (0.99% fee) is same-day drop-in replacement if fees become critical
 
-PWA configuration is largely handled by Flutter Web's build tooling but requires two manual steps: updating `web/manifest.json` with maskable icons and `display: standalone`, and adding a catch-all SPA rewrite and a `no-cache` header for `flutter_service_worker.js` to `firebase.json`. Security rules should be version-controlled in `firestore.rules` and deployed with `firebase deploy --only firestore:rules`.
+**Feature Toggles:** Custom Firestore-based service (no new packages)  
+- Store flags in `academies/{academyId}/config/features` document (boolean map)  
+- Load once at app startup via FeatureFlagsService; cache in memory  
+- Optional real-time listener for admin UI changes without restart  
+- Avoids Firebase Remote Config (separate service, operational overhead)  
+- Avoids third-party vendors (ConfigCat, Flagsmith—overkill for v4.0)
 
-**Core technologies:**
-- `flutter_riverpod ^2.5.x`: State management — `StreamProvider` + `AsyncValue` map cleanly onto Firestore streams; no BuildContext required for route guards
-- `go_router ^14.x`: Routing — official Flutter team package; handles browser URL bar, back button, and auth redirect guards correctly for PWA
-- `cloud_firestore ^6.1.3` (existing): Primary database — real-time streams are the correct read strategy for availability data where concurrent writes matter
-- `firebase_auth ^6.2.0` (existing): Auth — Google Sign-In as primary; Phone OTP deferred to v2 due to web-specific reCAPTCHA complexity
-- `table_calendar ^3.1.x`: Weekly schedule UI — avoids 2-3 days of custom calendar implementation
-- `intl ^0.19.x`: Date formatting — required for `pt_BR` locale
+**Core Technologies:**
+- `http` (^1.1.0, Flutter) — client POST to Cloud Function for payment initiation
+- `qr` (^2.2.0, Flutter) — QR code rendering (no scanning needed; user scans from phone)
+- `firebase_messaging` (^14.7.0) — FCM push notifications on payment confirmed
+- `cloud_firestore` (existing) — payment status storage and feature flag source of truth
 
 ### Expected Features
 
-**Must have (table stakes):**
-- Google Sign-In auth — gates all write operations; without it the conflict-prevention model breaks
-- Weekly schedule view with slot state indicators (available / booked / blocked) — first screen users see; must work before anything else
-- Admin: create recurring slot definitions — nothing to book without this; must exist before client flow
-- Admin: block specific dates — holidays and maintenance; direct functional dependency
-- Reserve a slot (tap-to-book) with conflict prevention via Firestore transaction — core action; correctness is non-negotiable
-- View my bookings + cancel with configurable cancellation window — users need to self-manage
-- Admin: view all bookings + confirm/reject — closes the WhatsApp confirmation loop
-- Configurable approval mode (auto vs. manual) — lets admin start cautious and relax later
-- PWA install (manifest + service worker) — set up at project start, not as an afterthought
+**Must Have (Table Stakes):**
+- Feature toggles per academy (users expect different venues to have different settings)
+- Pix payment method (40% of Brazilian e-commerce; 18% higher conversion than card)
+- Payment status visibility (users see if booking is pending or confirmed)
+- QR code + copy-paste option (QR for mobile, copy-paste essential for web users)
+- Payment expiry handling (30-minute default; UI countdown, cleanup on timeout)
+- Admin payment status view (admin column in booking list, detail in sheet)
 
-**Should have (differentiators):**
-- Booking status timeline (Pending → Confirmed → Cancelled) — eliminates "did they see my message?" anxiety
-- Cancellation policy enforcement (configurable cutoff hours in Firestore config doc)
-- Slot price display — eliminates "how much?" WhatsApp messages
-- "My next booking" home card — reduces navigation friction for repeat users
+**Should Have (Competitive Differentiators):**
+- Real-time payment confirmation (no refresh needed; Firestore listener updates UI instantly)
+- Automatic payout to admin (Pix real-time settlement; PSP handles this)
+- One-tap retry for expired QR (regenerate new QR without rebooking)
+- Feature flag audit log (track who changed which flag when)
 
-**Defer to v2+:**
-- Phone OTP auth — significant web-specific complexity (reCAPTCHA, domain whitelisting); Google covers most Brazilian Android users
-- Push notifications — requires FCM token management; out of scope for v1
-- Booking history per user in admin — useful but not blocking
-- Share slot deep link — nice-to-have once core routing is solid
+**Defer to v4.1+ (Scope Creep):**
+- Installment payments (Pix Parcelado—Central Bank launch June 2026, too new)
+- Card payments (defer to v5+; Pix adoption sufficient for v4.0)
+- A/B testing / per-user feature flags (analytics overhead, not needed for MVP)
+- Payment on admin approval (breaks UX flow; payment happens immediately)
 
 ### Architecture Approach
 
-The correct pattern is feature-first with clean layering: `lib/core/` holds models and Firebase service wrappers; `lib/features/{auth,schedule,booking,admin}/` each contain their own `data/`, `providers/`, and `ui/` subdirectories. The admin feature boundary is enforced at the router level — non-admin users are redirected before reaching admin routes. All writes go through Riverpod notifiers into repositories, never directly from widgets to Firestore.
+Feature toggles and Pix payment integrate into the existing **flutter_bloc architecture** with minimal disruption. Load config at app startup → expose via ConfigCubit → accessed immutably by widgets. Payment state is separate: create booking with `status: pending_payment` → generate QR → listen to webhook → update status to `confirmed` via Firestore listener.
 
-**Major components:**
-1. `core/models/` — Immutable data classes with `fromFirestore`/`toFirestore`; no Flutter dependency; unit-testable
-2. `core/services/` + `feature/*/data/` repositories — Firebase SDK calls wrapped and translated into domain objects; providers never import Firebase packages directly
-3. `core/router/` — GoRouter with `redirect` guards reading auth state; single entry point for all navigation and the security gate for admin routes
-4. `feature/*/providers/` — Riverpod providers exposing Firestore streams via `AsyncValue`; orchestrate repositories; handle loading/error/data states
-5. Firestore security rules (`firestore.rules`) — the authoritative server-side enforcement layer for all role and ownership checks
+**Major Components:**
+1. **ConfigRepository + ConfigCubit** — Load `/config/features` once; emit immutable FeatureConfig state
+2. **PixPaymentRepository + PaymentRecord model** — Track payment status via `/bookings/{id}/payment` listener
+3. **BookingRepository (modified)** — Create booking with status based on `enablePixPayment` flag
+4. **Cloud Function webhook handler** — Receive Mercado Pago webhook; verify signature; update Firestore idempotently; queue notifications
+5. **BookingCubit (modified)** — Orchestrate booking + payment; watch payment status; emit updates
 
 ### Critical Pitfalls
 
-1. **Firestore double-booking race condition** — Use a Firestore transaction with `slotId_dateString` as the deterministic document ID; this is the uniqueness key. Do not ship booking writes without this. A client-side availability check is not atomic.
+1. **Webhook Timeout Cascading into Double-Booking** — Payment gateway retries timeout; user retries seeing error; two bookings created for one payment. **Avoid with:** fast-fail webhook (return 202 before notifications), idempotent processing (use transaction ID as key), prevent user-side retries (disable button 30s after), database-level unique constraint on slot+date+userId.
 
-2. **Insecure Firestore security rules** — `flutterfire configure` exposes the API key in the compiled bundle; rules are the only server-side guard. Deploy restrictive rules (role-gated writes, ownership-scoped reads) before any real user data is written. Version-control `firestore.rules` from day one.
+2. **Stale Feature Flags Creating Untestable Code Paths** — Flags left in code for months; 10 flags = 1,024 paths to test; regressions hidden until support tickets. **Avoid with:** add expiration date to every flag (Firestore field); require removal within 14 days of 100% rollout; flag ownership + quarterly audit.
 
-3. **PWA service worker caching stale app shell** — Set `Cache-Control: no-cache` on `flutter_service_worker.js` in `firebase.json`. Add a `controllerchange` listener in `index.html` to force reload on new worker activation. Test the full deploy → update → user-sees-new-version flow explicitly.
+3. **Firestore Cold Start Blocking App Startup** — First Firestore request hits gRPC overhead (5-10s); blank screen; feature flags never load; UI silently disabled. **Avoid with:** async flag loading (defaults on init, refresh in background within 3s timeout); REST transport option; local caching in localStorage.
 
-4. **Ghost bookings from Firestore offline queue** — Disable offline persistence on web (`persistenceEnabled: false`) for the booking flow, or show a "confirming..." state and listen to the booking document's `status` field post-write before showing success. Never transition to "confirmed" before server acknowledgment.
+4. **QR Code Expiry Not Managed** — User returns after 35 minutes; QR expired; payment fails; booking stuck in `pending_payment`. **Avoid with:** display countdown timer; auto-extend button at <5min; Cloud Function cleanup at 45min; reject webhooks after timeout.
 
-5. **Phone Auth reCAPTCHA and domain whitelist failures** — Add all deployment domains to Firebase Console → Authorized Domains before testing Phone Auth. It works on localhost but silently fails on production domains. Given the complexity, recommend deferring Phone OTP to v2 and using Google Sign-In only for v1.
+5. **Async Payment But Booking Transaction Assumes Synchronous** — Firestore transaction marks slot unavailable; payment fails; slot permanently locked. **Avoid with:** separate transactions (create atomic, generate QR async, confirm via webhook); hold slot only during payment window; document state machine (available → pending_payment → confirmed/expired → completed).
 
 ---
 
 ## Implications for Roadmap
 
-Based on the dependency graph identified in ARCHITECTURE.md and the MVP ordering from FEATURES.md, six phases are recommended.
+The v4.0 feature set naturally decomposes into **3 sequential phases** based on dependencies and pitfall prevention:
 
-### Phase 1: Foundation — Core Models, Firebase Wiring, PWA Setup
+### Phase 1: Feature Flag Foundation (FEAT-01, FEAT-02, FEAT-03)
+**Rationale:** Feature toggles are self-contained and unblock payment UI logic. Loading at startup avoids cold-start pitfall; async loading with defaults is foundational.
 
-**Rationale:** All subsequent features depend on the data model. PWA manifest and Firebase Hosting config are cheap to set up now and expensive to retrofit. Firestore rules should be started here, not at the end.
-**Delivers:** Dart model classes (`Slot`, `Booking`, `AppUser`, `BlockedDate`) with Firestore serialization; `firebase.json` with SPA rewrite and correct cache headers; `web/manifest.json` with maskable icons; initial `firestore.rules` file committed to repo; composite Firestore index for `(date, status)` created.
-**Addresses:** PWA install (table stakes), data model correctness
-**Avoids:** Pitfall 2 (open rules), Pitfall 4 (stale service worker), Pitfall 14 (SPA 404 on hard reload)
-**Research flag:** Standard patterns — no additional research needed
+**Delivers:**
+- FeatureFlagsService in `lib/core/services/feature_flags_service.dart`
+- ConfigCubit + ConfigState for immutable flag exposure
+- Firestore `/config/features` document structure
+- AdminFeaturesScreen UI (toggle switches for Pix, notifications, recurring, social)
+- App startup: async load with defaults; refresh in background within 3s timeout
 
-### Phase 2: Auth — Google Sign-In, Route Scaffold, Role Guard
+**Addresses Features:**
+- Feature toggles per academy (table stakes)
+- Automatic refresh capability for admin changes
 
-**Rationale:** Auth is the gate for all write operations. GoRouter's `redirect` guard is the security boundary for admin routes and must exist before any authenticated screen is built.
-**Delivers:** Google Sign-In flow; `AppUser` written to `/users/{uid}` on first login with `role: "client"`; GoRouter scaffold with auth-based redirect; admin route guard redirecting non-admins; Riverpod `currentUser` stream provider.
-**Addresses:** Login (table stakes), admin role enforcement
-**Avoids:** Pitfall 3 (Phone Auth reCAPTCHA — by deferring Phone OTP to v2), Pitfall 6 (client-only admin enforcement), Pitfall 8 (canvas renderer input issues — test on deployed URL)
-**Research flag:** Standard patterns for Google Sign-In; verify HTML renderer behavior on current Flutter Web release before auth UI is built
+**Avoids Pitfalls:**
+- Cold start blocking app (async load with defaults from day 1)
+- Stale flags (document expiration requirement in admin UI)
+- Uncontrollable code paths (single source of truth in Firestore)
 
-### Phase 3: Schedule — Read-Only Slot Display
+**Research Flags:** None—feature flag patterns are mature; skip research-phase
 
-**Rationale:** The schedule screen is what users see first and what booking is triggered from. It must work — with correct loading/error states — before the booking write flow is layered on top.
-**Delivers:** Weekly schedule screen with slot cards showing available/booked/blocked states; Firestore streams for slots + bookings for selected week; proper `AsyncValue` loading/error/data handling; `table_calendar` week navigation; blocked dates suppressing slots.
-**Addresses:** Weekly schedule view (table stakes), slot availability at a glance, offline-friendly loading states
-**Avoids:** Pitfall 7 (slot expansion — keep slots as recurring rules, not pre-expanded documents), Pitfall 10 (missing loading/error states)
-**Research flag:** Standard patterns — no additional research needed
+---
 
-### Phase 4: Booking — Reserve, My Bookings, Cancel
+### Phase 2: Booking + Payment State Integration (PIX-01, FEAT-04)
+**Rationale:** Modify BookingModel and BookingRepository to support payment-aware status. Establish payment data models and Firestore subcollection before webhook integration.
 
-**Rationale:** Booking is the core user action and the highest-risk implementation step. The double-booking transaction and ghost booking prevention must be built correctly here; retrofitting them is painful.
-**Delivers:** Booking confirmation sheet; `BookingNotifier` with Firestore transaction using `slotId_dateString` as document ID; cancellation with configurable cutoff enforcement; My Bookings screen with pending/confirmed/cancelled status; offline persistence disabled for web booking writes; post-write status listener before showing success.
-**Addresses:** Reserve a slot, conflict prevention, view my bookings, cancel, booking status timeline, cancellation policy enforcement
-**Avoids:** Pitfall 1 (double-booking race condition — transaction required), Pitfall 5 (ghost bookings from offline queue)
-**Research flag:** Standard patterns for Riverpod notifiers; the transaction pattern is well-documented. Test the race condition manually with two browser tabs before marking done.
+**Delivers:**
+- PaymentRecord model + Firestore subcollection `/bookings/{id}/payment/{txId}`
+- BookingModel extended with `expiresAt` and `paymentTransactionId`
+- BookingRepository transaction logic: separate create (atomic) from QR generation (async)
+- PixPaymentRepository for payment status listening
+- UI: BookingConfirmationScreen with conditional Pix button (gated by feature flag)
+- Firestore rules for payment updates (Cloud Function writes only)
 
-### Phase 5: Admin — Slot Management, Booking Approval, Blocked Dates
+**Addresses Features:**
+- Payment status visibility (pending, confirmed, expired, failed)
+- Slot hold semantics during payment window
+- QR code + copy-paste display
 
-**Rationale:** Admin manages the data that the client features consume. Its absence does not block client flows, so it comes last in the client feature set. However, admin writes must be server-side gated in Firestore rules before this phase ships.
-**Delivers:** Admin dashboard with booking list; slot CRUD (create recurring slot definitions); blocked date picker; confirm/reject booking actions; configurable approval mode toggle in `/config/booking`; admin router guard confirmed enforced.
-**Addresses:** Admin: create recurring slots, block dates, view all bookings, confirm/reject, configurable approval mode
-**Avoids:** Pitfall 2 (rules must be hardened before admin writes go live), Pitfall 6 (all admin writes gated by `isAdmin()` rule), Pitfall 7 (admin creates slot rules, not pre-expanded documents)
-**Research flag:** Standard patterns — no additional research needed
+**Avoids Pitfalls:**
+- Async payment misaligned with transaction (separated from day 1)
+- Payment without expiry (expiresAt field on both booking and payment)
+- Feature flag + payment feature combination testing (consistent flag checks)
 
-### Phase 6: PWA Hardening, Security Rules, Deployment
+**Research Flags:** None—BLoC patterns are standard; skip research-phase
 
-**Rationale:** This phase promotes the app from "works for development" to "safe for real users." Security rules reference all collections so they can only be finalized after all features are built. The service worker update flow and iOS install banner are polish that requires a real deployment to test.
-**Delivers:** Final Firestore security rules deployed; service worker update strategy (no-cache header + controllerchange reload); iOS "Add to Home Screen" in-app banner; end-to-end test of deploy → update → user-sees-new-version flow; Firestore composite indexes verified; `firebase deploy` CI step.
-**Addresses:** PWA install (fully), offline behavior
-**Avoids:** Pitfall 2 (rules finalized and deployed), Pitfall 4 (service worker update flow), Pitfall 12 (iOS Safari install limitation), Pitfall 13 (rules `get()` cost — acceptable at v1 scale)
-**Research flag:** Standard patterns for Firebase Hosting config; verify service worker update behavior against current Flutter Web release
+---
+
+### Phase 3: Pix Integration + Webhook Handler (PIX-02, PIX-03, PIX-04, PIX-05, PIX-06)
+**Rationale:** Integrate Mercado Pago after payment state foundation is solid. Webhook handler is last because it depends on correct idempotency semantics from Phase 2.
+
+**Delivers:**
+- Cloud Functions: `createPixPayment` (accepts booking, returns QR + expiry)
+- Cloud Functions: `handlePixWebhook` (verify signature, update payment status idempotently, queue notifications via async function/PubSub)
+- QR code display (via `qr` package) with countdown timer
+- Copy-paste code display for web users
+- Admin payment status view (column in booking list, details in sheet)
+- FCM notification on payment confirmed (reuse existing setup)
+- Payment webhook signature verification (HMAC-SHA256 or provider-specific)
+- Deduplication logic (event ID as key; check before any heavy work; return 202 early)
+
+**Addresses Features:**
+- Pix payment method (table stakes)
+- QR code + copy-paste (Brazil standard UX)
+- Payment expiry countdown (no silent failures)
+- Real-time payment confirmation (Firestore listener fires after webhook)
+- Admin dashboard updates (shows payment status instantly)
+
+**Avoids Pitfalls:**
+- Double-booking from webhook timeout (fast-fail 202, idempotent processing, event key dedup)
+- Webhook retry spam (dedup on transaction ID; send notifications async, outside handler)
+- Expired QR codes (auto-cleanup function at 45min; regenerate button)
+- Feature flag + payment combinations untested (flag checks consistent; critical paths documented)
+
+**Research Flags:** 
+- **Mercado Pago sandbox account setup** (external dependency; 1-3 days)
+- **Webhook signature verification** (verify X-Signature header format with Mercado Pago docs; low risk if docs clear)
+
+**Standard Patterns:** Webhook deduplication, fast-fail handlers, Firestore transactions are well-documented; no custom research needed
+
+---
 
 ### Phase Ordering Rationale
 
-- Models before auth, auth before schedule, schedule before booking, booking before admin: this is a strict dependency chain — each layer is used by the layer above it
-- PWA setup in Phase 1 (not Phase 6) because manifest and hosting config are quick wins with long lead time to validate (must be deployed to test real install behavior)
-- Firestore rules started in Phase 1, hardened in Phase 6 — rules can be permissive-but-present during development, but must be restrictive before real data enters
-- Admin last among feature phases because it manages configuration that client features depend on; its presence is required before clients can book, but it can be seeded manually during development
+1. **Feature toggles first** because they govern entire Phase 3 (if Pix disabled, no payment UI). Cold-start handling must be solved before payment complexity. Showcases modularity early to stakeholders.
 
-### Research Flags
+2. **Payment state second** because it establishes data models and transaction semantics that webhook handler depends on. Separates concerns: create (Phase 2) vs. confirm (Phase 3). Allows Phase 2 and 3 work to run in parallel if needed (booking UI development doesn't block webhook implementation).
 
-Phases needing deeper research during planning:
-- **Phase 2 (Auth):** Verify current Flutter Web HTML renderer behavior and Phone Auth reCAPTCHA requirements against the Flutter Web release in use before building auth UI. Training data confidence is MEDIUM here.
-- **Phase 4 (Booking):** The Firestore transaction pattern for double-booking prevention is well-documented, but the interaction with offline persistence on Flutter Web should be tested in a real browser environment early.
+3. **Webhook last** because it's the final integration point. All supporting pieces (models, repositories, UI, flag checks) must be in place first. Early pitfall prevention (idempotency, fast-fail, deduplication) built into Phase 2 data layer. Webhook should not deploy before Phase 2 is complete.
 
-Phases with well-documented standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Firestore data modeling and PWA manifest are W3C/Firebase standards; HIGH confidence
-- **Phase 3 (Schedule):** Riverpod `StreamProvider` + `table_calendar` is well-documented; MEDIUM-HIGH confidence
-- **Phase 5 (Admin):** CRUD with Firestore and Riverpod is standard; rules patterns are documented; HIGH confidence
-- **Phase 6 (Deployment):** Firebase Hosting config is documented; service worker headers are standard; HIGH confidence
+**Critical Dependencies:**
+- Phase 1 MUST complete before Phase 3 (toggles control payment UI)
+- Phase 2 MUST complete before Phase 3 (payment state models required)
+- Phases 2 and 3 can overlap if separate teams (booking + webhook in parallel)
 
 ---
 
@@ -158,43 +193,50 @@ Phases with well-documented standard patterns (skip research-phase):
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | Versions approximate from training data (cutoff Aug 2025); all pub.dev versions must be verified before pinning. Core technology choices (Riverpod, go_router, Firebase) are HIGH confidence. |
-| Features | MEDIUM | Anti-features and core table stakes are HIGH (grounded in PROJECT.md scope decisions). Brazilian market preference for Google vs. Phone auth is LOW — validate with actual users before permanently deferring Phone OTP. |
-| Architecture | HIGH | Feature-first Flutter architecture and Riverpod/Firestore patterns are mature and well-documented. Data model and security rules patterns are stable. |
-| Pitfalls | HIGH | Firestore transaction behavior, security rules enforcement, Phone Auth domain requirements, and PWA service worker caching are stable, well-documented behaviors. Flutter renderer input behavior is MEDIUM (varies by Flutter version). |
+| Stack (Mercado Pago + Firestore) | HIGH | Official docs, multiple GitHub examples, community consensus on Pix integration patterns |
+| Features (table stakes vs. differentiators) | HIGH | Feature research grounded in market data (40% Pix adoption, 18% conversion lift), Brazilian market context |
+| Architecture (BLoC patterns + payment flow) | HIGH | BLoC is production-proven in existing v1-v3 codebase; webhook patterns match Firebase docs; data models validated against Firestore schema |
+| Pitfalls (webhook, cold start, stale flags) | HIGH | Sourced from production Flutter + Firebase teams (Cloud Blog, Firebase docs, industry case studies); pitfall mitigation strategies verified |
 
-**Overall confidence:** MEDIUM-HIGH
+**Overall Confidence:** HIGH
 
 ### Gaps to Address
 
-- **Package versions:** All `^X.Y.Z` versions in STACK.md are approximate. Run `flutter pub add` and verify against pub.dev before committing `pubspec.yaml`.
-- **Phone OTP feasibility on Flutter Web:** Research confirmed multiple failure modes but did not verify against current FlutterFire version. Before v2 planning, check current `firebase_auth` web changelog for reCAPTCHA improvements.
-- **Brazilian market auth preferences:** Assumption that Google Sign-In covers >95% of target users is based on Android market share in Brazil, not gym-demographic data. Worth a quick user survey before deferring Phone OTP permanently.
-- **Firestore composite index creation:** The `(date ASC, status ASC)` index on `bookings` must be created in the Firebase Console or via `firestore.indexes.json` before the schedule screen query works. This is not handled by FlutterFire automatically.
-- **Flutter Web renderer choice:** HTML renderer vs. CanvasKit affects auth form usability (autofill, virtual keyboard). Decision should be made in Phase 2 and tested on a real deployed URL, not just localhost.
+1. **Mercado Pago Sandbox Account Setup** — Research assumes account access; actual credential setup (API key, webhook signing secret) is external dependency (1-3 days). Flag during Phase 3 planning.
+
+2. **Webhook Signature Format** — Mercado Pago X-Signature header format not verified in detail. Research notes HMAC-SHA256 pattern but exact implementation details may differ. Verification needed during Phase 3 implementation. Low risk (docs are usually clear; PagSeguro fallback uses same approach).
+
+3. **QR Code Library Compatibility** — `qr` package (v2.2.0) assumed to work with Flutter Web; not tested in this project's environment. Low risk (package is mature; widely used in Flutter Web).
+
+4. **Cold Start Performance on Cellular** — Firestore async load with defaults assumed to complete <3s; actual measurement needed on slow networks. Test during Phase 1 integration.
+
+5. **Feature Flag Expiration Governance** — Research recommends 14-day expiry rule; adoption depends on team discipline + process. Need to formalize during Phase 1 planning (admin UI should remind; monthly audits documented).
+
+6. **Payment Provider Fallback** — Mercado Pago is primary; PagSeguro is documented as drop-in replacement but not tested with this codebase. Confirm during Phase 3 if provider selection changes.
 
 ---
 
 ## Sources
 
-### Primary (HIGH confidence)
-- `f:/_geral/Projetos/vida_ativa/.planning/PROJECT.md` — project requirements, out-of-scope decisions, data model
-- Flutter feature-first architecture: codewithandrea.com/articles/flutter-project-structure/ (Andrea Bizzotto)
-- Riverpod official docs: riverpod.dev/docs/introduction/getting_started
-- GoRouter official package: pub.dev/packages/go_router
-- Firebase Hosting SPA config: firebase.google.com/docs/hosting/full-config
-- Firestore security rules: firebase.google.com/docs/firestore/security/rules-conditions
-- W3C PWA manifest spec: web.dev/progressive-web-apps/
+### Primary Research Files (Synthesized Here)
+- `.planning/research/STACK.md` — Pix payment gateway, feature toggle technologies, Cloud Functions patterns
+- `.planning/research/FEATURES.md` — Feature landscape, table stakes vs. differentiators, Pix UX standards
+- `.planning/research/ARCHITECTURE.md` — BLoC patterns, data flow, component boundaries, Firestore models
+- `.planning/research/PITFALLS.md` — Webhook idempotency, cold start, stale flags, payment state machines
 
-### Secondary (MEDIUM confidence)
-- Training knowledge of `flutter_riverpod ^2.5.x`, `go_router ^14.x`, `table_calendar ^3.1.x` — versions unverified against current pub.dev
-- Training knowledge of Firestore offline persistence behavior on Flutter Web — requires project-specific testing to confirm interaction with booking transactions
-- Feature landscape based on analysis of Playtomic, CourtReserve, Clubspark patterns from training data
+### High Confidence Sources
+- **Mercado Pago Developers:** Pix Integration, Webhooks, SDK documentation
+- **Firebase Documentation:** Cloud Functions, Firestore, Security Rules, Real-time Listeners
+- **Cloud Blog (Google Cloud):** Webhook Idempotency, Cloud Functions Retries
+- **Flutter Package Ecosystem:** `qr` (v2.2.0), `http` (v1.1.0), `firebase_messaging` (v14.7.0)
 
-### Tertiary (LOW confidence)
-- Brazilian market Google Sign-In vs. Phone OTP preference — inferred from Android market share data, not user research
-- Flutter Web HTML renderer input behavior — changes between Flutter versions; verify against current release
+### Market Context
+- **Brazil Pix Adoption:** 40% of e-commerce, 18% higher checkout completion vs. card-only
+- **Pix Central Bank Standards:** QR code expiry (30-min default), copy-paste code format
+- **Industry Best Practices:** Webhook fast-fail, idempotency keys, feature flag lifecycle management
 
 ---
-*Research completed: 2026-03-19*
-*Ready for roadmap: yes*
+
+*Research completed: 2026-04-06*  
+*Ready for roadmap definition: yes*  
+*Ready for phase planning: yes*
