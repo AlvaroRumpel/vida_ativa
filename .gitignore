@@ -35,6 +35,10 @@ scripts/service-account.json
 scripts/*-firebase-adminsdk-*.json
 scripts/node_modules/
 
+# Firebase options — contain API keys, regenerate via FlutterFire CLI
+lib/firebase_options.dart
+lib/firebase_options_staging.dart
+
 # Local/generated files
 users_backup.json
 devtools_options.yaml
