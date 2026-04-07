@@ -63,26 +63,22 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ BOOK-05: Agendamento recorrente semanal com data de término; conflitos ignorados — v3.0
 - ✓ NOTF-01: Push notifications FCM para admin quando nova reserva é criada — v3.0
 
-## Current Milestone: v4.0 Modularização & Pagamento Pix
+## Current Milestone: v4.0 Pagamento Pix
 
 **Goal:** Tornar o app modular via feature toggles por academia e integrar pagamento Pix automático no fluxo de reserva.
 
 **Target features:**
-- Feature toggles por academia via Firestore config doc — habilitar/desabilitar features sem redeploy
-- Admin pode gerenciar feature flags no painel
-- Pagamento Pix automático — QR code gerado na reserva, confirmação via webhook
+- Pagamento Pix automático — QR code gerado na reserva, confirmação via webhook (Mercado Pago)
 
 ### Active (v4.0)
 
-- [ ] FEAT-01: App lê config de features de Firestore na inicialização e habilita/desabilita UI conforme flags
-- [ ] FEAT-02: Admin pode ver e editar feature flags no painel admin
-- [ ] FEAT-03: Feature flags cobrem as principais features do app (notificações, recorrência, social, Pix)
-- [ ] PIX-01: Cliente pode pagar a reserva via Pix QR code gerado no app imediatamente após criar reserva
-- [ ] PIX-02: Reserva fica em status `pending_payment` até pagamento confirmado pelo gateway
-- [ ] PIX-03: App exibe QR code Pix + código copia-e-cola após criação da reserva
-- [ ] PIX-04: Cloud Function recebe webhook do gateway e atualiza status da reserva para `confirmed` ou `expired`
-- [ ] PIX-05: Cliente vê status de pagamento em "Minhas Reservas"
-- [ ] PIX-06: Admin vê status de pagamento no painel e pode confirmar manualmente se necessário
+- [ ] PIX-01: Cliente pode pagar a reserva via Pix QR code + copia-e-cola gerado no app após criar reserva
+- [ ] PIX-02: Reserva fica em status `pending_payment`; slot bloqueado por 30 min durante janela de pagamento
+- [ ] PIX-03: App exibe timer de expiração do QR code; botão regenerar QR sem refazer a reserva
+- [ ] PIX-04: Cloud Function recebe webhook do Mercado Pago, verifica assinatura, processa idempotente
+- [ ] PIX-05: Cliente vê status de pagamento em tempo real em "Minhas Reservas"
+- [ ] PIX-06: Admin vê status de pagamento no painel e pode confirmar manualmente se webhook falhar
+- [ ] PIX-07: Cloud Function expira reservas não pagas após 45 min; libera slot
 
 ### Active (v3.0 pendente)
 

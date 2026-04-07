@@ -4,7 +4,8 @@
 
 - ✅ **v1.0 MVP** — Phases 1–6 (shipped 2026-03-23)
 - ✅ **v2.0 Funcionalidades Sociais & Admin** — Phases 7–11 (shipped 2026-03-31)
-- 📋 **v3.0** — Phase 12+ (planned — awaiting client assets)
+- ✅ **v3.0 Aprimoramentos de Reserva & Notificações** — Phases 12–16 (shipped 2026-04-06)
+- 🚧 **v4.0 Pagamento Pix** — Phases 17–18 (in progress)
 
 ## Phases
 
@@ -35,75 +36,50 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
 </details>
 
-### 🔄 v3.0 Aprimoramentos de Reserva & Notificações
+<details>
+<summary>✅ v3.0 Aprimoramentos de Reserva & Notificações (Phases 12–16) — SHIPPED 2026-04-06</summary>
 
 - [x] **Phase 12: Rebrand Visual** - Logo e paleta de cores do cliente aplicados em todas as telas (completed 2026-03-31)
-- [x] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (ADMN-10, ADMN-11) (completed 2026-04-01)
-- [x] **Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento** - Cliente abre bottomsheet com detalhe completo; aviso de pagamento na confirmação (BOOK-04, BOOK-06) (completed 2026-04-01)
-- [x] **Phase 15: Agendamento Recorrente** - Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos (BOOK-05) (completed 2026-04-04)
-- [x] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (NOTF-01) (completed 2026-04-05)
+- [x] **Phase 13: Admin Semana Contextualizada** - Admin vê label da semana atual, navega entre semanas, acessa detalhe de qualquer reserva via bottomsheet (completed 2026-04-01)
+- [x] **Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento** - Cliente abre bottomsheet com detalhe completo; aviso de pagamento na confirmação (completed 2026-04-01)
+- [x] **Phase 15: Agendamento Recorrente** - Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos (completed 2026-04-04)
+- [x] **Phase 16: Push Notifications Admin** - Admin recebe web push (FCM) quando nova reserva é criada (completed 2026-04-05)
 
 Full details: `.planning/milestones/v3.0-ROADMAP.md`
 
+</details>
+
+### 🚧 v4.0 Pagamento Pix (In Progress)
+
+**Milestone Goal:** Cliente paga a reserva via Pix no app; pagamento confirmado automaticamente via webhook; slot liberado se pagamento expirar.
+
+- [ ] **Phase 17: Pix QR Generation** - BookingModel estendido com status de pagamento; Cloud Function gera QR code Mercado Pago; Flutter exibe QR + copia-e-cola após reserva
+- [ ] **Phase 18: Webhook + Confirmação em Tempo Real** - Cloud Function processa webhook idempotente; Flutter atualiza status em tempo real; timer de expiração + regeneração de QR; Cloud Function expira reservas após 45 min; admin vê status de pagamento e pode confirmar manualmente
+
 ## Phase Details
 
-### Phase 13: Admin Semana Contextualizada
-**Goal:** Admin vê qual semana está exibida nos slots, navega entre semanas e acessa detalhe de qualquer reserva
-**Depends on:** v2.0 complete
-**Requirements**: ADMN-10, ADMN-11
-**Plans:** 2/2 plans complete
+### Phase 17: Pix QR Generation
+**Goal**: Cliente cria uma reserva e imediatamente recebe um QR code Pix para pagar, com o slot bloqueado durante a janela de pagamento
+**Depends on**: Phase 16 (v3.0 complete)
+**Requirements**: PIX-01, PIX-02
+**Success Criteria** (what must be TRUE):
+  1. Após criar reserva, cliente vê tela com QR code Pix e código copia-e-cola gerados pelo Mercado Pago
+  2. Reserva criada fica com status `pending_payment` no Firestore; slot não aparece como disponível para outros clientes
+  3. QR code tem validade de 30 min; campo `expiresAt` visível na reserva
+  4. Cloud Function `createPixPayment` aceita bookingId, chama Mercado Pago, salva PaymentRecord em `/bookings/{id}/payment/{txId}` e retorna QR data
+**Plans**: TBD
 
-Plans:
-- [ ] 13-01-PLAN.md — Week navigation e date chips na aba Slots (ADMN-10)
-- [ ] 13-02-PLAN.md — AdminBookingDetailSheet + wire em BookingManagementTab (ADMN-11)
-
-**Success Criteria:**
-1. Aba Slots exibe label "31 mar – 6 abr" com botões ← → para navegar entre semanas
-2. Day chips mostram dia + data real (ex: "Seg\n01")
-3. Admin toca qualquer reserva (em Reservas ou em Slots) → bottomsheet com nome, status, horário, preço, participantes
-4. Bottomsheet tem botões confirmar/recusar para reservas pendentes
-
-### Phase 14: Detalhe de Reserva (Cliente) + Aviso de Pagamento
-**Goal:** Cliente acessa detalhe de reserva com um toque; aviso de pagamento visível na confirmação
-**Depends on:** Phase 13
-**Requirements**: BOOK-04, BOOK-06
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] 14-01-PLAN.md — ClientBookingDetailSheet + tap em MyBookingsScreen (BOOK-04)
-- [ ] 14-02-PLAN.md — Payment warning banner em BookingConfirmationSheet (BOOK-06)
-
-**Success Criteria:**
-1. Toque em qualquer card em "Minhas Reservas" abre bottomsheet com detalhe completo
-2. Bottomsheet exibe: data formatada, horário, preço, participantes, status badge, botões cancelar + compartilhar
-3. Tela de confirmação de reserva exibe banner com aviso de pagamento antes do botão "Reservar"
-
-### Phase 15: Agendamento Recorrente
-**Goal:** Cliente cria múltiplas reservas semanais de uma vez, com gestão de conflitos
-**Depends on:** Phase 14
-**Requirements**: BOOK-05
-**Success Criteria:**
-1. Tela de confirmação tem opção "Reserva recorrente" com date picker de término
-2. Preview lista todas as datas que serão reservadas
-3. Após confirmar, todas as datas são criadas; conflitos listados em dialog de resultado
-4. Sem novo modelo Firestore — cada reserva é um doc `bookings/{slotId}_{date}` normal
-
-### Phase 16: Push Notifications Admin
-**Goal:** Admin recebe notificação push no browser quando nova reserva é feita
-**Depends on:** Phase 13
-**Requirements**: NOTF-01
-**Plans:** 3/3 plans complete
-
-Plans:
-- [ ] 16-01-PLAN.md — FCM infrastructure: pubspec, service worker, Cloud Function trigger
-- [ ] 16-02-PLAN.md — Flutter FCM cubit + AdminScreen permission banner and foreground messages
-- [ ] 16-03-PLAN.md — Deploy to staging + end-to-end human verification
-
-**Success Criteria:**
-1. Admin autoriza notificações no browser → token FCM registrado
-2. Nova reserva criada por cliente → admin recebe push notification
-3. Notificação exibe nome do cliente e horário da reserva
-4. Funciona com browser fechado (service worker)
+### Phase 18: Webhook + Confirmação em Tempo Real
+**Goal**: Pagamento confirmado via webhook atualiza reserva para `confirmed`; reservas não pagas expiram automaticamente; admin e cliente veem status atualizado sem recarregar
+**Depends on**: Phase 17
+**Requirements**: PIX-03, PIX-04, PIX-05, PIX-06, PIX-07
+**Success Criteria** (what must be TRUE):
+  1. Cliente vê timer de contagem regressiva na tela de pagamento; após expirar, exibe botão "Gerar novo QR" sem precisar refazer a reserva
+  2. Quando Mercado Pago confirma pagamento, status da reserva em "Minhas Reservas" atualiza para `confirmed` automaticamente (sem refresh)
+  3. Cloud Function `handlePixWebhook` verifica assinatura do Mercado Pago, processa de forma idempotente usando transaction ID como chave, retorna 202 imediatamente; pagamento confirmado move reserva para `confirmed` ignorando modo de aprovação manual do admin
+  4. Admin vê coluna/badge de status de pagamento na listagem de reservas e no bottomsheet de detalhe; botão "Confirmar manualmente" disponível para fallback
+  5. Reservas em `pending_payment` sem pagamento são marcadas como `expired` e o slot é liberado automaticamente após 45 min pela Cloud Function `expireUnpaidBookings`
+**Plans**: TBD
 
 ## Progress
 
@@ -121,7 +97,9 @@ Plans:
 | 10. Monitoramento de Erros | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 11. Melhorias Visuais | v2.0 | 2/2 | Complete | 2026-03-26 |
 | 12. Rebrand Visual | v3.0 | 2/2 | Complete | 2026-03-31 |
-| 13. Admin Semana Contextualizada | 2/2 | Complete    | 2026-04-01 | - |
-| 14. Detalhe de Reserva (Cliente) + Aviso | 2/2 | Complete    | 2026-04-01 | - |
-| 15. Agendamento Recorrente | 3/3 | Complete    | 2026-04-04 | - |
-| 16. Push Notifications Admin | 3/3 | Complete   | 2026-04-05 | - |
+| 13. Admin Semana Contextualizada | v3.0 | 2/2 | Complete | 2026-04-01 |
+| 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 2/2 | Complete | 2026-04-01 |
+| 15. Agendamento Recorrente | v3.0 | 3/3 | Complete | 2026-04-04 |
+| 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
+| 17. Pix QR Generation | v4.0 | 0/? | Not started | - |
+| 18. Webhook + Confirmação em Tempo Real | v4.0 | 0/? | Not started | - |
