@@ -3,6 +3,21 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
 status: ready-to-plan
+stopped_at: Phase 17 context gathered
+last_updated: "2026-04-07T21:35:08.872Z"
+last_activity: 2026-04-06 — v4.0 roadmap created (Phases 17–18)
+progress:
+  total_phases: 2
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+---
+
+---
+gsd_state_version: 1.0
+milestone: v4.0
+milestone_name: Pagamento Pix
+status: ready-to-plan
 stopped_at: roadmap-created
 last_updated: "2026-04-06T00:00:00.000Z"
 progress:
@@ -33,6 +48,7 @@ Progress: [░░░░░░░░░░] 0% (v4.0 milestone)
 ## Performance Metrics
 
 **Velocity (v3.0 reference):**
+
 - Total v3.0 plans completed: 10
 - Average duration: ~5 min/plan
 - Total v3.0 execution time: ~50 min
@@ -76,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06
-Stopped at: v4.0 roadmap created — Phases 17 and 18 defined
-Resume file: None
+Last session: 2026-04-07T21:35:08.863Z
+Stopped at: Phase 17 context gathered
+Resume file: .planning/phases/17-pix-qr-generation/17-CONTEXT.md
