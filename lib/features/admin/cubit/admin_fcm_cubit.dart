@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'admin_fcm_state.dart';
 
@@ -53,9 +54,8 @@ class AdminFcmCubit extends Cubit<AdminFcmState> {
       } else {
         emit(AdminFcmDenied());
       }
-    } catch (e) {
-      // ignore: avoid_print
-      print('[AdminFcmCubit] requestPermission error: $e');
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AdminFcmError('Erro ao solicitar permissão: $e'));
     }
   }
@@ -67,15 +67,9 @@ class AdminFcmCubit extends Cubit<AdminFcmState> {
       const vapidProd = 'BE4IVHDfXnkE9o2xxSfYWpKxggsOlYKDI14_VW0wAEj_mWIx-K6lSDKQoLBbzFdgI8Ajrsv8FCen99oI-ST6qB4';
       const vapidKey = env == 'staging' ? vapidStaging : vapidProd;
 
-      // ignore: avoid_print
-      print('[AdminFcmCubit] getToken vapidKey=${vapidKey.isNotEmpty ? "${vapidKey.substring(0, 10)}..." : "(empty)"}');
-
       final token = await _messaging.getToken(
         vapidKey: vapidKey.isNotEmpty ? vapidKey : null,
       );
-
-      // ignore: avoid_print
-      print('[AdminFcmCubit] token=${token != null ? "${token.substring(0, 20)}..." : "null"}');
 
       if (token != null) {
         await _storeTokenInFirestore(token);
@@ -87,9 +81,8 @@ class AdminFcmCubit extends Cubit<AdminFcmState> {
       // Listen for token refreshes (browser rotates token ~every 7 days)
       _tokenRefreshSub?.cancel();
       _tokenRefreshSub = _messaging.onTokenRefresh.listen(_storeTokenInFirestore);
-    } catch (e) {
-      // ignore: avoid_print
-      print('[AdminFcmCubit] _activateToken error: $e');
+    } catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       emit(AdminFcmError('Erro ao obter token FCM: $e'));
     }
   }

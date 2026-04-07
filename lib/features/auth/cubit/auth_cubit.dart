@@ -64,6 +64,18 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  // Auth errors that are expected user behaviour — not reported to Sentry.
+  static const _silentAuthCodes = {
+    'invalid-credential',
+    'user-not-found',
+    'wrong-password',
+    'email-already-in-use',
+    'weak-password',
+    'invalid-email',
+    'popup-closed-by-user',
+    'user-cancelled',
+  };
+
   Future<void> signInWithGoogle() async {
     emit(const AuthLoading());
     try {
@@ -84,7 +96,9 @@ class AuthCubit extends Cubit<AuthState> {
       }
       // authStateChanges will fire and emit AuthAuthenticated
     } on FirebaseAuthException catch (e, s) {
-      await Sentry.captureException(e, stackTrace: s);
+      if (!_silentAuthCodes.contains(e.code)) {
+        await Sentry.captureException(e, stackTrace: s);
+      }
       emit(AuthError(_mapEmailError(e.code)));
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
@@ -98,7 +112,9 @@ class AuthCubit extends Cubit<AuthState> {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       // authStateChanges will fire and emit AuthAuthenticated
     } on FirebaseAuthException catch (e, s) {
-      await Sentry.captureException(e, stackTrace: s);
+      if (!_silentAuthCodes.contains(e.code)) {
+        await Sentry.captureException(e, stackTrace: s);
+      }
       emit(AuthError(_mapEmailError(e.code)));
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
@@ -134,7 +150,9 @@ class AuthCubit extends Cubit<AuthState> {
           .set(user.toFirestore());
       // authStateChanges will fire and emit AuthAuthenticated
     } on FirebaseAuthException catch (e, s) {
-      await Sentry.captureException(e, stackTrace: s);
+      if (!_silentAuthCodes.contains(e.code)) {
+        await Sentry.captureException(e, stackTrace: s);
+      }
       emit(AuthError(_mapEmailError(e.code)));
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
@@ -64,7 +65,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
           },
         ),
       );
-    } on Exception {
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       if (mounted) {
         setState(() {
           _isSubmitting = false;
@@ -95,10 +97,13 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         Navigator.pop(context);
         SnackHelper.success(context, 'Reserva feita!');
       }
-    } on Exception catch (e) {
-      final msg = e.toString().contains('slot_already_booked')
+    } on Exception catch (e, s) {
+      final str = e.toString();
+      final isExpected = str.contains('slot_already_booked') || str.contains('slot_already_passed');
+      if (!isExpected) await Sentry.captureException(e, stackTrace: s);
+      final msg = str.contains('slot_already_booked')
           ? 'Este horario acabou de ser reservado.'
-          : e.toString().contains('slot_already_passed')
+          : str.contains('slot_already_passed')
               ? 'Este horario ja passou.'
               : 'Falha na conexao. Tente novamente.';
       if (mounted) {

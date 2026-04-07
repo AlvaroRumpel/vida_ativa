@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -88,7 +89,8 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     try {
       await widget.bookingCubit.cancelBooking(widget.booking.id);
       if (mounted) Navigator.pop(context);
-    } on Exception {
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       if (mounted) {
         setState(() {
           _isSubmitting = false;
@@ -144,7 +146,8 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
         );
       }
       if (mounted) Navigator.pop(context);
-    } on Exception {
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
       if (mounted) {
         setState(() {
           _isSubmitting = false;
