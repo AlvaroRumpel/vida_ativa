@@ -47,36 +47,40 @@ Declared values (Flutter EdgeInsets, multiples of 4px):
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
+| Label/Badge | 14px | 400 (regular) | 1.5 | Input labels, helper text, timestamps, badge text |
 | Body | 16px | 400 (regular) | 1.5 | Default text, instructions, card content |
-| Label | 14px | 400 (regular) | 1.5 | Input labels, helper text, timestamps |
 | Heading (AppBar) | 18px | 700 (bold) | 1.2 | Screen titles, section headings |
-| Countdown (Timer) | 24px | 600 (semibold) | 1.2 | Prominent timer display on payment screen |
-| Badge Text | 12px | 500 (medium) | 1.4 | Admin payment status badges |
+| Countdown (Timer) | 24px | 700 (bold) | 1.2 | Prominent timer display on payment screen |
 
 **Font Family:** Nunito (from `google_fonts` package)
 
-**Source:** AppTheme.lightTheme uses `GoogleFonts.nunitoTextTheme()`. Phase 18 adds countdown display at 24px for prominence.
+**Font Weight Palette:** Exactly 2 weights — 400 (regular) + 700 (bold). No 500 or 600.
+
+**Source:** AppTheme.lightTheme uses `GoogleFonts.nunitoTextTheme()`. Phase 18 countdown display at 24px/700 for prominence.
 
 ---
 
 ## Color Contract
 
-| Role | Value (Hex) | Semantics | Usage |
-|------|-------------|-----------|-------|
-| **Dominant (60%)** | #FDFAf5 | Surface background | Screen backgrounds, SafeArea fill |
-| **Secondary (30%)** | #F5F1E8 | Card/container background | Card surfaces, bottom sheets |
-| **Primary Brand** | #7B5D0A | Primary action, text | AppBar title, FilledButton, primary text |
-| **Accent Brand** | #D4A800 | Secondary action | Secondary buttons, emphasis text |
-| **Semantic: Success** | #4CAF50 | Confirmed/paid state | Badge "Pix pago", confirmed status icon |
-| **Semantic: Warning** | #FFC107 | Awaiting payment | Badge "Aguardando Pix", pending state |
-| **Semantic: Expired** | #9E9E9E | Expired/inactive | Badge "Expirada", greyed QR overlay |
-| **Semantic: Info** | #2196F3 | On-arrival payment | Badge "Pagar na hora" |
-| **Semantic: Error** | #C62828 | Error/destructive | Error text, loading spinner color, reject button |
+### 60-30-10 Split
 
-**Accent reserved for:**
+| Category | Role | Value (Hex) | Percentage | Semantics | Usage |
+|----------|------|-------------|-----------|-----------|-------|
+| **60% Dominant** | Surface Background | #FDFAf5 | 60% | Primary screen fill | Screen backgrounds, SafeArea fill |
+| **30% Secondary** | Card/Container Background | #F5F1E8 | 30% | Secondary container | Card surfaces, bottom sheets |
+| **10% Accent + Semantic** | Primary Brand (Intent) | #7B5D0A (primaryGreen) | 8% | Primary action, text | AppBar title, FilledButton, primary text |
+| | Secondary Brand | #D4A800 (brandAmber) | — | Secondary action | Secondary buttons (reserve) |
+| | Semantic: Success | #4CAF50 | 2% | Confirmed/paid state | Badge "Pix pago", confirmed status icon |
+| | Semantic: Warning | #FFC107 | — | Awaiting payment | Badge "Aguardando Pix", pending state |
+| | Semantic: Expired | #9E9E9E | — | Expired/inactive | Badge "Expirada", greyed QR overlay |
+| | Semantic: Info | #2196F3 | — | On-arrival payment | Badge "Pagar na hora" |
+| | Semantic: Error | #C62828 (error) | — | Error/destructive | Error text, loading spinner, reject button |
+
+**Accent (#7B5D0A) reserved for:**
 - FilledButton primary actions ("Gerar novo QR", "Confirmar pagamento manual")
 - Primary text highlighting (active state indicators)
 - Important interactive elements in PixPaymentScreen
+- AppBar titles and primary navigation
 
 **Source:** Extracted from `AppTheme` (primaryGreen, brandAmber, error) and Material 3 ColorScheme. Additional semantic colors follow Material 3 standards.
 
@@ -91,7 +95,7 @@ Declared values (Flutter EdgeInsets, multiples of 4px):
 **Countdown Display:**
 - **Format:** "MM:SS restantes" (minutes:seconds remaining), centered
 - **Position:** Below QR code, above copy-paste code section
-- **Font size:** 24px, weight 600 (semibold), color primaryGreen by default
+- **Font size:** 24px, weight 700 (bold), color primaryGreen by default
 - **Color override:** Change to error red (#C62828) when **< 2 minutes remaining**
 - **Implementation:** `Timer.periodic(Duration(seconds: 1), ...)` updating `setState()`
 - **Start/stop:** Initiated in `initState()`, cancelled in `dispose()` (CRITICAL for memory)
@@ -112,7 +116,7 @@ Declared values (Flutter EdgeInsets, multiples of 4px):
 
 **QR Visual When Expired:**
 - **Overlay effect:** Semi-transparent grey (Colors.grey.withOpacity(0.3)) over QR image
-- **Text below QR:** "QR expirado. Gere um novo acima." (12px, error color, italic)
+- **Text below QR:** "QR expirado. Gere um novo acima." (14px, error color, italic)
 
 **Copy-paste Code Section:**
 - **No change** to existing layout below countdown/button
@@ -179,7 +183,7 @@ String _statusLabel(String status, String? paymentMethod) {
 ```
 
 **Badge Styling:**
-- **Font size:** 12px, weight 500 (medium)
+- **Font size:** 14px, weight 400 (regular)
 - **Padding:** 8px horizontal, 4px vertical
 - **Border radius:** 4px
 - **Background colors:**
@@ -343,6 +347,7 @@ String _statusLabel(String status, String? paymentMethod) {
 - [ ] **PixPaymentScreen countdown:**
   - Timer.periodic(Duration(seconds: 1)) in initState
   - Format: MM:SS restantes
+  - Size: 24px / weight 700 (bold)
   - Color: primaryGreen normal, error red < 2 min
   - Cancel in dispose()
   
@@ -361,6 +366,7 @@ String _statusLabel(String status, String? paymentMethod) {
 - [ ] **AdminBookingCard badge updates:**
   - _statusColor() extended: (status, paymentMethod) tuple
   - _statusLabel() extended: new labels for pending_payment/expired/pix
+  - Font: 14px / weight 400
   - Renders in existing card header row
   
 - [ ] **AdminBookingDetailSheet manual button:**
@@ -380,9 +386,9 @@ String _statusLabel(String status, String? paymentMethod) {
 
 **Spacing:** All padding/margin values are multiples of 4px, consistent with Material 3 and existing app patterns.
 
-**Typography:** Uses Nunito (existing) at declared sizes (16px body, 24px countdown, 12px badge), weights 400/500/600/700 only.
+**Typography:** Uses Nunito (existing) at exactly 4 declared sizes (14px, 16px, 18px, 24px), with exactly 2 weights (400 regular + 700 bold).
 
-**Color:** Leverages AppTheme.primaryGreen, brandAmber, error, + Material 3 semantic colors (amber, green, grey, blue) for status badges. No custom color mixing.
+**Color:** 60% dominant (#FDFAf5), 30% secondary (#F5F1E8), 10% accent + semantics. Leverages AppTheme.primaryGreen, brandAmber, error, + Material 3 semantic colors (amber, green, grey, blue) for status badges. No custom color mixing.
 
 **Material 3 Components:** FilledButton, OutlinedButton, Card, SnackBar, AlertDialog — all built-in Flutter Material 3 widgets. No external component library required.
 
