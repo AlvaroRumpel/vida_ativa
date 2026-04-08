@@ -1,12 +1,18 @@
 # Phase 17: Pix QR Generation - Context
 
 **Gathered:** 2026-04-07
+**Updated:** 2026-04-07
 **Status:** Ready for planning
 
 <domain>
 ## Phase Boundary
 
-Cliente finaliza reserva → BookingConfirmationSheet chama Cloud Function `createPixPayment` → booking criado com status `pending_payment` → PixPaymentScreen exibe QR Pix + copia-e-cola gerados pelo Mercado Pago → slot bloqueado por 30 min.
+**Contexto de negócio:** O admin vende horários de quadra (vôlei, futevôlei, beach tenis). Quem reserva paga o valor total — divisão entre jogadores é resolvida fora do app (WhatsApp, Pix manual, etc). O app não gerencia split social.
+
+**Dois métodos de pagamento disponíveis na confirmação de reserva:**
+
+1. **Pix online** — BookingConfirmationSheet → usuário escolhe Pix → `createPixPayment` CF chamada → booking `pending_payment` → PixPaymentScreen com QR + copia-e-cola → slot bloqueado 30min.
+2. **Pagar na hora** — BookingConfirmationSheet → usuário escolhe "Pagar na hora" → booking vai direto para `confirmed` → sem QR, sem CF, sem expiresAt → pagamento presencial ao dono.
 
 Escopo: PIX-01 (QR na confirmação) e PIX-02 (pending_payment + slot bloqueado).
 
@@ -22,8 +28,21 @@ Fora do escopo desta fase:
 <decisions>
 ## Implementation Decisions
 
-### QR Display UX
-- Após confirmar reserva: Navigator.push para **PixPaymentScreen** dedicada (não sheet)
+### Seleção de método de pagamento
+- BookingConfirmationSheet exibe **dois botões** no passo de confirmação:
+  - "Pagar com Pix" → fluxo Pix online
+  - "Pagar na hora" → confirmar direto sem QR
+- Sem tela intermediária de escolha — botões ficam na própria sheet de confirmação
+- Campo `paymentMethod: 'pix' | 'on_arrival'` salvo no booking
+
+### Fluxo "Pagar na hora"
+- `bookSlot()` cria booking direto com `status: 'confirmed'` e `paymentMethod: 'on_arrival'`
+- Sem CF `createPixPayment`, sem `expiresAt`, sem `paymentId`
+- BookingConfirmationSheet fecha e exibe snackbar "Reserva confirmada!"
+- BookingCard mostra badge **"Pagar na hora"** (cor azul/info) para status confirmed + paymentMethod on_arrival
+
+### QR Display UX (fluxo Pix)
+- Após escolher Pix: Navigator.push para **PixPaymentScreen** dedicada (não sheet)
 - BookingConfirmationSheet fecha, PixPaymentScreen abre imediatamente
 - PixPaymentScreen abre com **loading state** (spinner + "Gerando QR...") enquanto CF processa (1-3s)
 - QR e copia-e-cola aparecem quando httpsCallable retorna
@@ -52,9 +71,10 @@ Fora do escopo desta fase:
 
 ### BookingModel — novos campos
 - `status` novos valores: `'pending_payment'` e `'expired'` (além de pending, confirmed, cancelled)
-- `expiresAt: DateTime?` — Timestamp Firestore; Quando o QR/slot expira (30 min)
-- `paymentId: String?` — txId do Mercado Pago (preenchido após createPixPayment)
-- Getters a adicionar: `isPendingPayment`, `isExpired`
+- `paymentMethod: String?` — `'pix'` | `'on_arrival'` | null (null para bookings antigos sem método)
+- `expiresAt: DateTime?` — Timestamp Firestore; Quando o QR/slot expira (30 min). Só para Pix.
+- `paymentId: String?` — txId do Mercado Pago (preenchido após createPixPayment). Só para Pix.
+- Getters a adicionar: `isPendingPayment`, `isExpired`, `isOnArrival`
 
 ### PaymentRecord schema — /bookings/{id}/payment/{txId}
 - `qrCode: String` — string copia-e-cola do Pix
@@ -73,7 +93,9 @@ Fora do escopo desta fase:
 - ScheduleScreen deve tratar pending_payment como status "ocupado" no filtro de disponibilidade
 
 ### BookingCard em Minhas Reservas
-- Status `pending_payment`: badge **"Aguardando pagamento"** + cor âmbar/laranja
+- Status `pending_payment`: badge **"Aguardando Pix"** + cor âmbar/laranja
+- Status `confirmed` + `paymentMethod == 'on_arrival'`: badge **"Pagar na hora"** + cor azul/info
+- Status `confirmed` + `paymentMethod == 'pix'` (pago): badge **"Pago"** + cor verde (Phase 18 seta isso)
 - Status `expired`: badge **"Expirada"** + cor cinza (igual a cancelled visualmente)
 - Tap no card com status `pending_payment`: abre **PixPaymentScreen** lendo PaymentRecord da subcollection
 - PixPaymentScreen reutilizada tanto no fluxo inicial (pós-booking) quanto via tap no card
@@ -89,6 +111,7 @@ Fora do escopo desta fase:
 - Animação de loading → QR reveal
 - Estratégia exata de retry ao clicar "Tentar novamente"
 - Usar Image.memory vs package qr — prefira Image.memory(base64Decode()) por simplicidade
+- Layout dos dois botões na BookingConfirmationSheet (lado a lado vs empilhados)
 
 </decisions>
 
@@ -135,7 +158,7 @@ Fora do escopo desta fase:
 - Sentry: `Sentry.captureException(e, stackTrace: s)` apenas para erros não esperados
 
 ### Integration Points
-- `BookingConfirmationSheet._handleConfirm()` — Após `bookSlot()` com sucesso, fazer `Navigator.push(PixPaymentScreen(bookingId: docId))`
+- `BookingConfirmationSheet._handleConfirm()` — Bifurcar: se Pix → `Navigator.push(PixPaymentScreen(bookingId: docId))`; se on_arrival → fechar sheet + snackbar "Reserva confirmada!"
 - `BookingCard` — Condicional em `booking.status == 'pending_payment'` para badge âmbar e tap para PixPaymentScreen
 - `functions/package.json` — Adicionar `@mercadopago/sdk-node: "^2.0.0"` e `firebase-functions/params` para Secret Manager
 - ScheduleScreen/ViewModel — Adicionar `pending_payment` ao set de statuses que bloqueiam slot
