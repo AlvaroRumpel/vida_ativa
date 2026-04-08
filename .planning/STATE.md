@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: Pagamento Pix
 status: ready-to-plan
 stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-04-08T19:24:38.863Z"
+last_updated: "2026-04-08T19:30:35.133Z"
 progress:
   total_phases: 2
   completed_phases: 1
