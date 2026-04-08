@@ -67,7 +67,10 @@ Full details: `.planning/milestones/v3.0-ROADMAP.md`
   2. Reserva criada fica com status `pending_payment` no Firestore; slot não aparece como disponível para outros clientes
   3. QR code tem validade de 30 min; campo `expiresAt` visível na reserva
   4. Cloud Function `createPixPayment` aceita bookingId, chama Mercado Pago, salva PaymentRecord em `/bookings/{id}/payment/{txId}` e retorna QR data
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 17-01-PLAN.md — Camada de dados + CF (BookingModel, PaymentRecordModel, bookSlot bifurcado, ScheduleCubit, createPixPayment)
+- [ ] 17-02-PLAN.md — Flutter UI (PixPaymentScreen, BookingConfirmationSheet dois botoes, BookingCard badges, MyBookingsScreen tap)
 
 ### Phase 18: Webhook + Confirmação em Tempo Real
 **Goal**: Pagamento confirmado via webhook atualiza reserva para `confirmed`; reservas não pagas expiram automaticamente; admin e cliente veem status atualizado sem recarregar
@@ -101,5 +104,5 @@ Full details: `.planning/milestones/v3.0-ROADMAP.md`
 | 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Agendamento Recorrente | v3.0 | 3/3 | Complete | 2026-04-04 |
 | 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
-| 17. Pix QR Generation | v4.0 | 0/? | Not started | - |
+| 17. Pix QR Generation | v4.0 | 0/2 | In progress | - |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 0/? | Not started | - |
