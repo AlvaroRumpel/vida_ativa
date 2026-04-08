@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
 status: ready-to-plan
-stopped_at: Phase 17 context gathered
-last_updated: "2026-04-08T05:58:03.761Z"
+stopped_at: Completed 17-02-PLAN.md
+last_updated: "2026-04-08T19:24:38.863Z"
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 2
 ---
 
 ---
@@ -37,8 +37,8 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 ## Current Position
 
-Phase: 17 (pix-qr-generation) — EXECUTING
-Plan: 2 of 2
+Phase: 17 (pix-qr-generation) — COMPLETE
+Plan: 2 of 2 (DONE)
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Plan: 2 of 2
 | 15-agendamento-recorrente | P02 | 8 min |
 
 **Recent Trend:** Stable (~5 min/plan)
+| Phase 17 P02 | 25 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting v4.0 work:
 - [17-01]: paymentMethod param replaces confirmationMode Firestore read in bookSlot — simpler, no extra round-trip
 - [17-01]: auto-cancel guard in ScheduleCubit intentionally excludes pending_payment — Phase 18 CF handles expiration via webhook
 - [17-01]: booking_confirmation_sheet uses on_arrival as temp default until 17-02 adds payment selector
+- [Phase 17]: PixPaymentScreen usa paymentId opcional: null chama CF, nao-nulo le subcollection
+- [Phase 17]: isOnArrival badge exige booking object — combina status+paymentMethod, switch de status sozinho insuficiente
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T00:35:00Z
-Stopped at: Completed 17-01-PLAN.md
-Resume file: .planning/phases/17-pix-qr-generation/17-02-PLAN.md
+Last session: 2026-04-08T19:24:25.480Z
+Stopped at: Completed 17-02-PLAN.md
+Resume file: None

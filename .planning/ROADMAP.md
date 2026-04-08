@@ -53,7 +53,7 @@ Full details: `.planning/milestones/v3.0-ROADMAP.md`
 
 **Milestone Goal:** Cliente paga a reserva via Pix no app; pagamento confirmado automaticamente via webhook; slot liberado se pagamento expirar.
 
-- [ ] **Phase 17: Pix QR Generation** - BookingModel estendido com status de pagamento; Cloud Function gera QR code Mercado Pago; Flutter exibe QR + copia-e-cola após reserva
+- [x] **Phase 17: Pix QR Generation** - BookingModel estendido com status de pagamento; Cloud Function gera QR code Mercado Pago; Flutter exibe QR + copia-e-cola após reserva (completed 2026-04-08)
 - [ ] **Phase 18: Webhook + Confirmação em Tempo Real** - Cloud Function processa webhook idempotente; Flutter atualiza status em tempo real; timer de expiração + regeneração de QR; Cloud Function expira reservas após 45 min; admin vê status de pagamento e pode confirmar manualmente
 
 ## Phase Details
@@ -104,5 +104,5 @@ Plans:
 | 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Agendamento Recorrente | v3.0 | 3/3 | Complete | 2026-04-04 |
 | 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
-| 17. Pix QR Generation | 1/2 | In Progress|  | - |
+| 17. Pix QR Generation | 2/2 | Complete   | 2026-04-08 | - |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 0/? | Not started | - |
