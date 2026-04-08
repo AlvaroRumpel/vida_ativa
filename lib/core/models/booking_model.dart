@@ -14,6 +14,9 @@ class BookingModel extends Equatable {
   final String? userDisplayName; // Stored at booking time for admin display
   final String? participants; // Optional list of participant names (free-text)
   final String? recurrenceGroupId;
+  final String? paymentMethod; // 'pix' | 'on_arrival' | null
+  final DateTime? expiresAt;   // Timestamp Firestore; so para Pix
+  final String? paymentId;     // txId Mercado Pago; so para Pix
 
   const BookingModel({
     required this.id,
@@ -28,6 +31,9 @@ class BookingModel extends Equatable {
     this.userDisplayName,
     this.participants,
     this.recurrenceGroupId,
+    this.paymentMethod,
+    this.expiresAt,
+    this.paymentId,
   });
 
   /// Generates the deterministic document ID for anti-double-booking.
@@ -51,6 +57,11 @@ class BookingModel extends Equatable {
       userDisplayName: data['userDisplayName'] as String?,
       participants: data['participants'] as String?,
       recurrenceGroupId: data['recurrenceGroupId'] as String?,
+      paymentMethod: data['paymentMethod'] as String?,
+      expiresAt: data['expiresAt'] != null
+          ? (data['expiresAt'] as Timestamp).toDate()
+          : null,
+      paymentId: data['paymentId'] as String?,
     );
   }
 
@@ -67,6 +78,9 @@ class BookingModel extends Equatable {
       if (userDisplayName != null) 'userDisplayName': userDisplayName,
       if (participants != null) 'participants': participants,
       if (recurrenceGroupId != null) 'recurrenceGroupId': recurrenceGroupId,
+      if (paymentMethod != null) 'paymentMethod': paymentMethod,
+      if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),
+      if (paymentId != null) 'paymentId': paymentId,
     };
   }
 
@@ -74,7 +88,14 @@ class BookingModel extends Equatable {
   bool get isConfirmed => status == 'confirmed';
   bool get isCancelled => status == 'cancelled';
   bool get isRejected => status == 'rejected';
+  bool get isPendingPayment => status == 'pending_payment';
+  bool get isExpired => status == 'expired';
+  // NOTE: isOnArrival checks both confirmed status AND on_arrival method
+  // because on_arrival bookings go directly to 'confirmed'
+  bool get isOnArrival => isConfirmed && paymentMethod == 'on_arrival';
 
   @override
-  List<Object?> get props => [id, slotId, date, userId, status, createdAt, cancelledAt, startTime, price, userDisplayName, participants, recurrenceGroupId];
+  List<Object?> get props => [id, slotId, date, userId, status, createdAt,
+      cancelledAt, startTime, price, userDisplayName, participants,
+      recurrenceGroupId, paymentMethod, expiresAt, paymentId];
 }
