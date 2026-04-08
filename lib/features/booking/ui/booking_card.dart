@@ -102,7 +102,7 @@ class BookingCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _statusBadge(booking.status),
+                        _statusBadge(booking.status, booking: booking),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -242,19 +242,41 @@ class BookingCard extends StatelessWidget {
 
   Color _statusColor(String status) => switch (status) {
     'pending' => const Color(0xFFD4860A),
+    'pending_payment' => const Color(0xFFE65100),
     'confirmed' => AppTheme.primaryGreen,
+    'expired' => Colors.grey,
     'rejected' => Colors.red,
     _ => Colors.grey,
   };
 
   String _statusLabel(String status) => switch (status) {
     'pending' => 'Aguardando',
+    'pending_payment' => 'Aguardando Pix',
     'confirmed' => 'Confirmado',
+    'expired' => 'Expirada',
     'rejected' => 'Recusado',
     _ => 'Cancelado',
   };
 
-  Widget _statusBadge(String status) {
+  Widget _statusBadge(String status, {BookingModel? booking}) {
+    // Special case: on_arrival confirmed bookings show different badge
+    if (booking != null && booking.isOnArrival) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1565C0).withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Text(
+          'Pagar na hora',
+          style: TextStyle(
+            color: Color(0xFF1565C0),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
     final color = _statusColor(status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
