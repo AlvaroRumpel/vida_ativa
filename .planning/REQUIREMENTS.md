@@ -11,8 +11,8 @@
 
 ### Pagamento Pix
 
-- [ ] **PIX-01**: Na confirmação de reserva, app exibe QR code Pix + código copia-e-cola gerado pelo gateway (Mercado Pago)
-- [ ] **PIX-02**: Reserva criada fica em status `pending_payment`; slot permanece bloqueado durante janela de pagamento (30 min)
+- [x] **PIX-01**: Na confirmação de reserva, app exibe QR code Pix + código copia-e-cola gerado pelo gateway (Mercado Pago)
+- [x] **PIX-02**: Reserva criada fica em status `pending_payment`; slot permanece bloqueado durante janela de pagamento (30 min)
 - [ ] **PIX-03**: App exibe timer de expiração do QR code; após expirar, exibe botão para regenerar novo QR sem precisar refazer a reserva
 - [ ] **PIX-04**: Cloud Function recebe webhook do Mercado Pago, verifica assinatura, processa de forma idempotente e atualiza status da reserva para `confirmed` ou `expired` — pagamento confirmado implica reserva confirmada independentemente do modo de aprovação configurado pelo admin
 - [ ] **PIX-05**: Cliente vê status de pagamento em tempo real em "Minhas Reservas" — atualiza automaticamente quando pagamento é confirmado
@@ -45,8 +45,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PIX-01 | Phase 17 | Pending |
-| PIX-02 | Phase 17 | Pending |
+| PIX-01 | Phase 17 | Complete |
+| PIX-02 | Phase 17 | Complete |
 | PIX-03 | Phase 18 | Pending |
 | PIX-04 | Phase 18 | Pending |
 | PIX-05 | Phase 18 | Pending |

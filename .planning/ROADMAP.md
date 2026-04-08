@@ -104,5 +104,5 @@ Plans:
 | 14. Detalhe de Reserva (Cliente) + Aviso | v3.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Agendamento Recorrente | v3.0 | 3/3 | Complete | 2026-04-04 |
 | 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
-| 17. Pix QR Generation | v4.0 | 0/2 | In progress | - |
+| 17. Pix QR Generation | 1/2 | In Progress|  | - |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 0/? | Not started | - |

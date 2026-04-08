@@ -4,12 +4,11 @@ milestone: v4.0
 milestone_name: Pagamento Pix
 status: ready-to-plan
 stopped_at: Phase 17 context gathered
-last_updated: "2026-04-07T21:35:08.872Z"
-last_activity: 2026-04-06 — v4.0 roadmap created (Phases 17–18)
+last_updated: "2026-04-08T05:58:03.761Z"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
 ---
 
@@ -34,16 +33,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** v4.0 — Pagamento Pix (Phase 17 ready to plan)
+**Current focus:** Phase 17 — pix-qr-generation
 
 ## Current Position
 
-Phase: 17 of 18 (Pix QR Generation)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-04-06 — v4.0 roadmap created (Phases 17–18)
-
-Progress: [░░░░░░░░░░] 0% (v4.0 milestone)
+Phase: 17 (pix-qr-generation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -79,6 +74,9 @@ Recent decisions affecting v4.0 work:
 - [v4.0 Architecture]: Webhook MUST return 202 before any heavy work — idempotency key = transaction ID from Mercado Pago event
 - [v4.0 Architecture]: BookingModel gains `pending_payment` and `expired` statuses; `expiresAt` field for payment window
 - [v4.0 Architecture]: Pix payment confirmed = booking confirmed — webhook bypasses admin approval mode; admin can still cancel manually after
+- [17-01]: paymentMethod param replaces confirmationMode Firestore read in bookSlot — simpler, no extra round-trip
+- [17-01]: auto-cancel guard in ScheduleCubit intentionally excludes pending_payment — Phase 18 CF handles expiration via webhook
+- [17-01]: booking_confirmation_sheet uses on_arrival as temp default until 17-02 adds payment selector
 
 ### Pending Todos
 
@@ -86,12 +84,13 @@ None yet.
 
 ### Blockers/Concerns
 
+- [v4.0]: Secret Manager API + MP_ACCESS_TOKEN must be set before 17-01 CF deploy — see 17-01-SUMMARY.md User Setup Required
 - [v4.0]: Mercado Pago sandbox account needed before Phase 18 execution — external dependency (1-3 days to set up credentials + webhook signing secret)
 - [v4.0]: Webhook signature format (X-Signature header) needs verification against Mercado Pago docs during Phase 18 planning
 - [Phase 12]: UI-01 still BLOCKED — client has not delivered logo + color palette assets
 
 ## Session Continuity
 
-Last session: 2026-04-07T21:35:08.863Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-pix-qr-generation/17-CONTEXT.md
+Last session: 2026-04-07T00:35:00Z
+Stopped at: Completed 17-01-PLAN.md
+Resume file: .planning/phases/17-pix-qr-generation/17-02-PLAN.md
