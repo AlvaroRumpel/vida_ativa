@@ -47,6 +47,7 @@ class BookingCubit extends Cubit<BookingState> {
     required double price,
     required String startTime,
     required String userDisplayName,
+    required String paymentMethod, // 'pix' | 'on_arrival'
     String? participants,
     String? recurrenceGroupId,
   }) async {
@@ -66,9 +67,12 @@ class BookingCubit extends Cubit<BookingState> {
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
 
-    final configSnap = await _firestore.collection('config').doc('booking').get();
-    final mode = configSnap.data()?['confirmationMode'] ?? 'manual';
-    final initialStatus = mode == 'automatic' ? 'confirmed' : 'pending';
+    // Payment method determines initial status:
+    // - 'pix': always pending_payment (slot blocked, QR will be generated next)
+    // - 'on_arrival': always confirmed (payment happens in person, no QR needed)
+    // confirmationMode is bypassed for Pix — webhook (Phase 18) handles confirmation.
+    final initialStatus =
+        paymentMethod == 'on_arrival' ? 'confirmed' : 'pending_payment';
 
     await _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);
@@ -89,6 +93,7 @@ class BookingCubit extends Cubit<BookingState> {
         userDisplayName: userDisplayName,
         participants: participants,
         recurrenceGroupId: recurrenceGroupId,
+        paymentMethod: paymentMethod, // NEW
       );
       tx.set(ref, booking.toFirestore());
     });
@@ -103,6 +108,7 @@ class BookingCubit extends Cubit<BookingState> {
     required List<RecurrenceEntry> entries,
     required String startTime,
     required String userDisplayName,
+    required String paymentMethod, // NEW
     String? participants,
   }) async {
     final groupId = const Uuid().v4();
@@ -118,6 +124,7 @@ class BookingCubit extends Cubit<BookingState> {
             userDisplayName: userDisplayName,
             participants: participants,
             recurrenceGroupId: groupId,
+            paymentMethod: paymentMethod, // NEW
           );
           return RecurrenceOutcome.success(entry.dateString);
         } on Exception catch (e) {

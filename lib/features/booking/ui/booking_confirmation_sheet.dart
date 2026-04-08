@@ -46,6 +46,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         entries: _availableRecurrenceEntries,
         startTime: widget.viewModel.slot.startTime,
         userDisplayName: authState.user.displayName,
+        paymentMethod: 'on_arrival', // TODO(17-02): replace with user-selected method
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
@@ -89,6 +90,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
         userDisplayName: authState.user.displayName,
+        paymentMethod: 'on_arrival', // TODO(17-02): replace with user-selected method
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
