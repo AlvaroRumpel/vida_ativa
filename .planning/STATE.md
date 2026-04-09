@@ -2,28 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
-status: ready-to-plan
-stopped_at: Phase 18 context gathered
-last_updated: "2026-04-08T20:30:47.823Z"
+status: executing
+stopped_at: "Completed 18-01-PLAN.md"
+last_updated: "2026-04-08T21:00:00.000Z"
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
----
-
----
-gsd_state_version: 1.0
-milestone: v4.0
-milestone_name: Pagamento Pix
-status: ready-to-plan
-stopped_at: roadmap-created
-last_updated: "2026-04-06T00:00:00.000Z"
-progress:
-  total_phases: 2
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 3
 ---
 
 # Project State
@@ -33,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 17 — pix-qr-generation
+**Current focus:** Phase 18 — webhook-+-confirmacao-em-tempo-real
 
 ## Current Position
 
-Phase: 17 (pix-qr-generation) — COMPLETE
-Plan: 2 of 2 (DONE)
+Phase: 18 (webhook-+-confirmacao-em-tempo-real) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -80,6 +66,9 @@ Recent decisions affecting v4.0 work:
 - [17-01]: booking_confirmation_sheet uses on_arrival as temp default until 17-02 adds payment selector
 - [Phase 17]: PixPaymentScreen usa paymentId opcional: null chama CF, nao-nulo le subcollection
 - [Phase 17]: isOnArrival badge exige booking object — combina status+paymentMethod, switch de status sozinho insuficiente
+- [18-01]: handlePixWebhook retorna 202 antes de qualquer async — previne retry do Mercado Pago
+- [18-01]: transactionId (MP payment ID) usado como chave de idempotencia — webhooks duplicados ignorados silenciosamente
+- [18-01]: expireUnpaidBookings usa batch.update em chunks de 500 — respeita limite do Firestore batch
 
 ### Pending Todos
 
@@ -94,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T20:30:47.819Z
-Stopped at: Phase 18 context gathered
-Resume file: .planning/phases/18-webhook-+-confirmacao-em-tempo-real/18-CONTEXT.md
+Last session: 2026-04-08T21:00:00.000Z
+Stopped at: Completed 18-01-PLAN.md
+Resume file: .planning/phases/18-webhook-+-confirmacao-em-tempo-real/18-02-PLAN.md

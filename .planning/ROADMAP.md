@@ -105,4 +105,4 @@ Plans:
 | 15. Agendamento Recorrente | v3.0 | 3/3 | Complete | 2026-04-04 |
 | 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
 | 17. Pix QR Generation | 2/2 | Complete    | 2026-04-08 | - |
-| 18. Webhook + Confirmação em Tempo Real | v4.0 | 0/? | Not started | - |
+| 18. Webhook + Confirmação em Tempo Real | 1/3 | In Progress|  | - |
