@@ -1,5 +1,5 @@
 const { onDocumentWritten } = require('firebase-functions/v2/firestore');
-const { onCall, onRequest } = require('firebase-functions/v2/https');
+const { onCall, onRequest, HttpsError } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { defineSecret } = require('firebase-functions/params');
 const { MercadoPagoConfig, Payment } = require('mercadopago');
@@ -157,12 +157,12 @@ exports.createPixPayment = onCall(
   { secrets: [mpAccessToken] },
   async (request) => {
     if (!request.auth) {
-      throw new Error('unauthenticated');
+      throw new HttpsError('unauthenticated', 'Authentication required');
     }
 
     const { bookingId } = request.data;
     if (!bookingId || typeof bookingId !== 'string') {
-      throw new Error('invalid_argument: bookingId required');
+      throw new HttpsError('invalid-argument', 'bookingId required');
     }
 
     const callerId = request.auth.uid;
@@ -173,17 +173,26 @@ exports.createPixPayment = onCall(
     const bookingSnap = await bookingRef.get();
 
     if (!bookingSnap.exists) {
-      throw new Error('not_found: booking does not exist');
+      throw new HttpsError('not-found', 'Booking does not exist');
     }
 
     const booking = bookingSnap.data();
 
     if (booking.userId !== callerId) {
-      throw new Error('permission_denied: booking belongs to different user');
+      throw new HttpsError('permission-denied', 'Booking belongs to different user');
     }
 
     if (booking.status !== 'pending_payment') {
-      throw new Error(`invalid_status: expected pending_payment, got ${booking.status}`);
+      throw new HttpsError('failed-precondition', `Expected pending_payment, got ${booking.status}`);
+    }
+
+    const transactionAmount = typeof booking.price === 'number' && booking.price > 0
+      ? booking.price
+      : null;
+
+    if (!transactionAmount) {
+      console.error(`createPixPayment: booking ${bookingId} has no valid price (${booking.price})`);
+      throw new HttpsError('failed-precondition', 'Booking has no valid price for payment');
     }
 
     // 2. Get payer email for MP API (required even in sandbox)
@@ -202,17 +211,23 @@ exports.createPixPayment = onCall(
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // now + 30 min
 
-    const result = await paymentApi.create({
-      body: {
-        transaction_amount: booking.price || 0,
-        payment_method_id: 'pix',
-        date_of_expiration: expiresAt.toISOString(),
-        payer: { email: payerEmail },
-        description: `Reserva ${bookingId}`,
-        external_reference: bookingId,
-      },
-      requestOptions: { idempotencyKey: bookingId },
-    });
+    let result;
+    try {
+      result = await paymentApi.create({
+        body: {
+          transaction_amount: transactionAmount,
+          payment_method_id: 'pix',
+          date_of_expiration: expiresAt.toISOString(),
+          payer: { email: payerEmail },
+          description: `Reserva ${bookingId}`,
+          external_reference: bookingId,
+        },
+        requestOptions: { idempotencyKey: bookingId },
+      });
+    } catch (mpError) {
+      console.error('createPixPayment: Mercado Pago API error:', JSON.stringify(mpError));
+      throw new HttpsError('internal', `Payment API error: ${mpError?.message || mpError}`);
+    }
 
     const txId = String(result.id);
     const qrCode = result.point_of_interaction.transaction_data.qr_code;
