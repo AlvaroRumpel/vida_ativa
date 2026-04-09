@@ -15,20 +15,28 @@ class AdminBookingCard extends StatelessWidget {
     required this.bookingCubit,
   });
 
-  Color _statusColor(String status) {
-    return switch (status) {
-      'pending' => Colors.orange,
-      'confirmed' => AppTheme.primaryGreen,
-      'rejected' => Colors.red,
+  Color _statusColor(String status, String? paymentMethod) {
+    return switch ((status, paymentMethod)) {
+      ('pending', _) => Colors.orange,
+      ('pending_payment', _) => const Color(0xFFFFC107),
+      ('confirmed', 'pix') => const Color(0xFF4CAF50),
+      ('confirmed', 'on_arrival') => const Color(0xFF2196F3),
+      ('confirmed', _) => AppTheme.primaryGreen,
+      ('expired', _) => Colors.grey,
+      ('rejected', _) => Colors.red,
       _ => Colors.grey,
     };
   }
 
-  String _statusLabel(String status) {
-    return switch (status) {
-      'pending' => 'Aguardando',
-      'confirmed' => 'Confirmado',
-      'rejected' => 'Recusado',
+  String _statusLabel(String status, String? paymentMethod) {
+    return switch ((status, paymentMethod)) {
+      ('pending', _) => 'Aguardando',
+      ('pending_payment', _) => 'Aguardando Pix',
+      ('confirmed', 'pix') => 'Pix pago',
+      ('confirmed', 'on_arrival') => 'Pagar na hora',
+      ('confirmed', _) => 'Confirmado',
+      ('expired', _) => 'Expirada',
+      ('rejected', _) => 'Recusado',
       _ => 'Cancelado',
     };
   }
@@ -87,8 +95,8 @@ class AdminBookingCard extends StatelessWidget {
         ? NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
             .format(booking.price)
         : '';
-    final statusColor = _statusColor(booking.status);
-    final statusLabel = _statusLabel(booking.status);
+    final statusColor = _statusColor(booking.status, booking.paymentMethod);
+    final statusLabel = _statusLabel(booking.status, booking.paymentMethod);
     final clientName = booking.userDisplayName ?? 'Cliente';
 
     return Card(
