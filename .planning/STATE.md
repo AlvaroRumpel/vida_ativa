@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
-status: executing
-stopped_at: "Completed 18-01-PLAN.md"
-last_updated: "2026-04-08T21:00:00.000Z"
+status: unknown
+stopped_at: Completed 18-03-PLAN.md
+last_updated: "2026-04-09T02:38:08.034Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 ## Current Position
 
-Phase: 18 (webhook-+-confirmacao-em-tempo-real) — EXECUTING
-Plan: 2 of 3
+Phase: 18 (webhook-+-confirmacao-em-tempo-real) — COMPLETE
+Plan: 3 of 3 — COMPLETE
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: 2 of 3
 
 **Recent Trend:** Stable (~5 min/plan)
 | Phase 17 P02 | 25 | 2 tasks | 4 files |
+| Phase 18 P03 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting v4.0 work:
 - [18-01]: handlePixWebhook retorna 202 antes de qualquer async — previne retry do Mercado Pago
 - [18-01]: transactionId (MP payment ID) usado como chave de idempotencia — webhooks duplicados ignorados silenciosamente
 - [18-01]: expireUnpaidBookings usa batch.update em chunks de 500 — respeita limite do Firestore batch
+- [Phase 18]: (status, paymentMethod) tuple switch used in both admin files for consistent Pix badge logic
+- [Phase 18]: Manual Pix confirm updates PaymentRecord subcollection directly via FirebaseFirestore instance — no cubit abstraction needed for one-off admin action
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T21:00:00.000Z
-Stopped at: Completed 18-01-PLAN.md
-Resume file: .planning/phases/18-webhook-+-confirmacao-em-tempo-real/18-02-PLAN.md
+Last session: 2026-04-09T02:38:08.026Z
+Stopped at: Completed 18-03-PLAN.md
+Resume file: None
