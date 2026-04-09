@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,7 +6,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:vida_ativa/core/models/payment_record_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -44,6 +44,14 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
   DateTime? _expiresAt;
   bool _copied = false;
 
+  // Countdown timer state
+  Timer? _countdownTimer;
+  Duration _remaining = Duration.zero;
+  bool _qrExpired = false;
+
+  // Real-time booking listener
+  StreamSubscription<DocumentSnapshot>? _bookingSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +60,80 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     } else {
       _generateQr();
     }
+    _startBookingListener();
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    _bookingSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _startCountdown() {
+    _countdownTimer?.cancel();
+    if (_expiresAt == null) return;
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final remaining = _expiresAt!.difference(DateTime.now());
+      if (remaining <= Duration.zero) {
+        _countdownTimer?.cancel();
+        setState(() {
+          _remaining = Duration.zero;
+          _qrExpired = true;
+        });
+      } else {
+        setState(() {
+          _remaining = remaining;
+          _qrExpired = false;
+        });
+      }
+    });
+    // Trigger first tick immediately so display appears without 1s delay
+    final remaining = _expiresAt!.difference(DateTime.now());
+    setState(() {
+      _remaining = remaining <= Duration.zero ? Duration.zero : remaining;
+      _qrExpired = remaining <= Duration.zero;
+    });
+  }
+
+  void _startBookingListener() {
+    _bookingSubscription?.cancel();
+    _bookingSubscription = FirebaseFirestore.instance
+        .collection('bookings')
+        .doc(widget.bookingId)
+        .snapshots()
+        .listen((snap) {
+      if (!mounted) return;
+      final data = snap.data();
+      if (data == null) return;
+      final status = data['status'] as String?;
+      if (status == 'confirmed') {
+        _countdownTimer?.cancel();
+        _bookingSubscription?.cancel();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pagamento confirmado! Reserva garantida.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        context.go('/bookings');
+      } else if (status == 'expired') {
+        _countdownTimer?.cancel();
+        if (!_qrExpired) {
+          setState(() {
+            _qrExpired = true;
+            _remaining = Duration.zero;
+          });
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pagamento expirado. Gere novo QR.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    });
   }
 
   /// Called on initial flow: invokes createPixPayment CF.
@@ -59,6 +141,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     setState(() {
       _isLoading = true;
       _error = null;
+      _qrExpired = false;
     });
     try {
       final callable =
@@ -72,6 +155,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = DateTime.parse(data['expiresAt'] as String);
         _isLoading = false;
       });
+      _startCountdown();
     } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
       setState(() {
@@ -123,6 +207,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = record.expiresAt;
         _isLoading = false;
       });
+      _startCountdown();
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       if (!mounted) return;
@@ -142,8 +227,53 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     if (mounted) setState(() => _copied = false);
   }
 
-  String _formatExpiresAt(DateTime dt) {
-    return 'Valido ate ${DateFormat('HH:mm').format(dt)}';
+  Widget _buildCountdown() {
+    if (_qrExpired) {
+      return Column(
+        children: [
+          const Text(
+            'QR expirado. Gere um novo acima.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFFC62828),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: _isLoading ? null : _generateQr,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Gerar novo QR'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.primaryGreen,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final minutes =
+        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final isUrgent = _remaining.inSeconds < 120;
+
+    return Text(
+      '$minutes:$seconds restantes',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+        color: isUrgent ? const Color(0xFFC62828) : AppTheme.primaryGreen,
+      ),
+    );
   }
 
   @override
@@ -152,25 +282,15 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
       appBar: AppBar(
         title: const Text('Pagamento Pix'),
         leading: BackButton(
-          onPressed: () {
-            // Always navigate to MyBookings on exit (not just pop)
-            // so the reactive stream shows the updated pending_payment booking
-            context.go('/bookings');
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) context.go('/bookings');
-        },
-        child: SafeArea(
-          child: _isLoading
-              ? _buildLoading()
-              : _error != null
-                  ? _buildError()
-                  : _buildQrContent(),
-        ),
+      body: SafeArea(
+        child: _isLoading
+            ? _buildLoading()
+            : _error != null
+                ? _buildError()
+                : _buildQrContent(),
       ),
     );
   }
@@ -233,37 +353,44 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
-          // QR image
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
+          // QR image with expired overlay
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Image.memory(
-              base64Decode(_qrCodeBase64!),
-              width: 240,
-              height: 240,
-              fit: BoxFit.contain,
-            ),
+                child: Image.memory(
+                  base64Decode(_qrCodeBase64!),
+                  width: 240,
+                  height: 240,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              if (_qrExpired)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 16),
-          // Expiry
-          if (_expiresAt != null)
-            Text(
-              _formatExpiresAt(_expiresAt!),
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF757575),
-              ),
-            ),
+          // Countdown widget (replaces static expiry text)
+          _buildCountdown(),
           const SizedBox(height: 32),
           // Divider with "ou"
           Row(
