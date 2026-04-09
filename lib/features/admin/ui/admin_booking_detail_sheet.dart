@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
@@ -23,20 +24,28 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
   bool _isSubmitting = false;
   String? _errorMessage;
 
-  Color _statusColor(String status) {
-    return switch (status) {
-      'pending' => Colors.orange,
-      'confirmed' => AppTheme.primaryGreen,
-      'rejected' => Colors.red,
+  Color _statusColor(String status, String? paymentMethod) {
+    return switch ((status, paymentMethod)) {
+      ('pending', _) => Colors.orange,
+      ('pending_payment', _) => const Color(0xFFFFC107),
+      ('confirmed', 'pix') => const Color(0xFF4CAF50),
+      ('confirmed', 'on_arrival') => const Color(0xFF2196F3),
+      ('confirmed', _) => AppTheme.primaryGreen,
+      ('expired', _) => Colors.grey,
+      ('rejected', _) => Colors.red,
       _ => Colors.grey,
     };
   }
 
-  String _statusLabel(String status) {
-    return switch (status) {
-      'pending' => 'Aguardando',
-      'confirmed' => 'Confirmado',
-      'rejected' => 'Recusado',
+  String _statusLabel(String status, String? paymentMethod) {
+    return switch ((status, paymentMethod)) {
+      ('pending', _) => 'Aguardando',
+      ('pending_payment', _) => 'Aguardando Pix',
+      ('confirmed', 'pix') => 'Pix pago',
+      ('confirmed', 'on_arrival') => 'Pagar na hora',
+      ('confirmed', _) => 'Confirmado',
+      ('expired', _) => 'Expirada',
+      ('rejected', _) => 'Recusado',
       _ => 'Cancelado',
     };
   }
@@ -56,6 +65,63 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
         Flexible(child: Text(text)),
       ],
     );
+  }
+
+  Future<void> _handleManualConfirm() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirmar pagamento Pix?'),
+        content: const Text('Deseja marcar este pagamento como confirmado?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Nao'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sim'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+    try {
+      // 1. Confirm booking (updates booking status to 'confirmed')
+      await widget.adminBookingCubit.confirmBooking(widget.booking.id);
+      // 2. Update PaymentRecord to 'paid' (most recent payment doc)
+      if (widget.booking.paymentId != null) {
+        await FirebaseFirestore.instance
+            .collection('bookings')
+            .doc(widget.booking.id)
+            .collection('payment')
+            .doc(widget.booking.paymentId)
+            .update({
+          'status': 'paid',
+          'paidAt': FieldValue.serverTimestamp(),
+        });
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pagamento confirmado manualmente.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } on Exception {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _errorMessage = 'Falha ao confirmar pagamento. Tente novamente.';
+        });
+      }
+    }
   }
 
   Future<void> _handleConfirm() async {
@@ -133,8 +199,8 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
   @override
   Widget build(BuildContext context) {
     final booking = widget.booking;
-    final statusColor = _statusColor(booking.status);
-    final statusLabel = _statusLabel(booking.status);
+    final statusColor = _statusColor(booking.status, booking.paymentMethod);
+    final statusLabel = _statusLabel(booking.status, booking.paymentMethod);
 
     // Format date: "YYYY-MM-DD" -> "Segunda, 31 de marco"
     final parsedDate = DateTime.parse(booking.date);
@@ -219,6 +285,33 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
               style: const TextStyle(
                 color: Color(0xFFC62828),
                 fontSize: 12,
+              ),
+            ),
+          ],
+          // Manual Pix confirm — visible only for pending_payment bookings
+          if (booking.status == 'pending_payment') ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: FilledButton.icon(
+                onPressed: _isSubmitting ? null : _handleManualConfirm,
+                icon: _isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.check_circle),
+                label: const Text('Confirmar pagamento manual'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
           ],
