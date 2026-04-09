@@ -1,10 +1,13 @@
 const { onDocumentWritten } = require('firebase-functions/v2/firestore');
-const { onCall } = require('firebase-functions/v2/https');
+const { onCall, onRequest } = require('firebase-functions/v2/https');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { defineSecret } = require('firebase-functions/params');
 const { MercadoPagoConfig, Payment } = require('mercadopago');
 const admin = require('firebase-admin');
+const crypto = require('crypto');
 
 const mpAccessToken = defineSecret('MP_ACCESS_TOKEN');
+const mpWebhookSecret = defineSecret('MP_WEBHOOK_SECRET');
 
 admin.initializeApp();
 
@@ -241,3 +244,167 @@ exports.createPixPayment = onCall(
     };
   }
 );
+
+/**
+ * Verifies the Mercado Pago webhook HMAC-SHA256 signature.
+ * x-signature header format: "ts=<timestamp>,v1=<hmac>"
+ * MP manifest format: "id:{dataId};request-id:{xRequestId};ts:{timestamp};"
+ */
+function verifyMpSignature(xSignature, xRequestId, dataId, secret) {
+  if (!xSignature) return false;
+  const parts = xSignature.split(',');
+  if (parts.length < 2) return false;
+  const tsValue = parts[0].replace('ts=', '');
+  const v1Value = parts[1].replace('v1=', '');
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${tsValue};`;
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(manifest)
+    .digest('hex');
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(v1Value, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * HTTP trigger that receives Mercado Pago payment notifications (webhooks).
+ * Returns 202 immediately to prevent MP retry, then processes the event.
+ *
+ * Flow:
+ *  1. Return 202 immediately
+ *  2. Verify HMAC-SHA256 signature using MP_WEBHOOK_SECRET
+ *  3. Check idempotency — skip if transactionId already processed
+ *  4. On approved payment: atomically update booking to confirmed + PaymentRecord to paid
+ *
+ * Secret: MP_WEBHOOK_SECRET must be set in Firebase Secret Manager before deploying.
+ */
+exports.handlePixWebhook = onRequest(
+  { secrets: [mpWebhookSecret] },
+  async (req, res) => {
+    // 1. Return 202 immediately — prevent Mercado Pago retry
+    res.status(202).send({ success: true });
+
+    // 2. Only process POST
+    if (req.method !== 'POST') return;
+
+    // 3. Verify MP signature
+    const xSignature = req.headers['x-signature'];
+    const xRequestId = req.headers['x-request-id'] || '';
+    const dataId = req.body?.data?.id;
+
+    if (!dataId) {
+      console.log('handlePixWebhook: missing data.id — ignoring');
+      return;
+    }
+
+    const isValid = verifyMpSignature(
+      xSignature,
+      xRequestId,
+      String(dataId),
+      mpWebhookSecret.value()
+    );
+    if (!isValid) {
+      console.error('handlePixWebhook: invalid signature — ignoring');
+      return;
+    }
+
+    // 4. Only process payment.updated or payment.created events
+    const action = req.body?.action;
+    if (action !== 'payment.updated' && action !== 'payment.created') {
+      console.log(`handlePixWebhook: action ${action} — ignoring`);
+      return;
+    }
+
+    const transactionId = String(dataId);
+    const bookingId = req.body?.data?.external_reference;
+
+    if (!bookingId) {
+      console.log('handlePixWebhook: missing external_reference — ignoring');
+      return;
+    }
+
+    const db = admin.firestore();
+    const bookingRef = db.collection('bookings').doc(bookingId);
+    const paymentRef = bookingRef.collection('payment').doc(transactionId);
+
+    // 5. Idempotency check
+    const paymentSnap = await paymentRef.get();
+    if (paymentSnap.exists && paymentSnap.data().status === 'paid') {
+      console.log(`handlePixWebhook: transactionId ${transactionId} already processed — skipping`);
+      return;
+    }
+
+    // 6. Only proceed on approved status
+    const mpStatus = req.body?.data?.status;
+    if (mpStatus !== 'approved') {
+      console.log(`handlePixWebhook: payment status ${mpStatus} — not approved, ignoring`);
+      return;
+    }
+
+    // 7. Atomic update: booking → confirmed, PaymentRecord → paid
+    await db.runTransaction(async (transaction) => {
+      const bookingSnap = await transaction.get(bookingRef);
+      if (!bookingSnap.exists) return;
+      const bookingData = bookingSnap.data();
+      if (bookingData.status === 'confirmed') return; // already confirmed
+
+      transaction.update(bookingRef, {
+        status: 'confirmed',
+        confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      if (paymentSnap.exists) {
+        transaction.update(paymentRef, {
+          status: 'paid',
+          paidAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    });
+
+    console.log(`handlePixWebhook: booking ${bookingId} confirmed via webhook`);
+  }
+);
+
+/**
+ * Scheduled function that runs every 15 minutes.
+ * Finds all bookings where status == 'pending_payment' AND expiresAt < now,
+ * and marks them as expired — freeing the slot for new bookings.
+ */
+exports.expireUnpaidBookings = onSchedule('every 15 minutes', async (event) => {
+  const now = admin.firestore.Timestamp.now();
+  const db = admin.firestore();
+
+  const query = await db
+    .collection('bookings')
+    .where('status', '==', 'pending_payment')
+    .where('expiresAt', '<', now)
+    .get();
+
+  if (query.empty) {
+    console.log('expireUnpaidBookings: no expired bookings found');
+    return;
+  }
+
+  // Process in batches of 500 (Firestore batch limit)
+  const BATCH_SIZE = 500;
+  const docs = query.docs;
+
+  for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+    const batch = db.batch();
+    const chunk = docs.slice(i, i + BATCH_SIZE);
+    chunk.forEach((doc) => {
+      batch.update(doc.ref, {
+        status: 'expired',
+        expiredAt: now,
+      });
+    });
+    await batch.commit();
+    console.log(`expireUnpaidBookings: expired ${chunk.length} bookings`);
+  }
+
+  console.log(`expireUnpaidBookings: total expired = ${docs.length}`);
+});
