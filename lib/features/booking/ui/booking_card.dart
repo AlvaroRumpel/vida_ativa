@@ -107,6 +107,7 @@ class BookingCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (!booking.isCancelled &&
+                                !booking.isRefunded &&
                                 booking.status != 'rejected')
                               IconButton(
                                 icon: const Icon(Icons.share, size: 18),
@@ -116,6 +117,7 @@ class BookingCard extends StatelessWidget {
                                 onPressed: _shareWhatsApp,
                               ),
                             if (!booking.isCancelled &&
+                                !booking.isRefunded &&
                                 bookingCubit != null) ...[
                               const SizedBox(width: 8),
                               IconButton(
@@ -246,6 +248,7 @@ class BookingCard extends StatelessWidget {
     'confirmed' => AppTheme.primaryGreen,
     'expired' => Colors.grey,
     'rejected' => Colors.red,
+    'refunded' => const Color(0xFF7B1FA2),
     _ => Colors.grey,
   };
 
@@ -255,6 +258,7 @@ class BookingCard extends StatelessWidget {
     'confirmed' => 'Confirmado',
     'expired' => 'Expirada',
     'rejected' => 'Recusado',
+    'refunded' => 'Reembolsado',
     _ => 'Cancelado',
   };
 

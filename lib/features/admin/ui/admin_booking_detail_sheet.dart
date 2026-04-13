@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
@@ -68,43 +68,13 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
   }
 
   Future<void> _handleManualConfirm() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar pagamento Pix?'),
-        content: const Text('Deseja marcar este pagamento como confirmado?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Nao'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sim'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
     });
     try {
-      // 1. Confirm booking (updates booking status to 'confirmed')
-      await widget.adminBookingCubit.confirmBooking(widget.booking.id);
-      // 2. Update PaymentRecord to 'paid' (most recent payment doc)
-      if (widget.booking.paymentId != null) {
-        await FirebaseFirestore.instance
-            .collection('bookings')
-            .doc(widget.booking.id)
-            .collection('payment')
-            .doc(widget.booking.paymentId)
-            .update({
-          'status': 'paid',
-          'paidAt': FieldValue.serverTimestamp(),
-        });
-      }
+      final callable = FirebaseFunctions.instance.httpsCallable('adminConfirmPixPayment');
+      await callable.call({'bookingId': widget.booking.id});
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -291,6 +261,11 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
           // Manual Pix confirm — visible only for pending_payment bookings
           if (booking.status == 'pending_payment') ...[
             const SizedBox(height: 24),
+            const Text(
+              'O QR code Pix sera invalidado apos a confirmacao.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               height: 48,

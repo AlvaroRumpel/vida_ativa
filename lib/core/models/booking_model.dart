@@ -90,6 +90,7 @@ class BookingModel extends Equatable {
   bool get isRejected => status == 'rejected';
   bool get isPendingPayment => status == 'pending_payment';
   bool get isExpired => status == 'expired';
+  bool get isRefunded => status == 'refunded';
   // NOTE: isOnArrival checks both confirmed status AND on_arrival method
   // because on_arrival bookings go directly to 'confirmed'
   bool get isOnArrival => isConfirmed && paymentMethod == 'on_arrival';

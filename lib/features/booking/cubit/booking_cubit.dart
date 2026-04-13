@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -141,12 +142,26 @@ class BookingCubit extends Cubit<BookingState> {
     return settled;
   }
 
-  Future<void> cancelBooking(String bookingId) async {
+  Future<void> cancelBooking(BookingModel booking) async {
+    if (booking.isPendingPayment && booking.paymentMethod == 'pix') {
+      // Call CF to cancel MP order + update Firestore atomically
+      final callable = FirebaseFunctions.instance.httpsCallable('cancelPixPayment');
+      await callable.call({'bookingId': booking.id});
+    } else {
+      await _firestore.collection('bookings').doc(booking.id).update({
+        'status': 'cancelled',
+        'cancelledAt': Timestamp.fromDate(DateTime.now()),
+      });
+    }
+    // Stream subscription picks up the change reactively — no state emit here.
+  }
+
+  /// Direct Firestore cancel — for rollback when PIX CF failed (no MP order exists yet).
+  Future<void> cancelBookingById(String bookingId) async {
     await _firestore.collection('bookings').doc(bookingId).update({
       'status': 'cancelled',
       'cancelledAt': Timestamp.fromDate(DateTime.now()),
     });
-    // Stream subscription picks up the change reactively — no state emit here.
   }
 
   /// Batch-cancels all bookings in a recurrence group dated on or after [fromDateInclusive].

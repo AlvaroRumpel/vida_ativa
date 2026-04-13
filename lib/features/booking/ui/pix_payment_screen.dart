@@ -117,6 +117,9 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             duration: Duration(seconds: 2),
           ),
         );
+        // Pop PixPaymentScreen (may be on root or branch navigator)
+        // then navigate GoRouter to bookings tab
+        if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         context.go('/bookings');
       } else if (status == 'expired') {
         _countdownTimer?.cancel();

@@ -125,7 +125,7 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
     if (bookingSnap.exists) {
       final data = bookingSnap.data();
       final status = data?['status'] as String?;
-      if (status != null && status != 'cancelled') {
+      if (status != null && status != 'cancelled' && status != 'refunded') {
         return _PreviewItem(
             dateString: dateStr, status: _PreviewStatus.alreadyBooked);
       }

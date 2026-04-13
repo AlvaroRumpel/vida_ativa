@@ -105,7 +105,7 @@ class _SlotDayViewState extends State<_SlotDayView> {
     final booked = snap.docs
         .where((d) {
           final status = d['status'] as String;
-          return status != 'cancelled' && status != 'rejected';
+          return status != 'cancelled' && status != 'rejected' && status != 'refunded';
         })
         .map((d) => d['slotId'] as String)
         .toSet();

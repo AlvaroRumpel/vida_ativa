@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vida_ativa/core/utils/snack_helper.dart';
+import 'package:vida_ativa/features/booking/ui/pix_payment_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
@@ -77,7 +79,60 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     }
   }
 
-  Future<void> _handleConfirm() async {
+  /// Fluxo Pix: cria booking com pending_payment, gera QR inline, navega para PixPaymentScreen.
+  /// Se a geração do QR falhar, a reserva é cancelada e o erro é exibido na sheet.
+  Future<void> _handlePayPix() async {
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+
+    final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+    final bookingId = BookingModel.generateId(
+      widget.viewModel.slot.id,
+      widget.viewModel.dateString,
+    );
+
+    // 1. Criar reserva
+    try {
+      await widget.bookingCubit.bookSlot(
+        slotId: widget.viewModel.slot.id,
+        dateString: widget.viewModel.dateString,
+        price: widget.viewModel.slot.price,
+        startTime: widget.viewModel.slot.startTime,
+        userDisplayName: authState.user.displayName,
+        paymentMethod: 'pix',
+        participants: _participantsController.text.trim().isEmpty
+            ? null
+            : _participantsController.text.trim(),
+      );
+    } on Exception catch (e, s) {
+      final str = e.toString();
+      final isExpected =
+          str.contains('slot_already_booked') || str.contains('slot_already_passed');
+      if (!isExpected) await Sentry.captureException(e, stackTrace: s);
+      final msg = str.contains('slot_already_booked')
+          ? 'Este horario acabou de ser reservado.'
+          : str.contains('slot_already_passed')
+              ? 'Este horario ja passou.'
+              : 'Falha na conexao. Tente novamente.';
+      if (mounted) setState(() { _isSubmitting = false; _errorMessage = msg; });
+      return;
+    }
+
+    // 2. Navegar para PixPaymentScreen (ela chama createPixPayment internamente)
+    if (!mounted) return;
+    final rootNav = Navigator.of(context, rootNavigator: true);
+    Navigator.pop(context); // fecha a sheet
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      rootNav.push(MaterialPageRoute(
+        builder: (_) => PixPaymentScreen(bookingId: bookingId),
+      ));
+    });
+  }
+
+  /// Fluxo presencial: cria booking com confirmed + on_arrival, fecha sheet.
+  Future<void> _handlePayOnArrival() async {
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
@@ -90,18 +145,18 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
         userDisplayName: authState.user.displayName,
-        paymentMethod: 'on_arrival', // TODO(17-02): replace with user-selected method
+        paymentMethod: 'on_arrival',
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
       );
-      if (mounted) {
-        Navigator.pop(context);
-        SnackHelper.success(context, 'Reserva feita!');
-      }
+      if (!mounted) return;
+      Navigator.pop(context);
+      SnackHelper.success(context, 'Reserva confirmada!');
     } on Exception catch (e, s) {
       final str = e.toString();
-      final isExpected = str.contains('slot_already_booked') || str.contains('slot_already_passed');
+      final isExpected =
+          str.contains('slot_already_booked') || str.contains('slot_already_passed');
       if (!isExpected) await Sentry.captureException(e, stackTrace: s);
       final msg = str.contains('slot_already_booked')
           ? 'Este horario acabou de ser reservado.'
@@ -137,35 +192,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         const SizedBox(width: 12),
         Text(text),
       ],
-    );
-  }
-
-  Widget _paymentWarningBanner() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFFFB300), width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, size: 18, color: Color(0xFFE65100)),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Esta reserva so sera confirmada apos o pagamento. '
-              'Aguarde a confirmacao do estabelecimento.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFFE65100),
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -209,8 +235,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
                   .format(widget.viewModel.slot.price),
             ),
-            const SizedBox(height: 16),
-            _paymentWarningBanner(),
             const SizedBox(height: 16),
             // Recurrence toggle
             Row(
@@ -275,31 +299,62 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               ),
             ],
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : (_isRecurrent ? _handleConfirmRecurring : _handleConfirm),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (!_isRecurrent) ...[
+              // Titulo da secao de pagamento
+              const Text(
+                'Como voce prefere pagar?',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 12),
+              // Botao Pix
+              FilledButton.icon(
+                onPressed: _isSubmitting ? null : _handlePayPix,
+                icon: const Icon(Icons.qr_code, size: 20),
+                label: const Text('Pagar com Pix'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(_isRecurrent
-                      ? (_availableRecurrenceEntries.isEmpty
-                          ? 'Reservar semanalmente'
-                          : 'Reservar ${_availableRecurrenceEntries.length} reserva${_availableRecurrenceEntries.length != 1 ? 's' : ''}')
-                      : 'Reservar'),
-            ),
+              const SizedBox(height: 10),
+              // Botao na hora
+              OutlinedButton.icon(
+                onPressed: _isSubmitting ? null : _handlePayOnArrival,
+                icon: const Icon(Icons.handshake_outlined, size: 20),
+                label: const Text('Pagar na hora'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ] else ...[
+              // Recorrente continua com um unico botao (bookRecurring)
+              FilledButton(
+                onPressed: _isSubmitting ? null : _handleConfirmRecurring,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(_availableRecurrenceEntries.isEmpty
+                        ? 'Reservar semanalmente'
+                        : 'Reservar ${_availableRecurrenceEntries.length} reserva${_availableRecurrenceEntries.length != 1 ? "s" : ""}'),
+              ),
+            ],
           ],
         ),
       ),
