@@ -49,7 +49,9 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       final outcomes = await widget.bookingCubit.bookRecurring(
         entries: _availableRecurrenceEntries,
         startTime: widget.viewModel.slot.startTime,
-        userDisplayName: authState.user.displayName,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
         paymentMethod: 'on_arrival', // TODO(17-02): replace with user-selected method
         participants: _participantsController.text.trim().isEmpty
             ? null
@@ -102,7 +104,9 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         dateString: widget.viewModel.dateString,
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
-        userDisplayName: authState.user.displayName,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
         paymentMethod: 'pix',
         participants: _participantsController.text.trim().isEmpty
             ? null
@@ -146,7 +150,9 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         dateString: widget.viewModel.dateString,
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
-        userDisplayName: authState.user.displayName,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
         paymentMethod: 'on_arrival',
         participants: _participantsController.text.trim().isEmpty
             ? null
