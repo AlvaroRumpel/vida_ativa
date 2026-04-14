@@ -127,6 +127,7 @@ class _SlotDayViewState extends State<SlotDayView> {
       builder: (_) => BookingConfirmationSheet(
         viewModel: viewModel,
         bookingCubit: bookingCubit,
+        pixEnabled: bookingCubit.pixEnabled,
       ),
     );
   }

@@ -33,6 +33,7 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
       ('confirmed', _) => AppTheme.primaryGreen,
       ('expired', _) => Colors.grey,
       ('rejected', _) => Colors.red,
+      ('refunded', _) => Colors.purple,
       _ => Colors.grey,
     };
   }
@@ -46,6 +47,7 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
       ('confirmed', _) => 'Confirmado',
       ('expired', _) => 'Expirada',
       ('rejected', _) => 'Recusado',
+      ('refunded', _) => 'Reembolsado',
       _ => 'Cancelado',
     };
   }

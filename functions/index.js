@@ -168,6 +168,13 @@ exports.createPixPayment = onCall(
     const callerId = request.auth.uid;
     const db = admin.firestore();
 
+    // 0. Check if Pix is enabled
+    const configSnap = await db.collection('config').doc('booking').get();
+    const pixEnabled = configSnap.data()?.pixEnabled ?? true;
+    if (!pixEnabled) {
+      throw new HttpsError('failed-precondition', 'Pix payments are currently disabled');
+    }
+
     // 1. Read and validate booking
     const bookingRef = db.collection('bookings').doc(bookingId);
     const bookingSnap = await bookingRef.get();

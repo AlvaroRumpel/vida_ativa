@@ -13,6 +13,10 @@ class BookingCubit extends Cubit<BookingState> {
   final FirebaseFirestore _firestore;
   final String _userId;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
+  bool _pixEnabled = true;
+  String _confirmationMode = 'manual';
+
+  bool get pixEnabled => _pixEnabled;
 
   BookingCubit({
     required FirebaseFirestore firestore,
@@ -21,6 +25,13 @@ class BookingCubit extends Cubit<BookingState> {
         _userId = userId,
         super(const BookingInitial()) {
     _startStream();
+    _loadConfig();
+  }
+
+  Future<void> _loadConfig() async {
+    final snap = await _firestore.collection('config').doc('booking').get();
+    _pixEnabled = snap.data()?['pixEnabled'] ?? true;
+    _confirmationMode = snap.data()?['confirmationMode'] ?? 'manual';
   }
 
   void _startStream() {
@@ -68,12 +79,11 @@ class BookingCubit extends Cubit<BookingState> {
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
 
-    // Payment method determines initial status:
-    // - 'pix': always pending_payment (slot blocked, QR will be generated next)
-    // - 'on_arrival': always confirmed (payment happens in person, no QR needed)
-    // confirmationMode is bypassed for Pix — webhook (Phase 18) handles confirmation.
-    final initialStatus =
-        paymentMethod == 'on_arrival' ? 'confirmed' : 'pending_payment';
+    // Pix → always pending_payment (webhook confirms after payment)
+    // on_arrival → respects confirmationMode: auto=confirmed, manual=pending
+    final initialStatus = paymentMethod == 'pix'
+        ? 'pending_payment'
+        : (_confirmationMode == 'auto' ? 'confirmed' : 'pending');
 
     await _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);

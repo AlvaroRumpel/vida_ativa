@@ -17,11 +17,13 @@ import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 class BookingConfirmationSheet extends StatefulWidget {
   final SlotViewModel viewModel;
   final BookingCubit bookingCubit;
+  final bool pixEnabled;
 
   const BookingConfirmationSheet({
     super.key,
     required this.viewModel,
     required this.bookingCubit,
+    this.pixEnabled = true,
   });
 
   @override
@@ -300,37 +302,60 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             ],
             const SizedBox(height: 24),
             if (!_isRecurrent) ...[
-              // Titulo da secao de pagamento
-              const Text(
-                'Como voce prefere pagar?',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 12),
-              // Botao Pix
-              FilledButton.icon(
-                onPressed: _isSubmitting ? null : _handlePayPix,
-                icon: const Icon(Icons.qr_code, size: 20),
-                label: const Text('Pagar com Pix'),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              if (widget.pixEnabled) ...[
+                // Titulo da secao de pagamento
+                const Text(
+                  'Como voce prefere pagar?',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 12),
+                // Botao Pix
+                FilledButton.icon(
+                  onPressed: _isSubmitting ? null : _handlePayPix,
+                  icon: const Icon(Icons.qr_code, size: 20),
+                  label: const Text('Pagar com Pix'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // Botao na hora
-              OutlinedButton.icon(
-                onPressed: _isSubmitting ? null : _handlePayOnArrival,
-                icon: const Icon(Icons.handshake_outlined, size: 20),
-                label: const Text('Pagar na hora'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 10),
+                // Botao na hora
+                OutlinedButton.icon(
+                  onPressed: _isSubmitting ? null : _handlePayOnArrival,
+                  icon: const Icon(Icons.handshake_outlined, size: 20),
+                  label: const Text('Pagar na hora'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
-              ),
+              ] else ...[
+                // Pix desabilitado — botao unico de confirmacao
+                FilledButton(
+                  onPressed: _isSubmitting ? null : _handlePayOnArrival,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Confirmar reserva'),
+                ),
+              ],
             ] else ...[
               // Recorrente continua com um unico botao (bookRecurring)
               FilledButton(
