@@ -16,17 +16,15 @@ class AdminBookingLoaded extends AdminBookingState {
   final List<BookingModel> bookings;
   final DateTime selectedDate;
   final String confirmationMode; // 'automatic' | 'manual'
-  final bool pixEnabled;
 
   const AdminBookingLoaded(
     this.bookings, {
     required this.selectedDate,
     required this.confirmationMode,
-    this.pixEnabled = true,
   });
 
   @override
-  List<Object?> get props => [bookings, selectedDate, confirmationMode, pixEnabled];
+  List<Object?> get props => [bookings, selectedDate, confirmationMode];
 }
 
 class AdminBookingError extends AdminBookingState {

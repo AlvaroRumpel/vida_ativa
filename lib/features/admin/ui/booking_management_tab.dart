@@ -113,18 +113,6 @@ class _BookingManagementView extends StatelessWidget {
             cubit.setConfirmationMode(value ? 'automatic' : 'manual');
           },
         ),
-        SwitchListTile(
-          title: const Text('Pagamento Pix'),
-          subtitle: Text(
-            state.pixEnabled
-                ? 'Usuarios podem pagar com Pix'
-                : 'Apenas pagamento na hora',
-          ),
-          value: state.pixEnabled,
-          onChanged: (value) {
-            cubit.setPixEnabled(value);
-          },
-        ),
         const Divider(),
         // Bookings list
         Expanded(

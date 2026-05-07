@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -13,10 +12,6 @@ class BookingCubit extends Cubit<BookingState> {
   final FirebaseFirestore _firestore;
   final String _userId;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
-  bool _pixEnabled = true;
-  String _confirmationMode = 'manual';
-
-  bool get pixEnabled => _pixEnabled;
 
   BookingCubit({
     required FirebaseFirestore firestore,
@@ -25,13 +20,6 @@ class BookingCubit extends Cubit<BookingState> {
         _userId = userId,
         super(const BookingInitial()) {
     _startStream();
-    _loadConfig();
-  }
-
-  Future<void> _loadConfig() async {
-    final snap = await _firestore.collection('config').doc('booking').get();
-    _pixEnabled = snap.data()?['pixEnabled'] ?? true;
-    _confirmationMode = snap.data()?['confirmationMode'] ?? 'manual';
   }
 
   void _startStream() {
@@ -59,7 +47,6 @@ class BookingCubit extends Cubit<BookingState> {
     required double price,
     required String startTime,
     required String userDisplayName,
-    required String paymentMethod, // 'pix' | 'on_arrival'
     String? participants,
     String? recurrenceGroupId,
   }) async {
@@ -79,11 +66,9 @@ class BookingCubit extends Cubit<BookingState> {
     final docId = BookingModel.generateId(slotId, dateString);
     final ref = _firestore.collection('bookings').doc(docId);
 
-    // Pix → always pending_payment (webhook confirms after payment)
-    // on_arrival → respects confirmationMode: auto=confirmed, manual=pending
-    final initialStatus = paymentMethod == 'pix'
-        ? 'pending_payment'
-        : (_confirmationMode == 'auto' ? 'confirmed' : 'pending');
+    final configSnap = await _firestore.collection('config').doc('booking').get();
+    final mode = configSnap.data()?['confirmationMode'] ?? 'manual';
+    final initialStatus = mode == 'automatic' ? 'confirmed' : 'pending';
 
     await _firestore.runTransaction((tx) async {
       final snap = await tx.get(ref);
@@ -104,7 +89,6 @@ class BookingCubit extends Cubit<BookingState> {
         userDisplayName: userDisplayName,
         participants: participants,
         recurrenceGroupId: recurrenceGroupId,
-        paymentMethod: paymentMethod, // NEW
       );
       tx.set(ref, booking.toFirestore());
     });
@@ -119,7 +103,6 @@ class BookingCubit extends Cubit<BookingState> {
     required List<RecurrenceEntry> entries,
     required String startTime,
     required String userDisplayName,
-    required String paymentMethod, // NEW
     String? participants,
   }) async {
     final groupId = const Uuid().v4();
@@ -135,7 +118,6 @@ class BookingCubit extends Cubit<BookingState> {
             userDisplayName: userDisplayName,
             participants: participants,
             recurrenceGroupId: groupId,
-            paymentMethod: paymentMethod, // NEW
           );
           return RecurrenceOutcome.success(entry.dateString);
         } on Exception catch (e) {
@@ -152,26 +134,12 @@ class BookingCubit extends Cubit<BookingState> {
     return settled;
   }
 
-  Future<void> cancelBooking(BookingModel booking) async {
-    if (booking.isPendingPayment && booking.paymentMethod == 'pix') {
-      // Call CF to cancel MP order + update Firestore atomically
-      final callable = FirebaseFunctions.instance.httpsCallable('cancelPixPayment');
-      await callable.call({'bookingId': booking.id});
-    } else {
-      await _firestore.collection('bookings').doc(booking.id).update({
-        'status': 'cancelled',
-        'cancelledAt': Timestamp.fromDate(DateTime.now()),
-      });
-    }
-    // Stream subscription picks up the change reactively — no state emit here.
-  }
-
-  /// Direct Firestore cancel — for rollback when PIX CF failed (no MP order exists yet).
-  Future<void> cancelBookingById(String bookingId) async {
+  Future<void> cancelBooking(String bookingId) async {
     await _firestore.collection('bookings').doc(bookingId).update({
       'status': 'cancelled',
       'cancelledAt': Timestamp.fromDate(DateTime.now()),
     });
+    // Stream subscription picks up the change reactively — no state emit here.
   }
 
   /// Batch-cancels all bookings in a recurrence group dated on or after [fromDateInclusive].
