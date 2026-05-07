@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
 status: unknown
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-04-09T02:43:24.908Z"
+stopped_at: Phase 19 context gathered
+last_updated: "2026-05-07T19:15:47.257Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
   total_plans: 5
   completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -73,6 +74,10 @@ Recent decisions affecting v4.0 work:
 - [Phase 18]: (status, paymentMethod) tuple switch used in both admin files for consistent Pix badge logic
 - [Phase 18]: Manual Pix confirm updates PaymentRecord subcollection directly via FirebaseFirestore instance — no cubit abstraction needed for one-off admin action
 
+### Roadmap Evolution
+
+- Phase 19 added: Admin Settings + Credenciais Pix
+
 ### Pending Todos
 
 None yet.
@@ -86,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T02:39:55.542Z
-Stopped at: Completed 18-02-PLAN.md
-Resume file: None
+Last session: 2026-05-07T19:15:47.251Z
+Stopped at: Phase 19 context gathered
+Resume file: .planning/phases/19-admin-settings-credenciais-pix/19-CONTEXT.md
