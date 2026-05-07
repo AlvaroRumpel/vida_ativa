@@ -67,7 +67,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     _bookingsSubscription = _firestore
         .collection('bookings')
         .where('date', isEqualTo: dateString)
-        .where('status', whereIn: ['pending', 'confirmed', 'pending_payment'])
+        .where('status', whereIn: ['pending', 'confirmed'])
         .snapshots()
         .listen(
       (snapshot) {
@@ -126,8 +126,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         orElse: () => null,
       );
 
-      // NOTE: auto-cancel only fires for 'pending' status (manual approval bookings past their time).
-      // 'pending_payment' bookings are excluded intentionally — Phase 18 CF handles their expiration.
+      // Auto-cancel pending bookings whose slot time has already passed
       if (booking != null && booking.isPending) {
         final parts = slot.date.split('-');
         final timeParts = slot.startTime.split(':');
