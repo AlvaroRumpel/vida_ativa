@@ -5,7 +5,7 @@
 - ✅ **v1.0 MVP** — Phases 1–6 (shipped 2026-03-23)
 - ✅ **v2.0 Funcionalidades Sociais & Admin** — Phases 7–11 (shipped 2026-03-31)
 - ✅ **v3.0 Aprimoramentos de Reserva & Notificações** — Phases 12–16 (shipped 2026-04-06)
-- 🚧 **v4.0 Pagamento Pix** — Phases 17–18 (in progress)
+- 🚧 **v4.0 Pagamento Pix** — Phases 17–19 (in progress)
 
 ## Phases
 
@@ -84,6 +84,17 @@ Plans:
   5. Reservas em `pending_payment` sem pagamento são marcadas como `expired` e o slot é liberado automaticamente após 45 min pela Cloud Function `expireUnpaidBookings`
 **Plans**: TBD
 
+### Phase 19: Admin Settings + Credenciais Pix
+
+**Goal:** Admin configura credenciais Mercado Pago (Access Token + Webhook Secret) pelo painel sem redeploy de Cloud Functions; kill switch Pix centralizado na nova aba Config; regras Firestore isolam credenciais de leitura pelo client Flutter.
+**Requirements**: D-01 a D-13
+**Depends on:** Phase 18
+**Plans:** 2 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Flutter: SettingsCubit + SettingsState + SettingsTab + AdminScreen (6ª aba) + migração pixEnabled
+- [ ] 19-02-PLAN.md — Backend: firestore.rules (write-only para config/mercadopago) + CF helpers getMpAccessToken/getMpWebhookSecret
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -106,3 +117,4 @@ Plans:
 | 16. Push Notifications Admin | v3.0 | 3/3 | Complete | 2026-04-05 |
 | 17. Pix QR Generation | 2/2 | Complete    | 2026-04-08 | - |
 | 18. Webhook + Confirmação em Tempo Real | 3/3 | Complete    | 2026-04-09 | - |
+| 19. Admin Settings + Credenciais Pix | v4.0 | 0/2 | In Progress | - |
