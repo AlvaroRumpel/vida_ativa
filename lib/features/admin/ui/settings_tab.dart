@@ -84,6 +84,31 @@ class _SettingsFormState extends State<_SettingsForm> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
+          // Pix section
+          Text('Pix', style: textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.xs),
+          Builder(builder: (context) {
+            final credentialsConfigured = state.isAccessTokenConfigured &&
+                state.isWebhookSecretConfigured;
+            return SwitchListTile(
+              title: const Text('Pagamento Pix'),
+              subtitle: Text(
+                !credentialsConfigured
+                    ? 'Configure as credenciais abaixo primeiro'
+                    : state.pixEnabled
+                        ? 'Usuários podem pagar com Pix'
+                        : 'Apenas pagamento na hora',
+              ),
+              value: state.pixEnabled,
+              onChanged: credentialsConfigured
+                  ? (v) => context.read<SettingsCubit>().setPixEnabled(v)
+                  : null,
+            );
+          }),
+
+          const SizedBox(height: AppSpacing.lg),
+          const Divider(),
+
           Text('Mercado Pago', style: textTheme.titleMedium),
           const SizedBox(height: AppSpacing.sm),
 
@@ -167,23 +192,6 @@ class _SettingsFormState extends State<_SettingsForm> {
                         strokeWidth: 2, color: Colors.white),
                   )
                 : const Text('Salvar Credenciais'),
-          ),
-
-          const SizedBox(height: AppSpacing.lg),
-          const Divider(),
-
-          // Pix section
-          Text('Pix', style: textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.xs),
-          SwitchListTile(
-            title: const Text('Pagamento Pix'),
-            subtitle: Text(
-              state.pixEnabled
-                  ? 'Usuários podem pagar com Pix'
-                  : 'Apenas pagamento na hora',
-            ),
-            value: state.pixEnabled,
-            onChanged: (v) => context.read<SettingsCubit>().setPixEnabled(v),
           ),
         ],
       ),

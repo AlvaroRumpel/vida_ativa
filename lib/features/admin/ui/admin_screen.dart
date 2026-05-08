@@ -95,7 +95,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 Tab(text: 'Reservas'),
                 Tab(text: 'Usuarios'),
                 Tab(text: 'Preços'),
-                Tab(text: 'Config'),
+                Tab(text: 'Ajustes'),
               ],
             ),
           ),

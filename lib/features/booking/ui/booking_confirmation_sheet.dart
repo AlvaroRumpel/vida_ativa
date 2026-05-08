@@ -33,6 +33,26 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
   final TextEditingController _participantsController = TextEditingController();
   bool _isRecurrent = false;
   List<RecurrenceEntry> _availableRecurrenceEntries = [];
+  bool _requiresConfirmation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchConfirmationMode();
+  }
+
+  Future<void> _fetchConfirmationMode() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('config')
+          .doc('booking')
+          .get();
+      final mode = snap.data()?['confirmationMode'] ?? 'manual';
+      if (mounted) setState(() => _requiresConfirmation = mode != 'automatic');
+    } catch (_) {
+      // keep default true
+    }
+  }
 
   Future<void> _handleConfirmRecurring() async {
     if (_availableRecurrenceEntries.isEmpty) return;
@@ -153,8 +173,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Esta reserva so sera confirmada apos o pagamento. '
-              'Aguarde a confirmacao do estabelecimento.',
+              'Esta reserva será confirmada após aprovação do estabelecimento.',
               style: TextStyle(
                 fontSize: 13,
                 color: Color(0xFFE65100),
@@ -208,8 +227,10 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                   .format(widget.viewModel.slot.price),
             ),
             const SizedBox(height: 16),
-            _paymentWarningBanner(),
-            const SizedBox(height: 16),
+            if (_requiresConfirmation) ...[
+              _paymentWarningBanner(),
+              const SizedBox(height: 16),
+            ],
             // Recurrence toggle
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
