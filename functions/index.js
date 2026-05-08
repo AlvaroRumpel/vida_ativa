@@ -1,60 +1,26 @@
 const { onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onCall, onRequest, HttpsError } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
-const { defineSecret } = require('firebase-functions/params');
 const { MercadoPagoConfig, Order } = require('mercadopago');
 const admin = require('firebase-admin');
 const crypto = require('crypto');
 
-const mpAccessToken = defineSecret('MP_ACCESS_TOKEN');
-const mpWebhookSecret = defineSecret('MP_WEBHOOK_SECRET');
-
 admin.initializeApp();
 
-/**
- * Reads MP_ACCESS_TOKEN from Firestore config/mercadopago first.
- * Falls back to Secret Manager if Firestore field is empty or document missing.
- * Per D-11: Firestore is primary source, Secret Manager is fallback.
- * @param {admin.firestore.Firestore} db
- * @returns {Promise<string>}
- */
+// Reads MP_ACCESS_TOKEN from Firestore config/mercadopago (set via admin panel).
 async function getMpAccessToken(db) {
-  try {
-    const configSnap = await db.collection('config').doc('mercadopago').get();
-    const token = configSnap.data()?.accessToken;
-    if (token && token.trim()) {
-      console.log('getMpAccessToken: using token from Firestore');
-      return token.trim();
-    }
-  } catch (err) {
-    console.warn('getMpAccessToken: Firestore read failed, falling back to Secret Manager:', err.message);
-  }
-  const token = mpAccessToken.value();
-  console.log('getMpAccessToken: using token from Secret Manager');
-  return token;
+  const configSnap = await db.collection('config').doc('mercadopago').get();
+  const token = configSnap.data()?.accessToken;
+  if (token && token.trim()) return token.trim();
+  throw new HttpsError('failed-precondition', 'MP_ACCESS_TOKEN not configured. Set credentials in admin panel.');
 }
 
-/**
- * Reads MP_WEBHOOK_SECRET from Firestore config/mercadopago first.
- * Falls back to Secret Manager if Firestore field is empty or document missing.
- * Per D-11: Firestore is primary source, Secret Manager is fallback.
- * @param {admin.firestore.Firestore} db
- * @returns {Promise<string>}
- */
+// Reads MP_WEBHOOK_SECRET from Firestore config/mercadopago (set via admin panel).
 async function getMpWebhookSecret(db) {
-  try {
-    const configSnap = await db.collection('config').doc('mercadopago').get();
-    const secret = configSnap.data()?.webhookSecret;
-    if (secret && secret.trim()) {
-      console.log('getMpWebhookSecret: using secret from Firestore');
-      return secret.trim();
-    }
-  } catch (err) {
-    console.warn('getMpWebhookSecret: Firestore read failed, falling back to Secret Manager:', err.message);
-  }
-  const secret = mpWebhookSecret.value();
-  console.log('getMpWebhookSecret: using secret from Secret Manager');
-  return secret;
+  const configSnap = await db.collection('config').doc('mercadopago').get();
+  const secret = configSnap.data()?.webhookSecret;
+  if (secret && secret.trim()) return secret.trim();
+  throw new Error('MP_WEBHOOK_SECRET not configured. Set credentials in admin panel.');
 }
 
 /**
@@ -199,9 +165,7 @@ exports.notifyAdminNewBooking = onDocumentWritten('bookings/{bookingId}', async 
  * Idempotency: bookingId used as MP idempotencyKey — duplicate calls return existing payment.
  * Secret: MP_ACCESS_TOKEN must be set in Firebase Secret Manager before deploying.
  */
-exports.createPixPayment = onCall(
-  { secrets: [mpAccessToken] },
-  async (request) => {
+exports.createPixPayment = onCall(async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'Authentication required');
     }
@@ -370,9 +334,7 @@ function verifyMpSignature(xSignature, xRequestId, dataId, secret) {
  *
  * Secrets: MP_WEBHOOK_SECRET and MP_ACCESS_TOKEN must be set in Firebase Secret Manager.
  */
-exports.handlePixWebhook = onRequest(
-  { secrets: [mpWebhookSecret, mpAccessToken] },
-  async (req, res) => {
+exports.handlePixWebhook = onRequest(async (req, res) => {
     // 2. Only process POST
     if (req.method !== 'POST') {
       res.status(202).send({ success: true });
@@ -584,9 +546,7 @@ exports.expireUnpaidBookings = onSchedule('every 15 minutes', async (event) => {
  * 4. Updates payment record status to 'cancelled'
  * 5. Updates booking status to 'cancelled'
  */
-exports.cancelPixPayment = onCall(
-  { secrets: [mpAccessToken] },
-  async (request) => {
+exports.cancelPixPayment = onCall(async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'Authentication required');
     }
@@ -628,7 +588,7 @@ exports.cancelPixPayment = onCall(
 
       if (orderId) {
         const client = new MercadoPagoConfig({
-          accessToken: mpAccessToken.value(),
+          accessToken: await getMpAccessToken(db),
           options: { timeout: 10000 },
         });
         const orderApi = new Order(client);
@@ -668,9 +628,7 @@ exports.cancelPixPayment = onCall(
  * 4. Updates payment record status to 'paid'
  * 5. Updates booking status to 'confirmed'
  */
-exports.adminConfirmPixPayment = onCall(
-  { secrets: [mpAccessToken] },
-  async (request) => {
+exports.adminConfirmPixPayment = onCall(async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'Authentication required');
     }
@@ -716,7 +674,7 @@ exports.adminConfirmPixPayment = onCall(
 
       if (orderId) {
         const client = new MercadoPagoConfig({
-          accessToken: mpAccessToken.value(),
+          accessToken: await getMpAccessToken(db),
           options: { timeout: 10000 },
         });
         const orderApi = new Order(client);
