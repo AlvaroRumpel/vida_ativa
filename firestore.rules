@@ -53,5 +53,10 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
+
+    match /config/mercadopago {
+      allow read: if false;
+      allow write: if isAdmin();
+    }
   }
 }

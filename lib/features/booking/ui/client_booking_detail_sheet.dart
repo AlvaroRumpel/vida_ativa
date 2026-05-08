@@ -31,8 +31,6 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     'pending' => const Color(0xFFD4860A),
     'confirmed' => AppTheme.primaryGreen,
     'rejected' => Colors.red,
-    'pending_payment' => Colors.amber,
-    'expired' => Colors.grey,
     _ => Colors.grey,
   };
 
@@ -40,8 +38,6 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     'pending' => 'Aguardando',
     'confirmed' => 'Confirmado',
     'rejected' => 'Recusado',
-    'pending_payment' => 'Aguardando Pix',
-    'expired' => 'Expirada',
     _ => 'Cancelado',
   };
 
@@ -91,7 +87,7 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     if (confirmed != true) return;
     setState(() { _isSubmitting = true; _errorMessage = null; });
     try {
-      await widget.bookingCubit.cancelBooking(widget.booking);
+      await widget.bookingCubit.cancelBooking(widget.booking.id);
       if (mounted) Navigator.pop(context);
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
@@ -136,7 +132,7 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     setState(() { _isSubmitting = true; _errorMessage = null; });
     try {
       if (choice == 'single') {
-        await widget.bookingCubit.cancelBooking(widget.booking);
+        await widget.bookingCubit.cancelBooking(widget.booking.id);
       } else {
         // Cancel this booking and all future bookings in the group.
         // fromDateInclusive = today (YYYY-MM-DD) to include this booking's date and forward.

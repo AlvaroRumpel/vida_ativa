@@ -12,6 +12,52 @@ const mpWebhookSecret = defineSecret('MP_WEBHOOK_SECRET');
 admin.initializeApp();
 
 /**
+ * Reads MP_ACCESS_TOKEN from Firestore config/mercadopago first.
+ * Falls back to Secret Manager if Firestore field is empty or document missing.
+ * Per D-11: Firestore is primary source, Secret Manager is fallback.
+ * @param {admin.firestore.Firestore} db
+ * @returns {Promise<string>}
+ */
+async function getMpAccessToken(db) {
+  try {
+    const configSnap = await db.collection('config').doc('mercadopago').get();
+    const token = configSnap.data()?.accessToken;
+    if (token && token.trim()) {
+      console.log('getMpAccessToken: using token from Firestore');
+      return token.trim();
+    }
+  } catch (err) {
+    console.warn('getMpAccessToken: Firestore read failed, falling back to Secret Manager:', err.message);
+  }
+  const token = mpAccessToken.value();
+  console.log('getMpAccessToken: using token from Secret Manager');
+  return token;
+}
+
+/**
+ * Reads MP_WEBHOOK_SECRET from Firestore config/mercadopago first.
+ * Falls back to Secret Manager if Firestore field is empty or document missing.
+ * Per D-11: Firestore is primary source, Secret Manager is fallback.
+ * @param {admin.firestore.Firestore} db
+ * @returns {Promise<string>}
+ */
+async function getMpWebhookSecret(db) {
+  try {
+    const configSnap = await db.collection('config').doc('mercadopago').get();
+    const secret = configSnap.data()?.webhookSecret;
+    if (secret && secret.trim()) {
+      console.log('getMpWebhookSecret: using secret from Firestore');
+      return secret.trim();
+    }
+  } catch (err) {
+    console.warn('getMpWebhookSecret: Firestore read failed, falling back to Secret Manager:', err.message);
+  }
+  const secret = mpWebhookSecret.value();
+  console.log('getMpWebhookSecret: using secret from Secret Manager');
+  return secret;
+}
+
+/**
  * Triggered when a booking document is created or updated in the `bookings` collection.
  * Sends an FCM push notification to all admin users when a new active booking is registered.
  *
@@ -210,8 +256,12 @@ exports.createPixPayment = onCall(
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
 
     // 3. Call Mercado Pago Orders API (required for Pix in Brazil sandbox)
+    const token = await getMpAccessToken(db);
+    if (!token) {
+      throw new HttpsError('failed-precondition', 'MP_ACCESS_TOKEN not configured');
+    }
     const client = new MercadoPagoConfig({
-      accessToken: mpAccessToken.value(),
+      accessToken: token,
       options: { timeout: 10000 },
     });
     const orderApi = new Order(client);
@@ -340,12 +390,31 @@ exports.handlePixWebhook = onRequest(
       return;
     }
 
+    // 3. Read credentials from Firestore (primary) or Secret Manager (fallback)
+    const db = admin.firestore();
+    const [accessToken, webhookSecret] = await Promise.all([
+      getMpAccessToken(db),
+      getMpWebhookSecret(db),
+    ]);
+
+    if (!webhookSecret) {
+      console.error('handlePixWebhook: MP_WEBHOOK_SECRET not configured');
+      res.status(202).send({ success: true });
+      return;
+    }
+
+    if (!accessToken) {
+      console.error('handlePixWebhook: MP_ACCESS_TOKEN not configured');
+      res.status(202).send({ success: true });
+      return;
+    }
+
     // 3. Verify MP signature — MP docs require lowercase data.id in the manifest
     const isValid = verifyMpSignature(
       xSignature,
       xRequestId,
       String(dataId).toLowerCase(),
-      mpWebhookSecret.value()
+      webhookSecret
     );
     if (!isValid) {
       console.error('handlePixWebhook: invalid signature — ignoring');
@@ -371,7 +440,7 @@ exports.handlePixWebhook = onRequest(
     }
 
     // 5. Fetch full order details from MP API (status/external_reference not in webhook body)
-    const client = new MercadoPagoConfig({ accessToken: mpAccessToken.value() });
+    const client = new MercadoPagoConfig({ accessToken: accessToken });
     const orderApi = new Order(client);
 
     let orderData;
@@ -402,7 +471,6 @@ exports.handlePixWebhook = onRequest(
       return;
     }
 
-    const db = admin.firestore();
     const bookingRef = db.collection('bookings').doc(bookingId);
     const paymentRef = bookingRef.collection('payment').doc(String(paymentId || dataId));
     const paymentSnap = await paymentRef.get();
