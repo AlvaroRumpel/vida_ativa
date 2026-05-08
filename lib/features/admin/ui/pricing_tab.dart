@@ -113,12 +113,15 @@ class _PricingEditorState extends State<_PricingEditor> {
                 price: d.price,
               ))
           .toList();
-      await context.read<PricingCubit>().saveTiers(tiers);
+      final updatedCount = await context.read<PricingCubit>().saveTiers(tiers);
       if (mounted) {
-        SnackHelper.success(context, 'Preços salvos.');
+        final msg = updatedCount > 0
+            ? 'Preços salvos. $updatedCount slot${updatedCount != 1 ? "s" : ""} atualizado${updatedCount != 1 ? "s" : ""}.'
+            : 'Preços salvos.';
+        SnackHelper.success(context, msg);
       }
-    } catch (_) {
-      if (mounted) setState(() => _error = 'Erro ao salvar. Tente novamente.');
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Erro: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

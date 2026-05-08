@@ -68,6 +68,7 @@ void _showBookingSheet(BuildContext context, SlotViewModel viewModel) {
     builder: (_) => BookingConfirmationSheet(
       viewModel: viewModel,
       bookingCubit: bookingCubit,
+      pixEnabled: bookingCubit.pixEnabled,
     ),
   );
 }

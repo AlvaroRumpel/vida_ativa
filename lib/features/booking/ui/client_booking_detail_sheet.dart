@@ -87,7 +87,7 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     if (confirmed != true) return;
     setState(() { _isSubmitting = true; _errorMessage = null; });
     try {
-      await widget.bookingCubit.cancelBooking(widget.booking.id);
+      await widget.bookingCubit.cancelBooking(widget.booking);
       if (mounted) Navigator.pop(context);
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
@@ -132,7 +132,7 @@ class _ClientBookingDetailSheetState extends State<ClientBookingDetailSheet> {
     setState(() { _isSubmitting = true; _errorMessage = null; });
     try {
       if (choice == 'single') {
-        await widget.bookingCubit.cancelBooking(widget.booking.id);
+        await widget.bookingCubit.cancelBooking(widget.booking);
       } else {
         // Cancel this booking and all future bookings in the group.
         // fromDateInclusive = today (YYYY-MM-DD) to include this booking's date and forward.
