@@ -13,7 +13,7 @@ class BookingCubit extends Cubit<BookingState> {
   final FirebaseFirestore _firestore;
   final String _userId;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
-  bool _pixEnabled = true;
+  bool _pixEnabled = false;
   String _confirmationMode = 'manual';
 
   bool get pixEnabled => _pixEnabled;
@@ -29,9 +29,21 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> _loadConfig() async {
-    final snap = await _firestore.collection('config').doc('booking').get();
-    _pixEnabled = snap.data()?['pixEnabled'] ?? true;
-    _confirmationMode = snap.data()?['confirmationMode'] ?? 'manual';
+    final results = await Future.wait([
+      _firestore.collection('config').doc('booking').get(),
+      _firestore.collection('config').doc('mercadopago').get(),
+    ]);
+    final bookingData = results[0].data();
+    final mpData = results[1].data();
+
+    final pixToggle = bookingData?['pixEnabled'] ?? false;
+    final hasAccessToken =
+        (mpData?['accessToken'] ?? '').toString().isNotEmpty;
+    final hasWebhookSecret =
+        (mpData?['webhookSecret'] ?? '').toString().isNotEmpty;
+
+    _pixEnabled = pixToggle && hasAccessToken && hasWebhookSecret;
+    _confirmationMode = bookingData?['confirmationMode'] ?? 'manual';
   }
 
   void _startStream() {
