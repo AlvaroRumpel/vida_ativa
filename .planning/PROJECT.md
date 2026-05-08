@@ -2,9 +2,9 @@
 
 ## What This Is
 
-PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp, permitindo que clientes vejam horários disponíveis e reservem pelo celular. Inclui visibilidade social entre jogadores (quem reservou, com quem vai jogar), compartilhamento via WhatsApp, toggle admin/cliente, promoção de usuários e monitoramento de erros em produção.
+PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp: clientes veem horários disponíveis, reservam pelo celular e pagam via Pix diretamente no app. Inclui confirmação automática de pagamento via webhook, expiração automática de reservas não pagas, visibilidade social entre jogadores, notificações push para admin, e painel admin completo com configuração de credenciais Mercado Pago.
 
-**Status:** v2.0 live em `vida-ativa-94ba0.web.app` — aguardando assets do cliente para v3.0 (rebrand visual)
+**Status:** v4.0 live em `vida-ativa-94ba0.web.app`
 
 ## Core Value
 
@@ -14,13 +14,9 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ### Validated (v1.0)
 
-- ✓ Projeto Flutter Web criado com suporte a PWA — existente
-- ✓ Firebase inicializado (firebase_options.dart gerado) — existente
-- ✓ Dependências instaladas: firebase_core, firebase_auth, cloud_firestore — existente
-- ✓ main.dart inicializa Firebase corretamente — existente
 - ✓ INFRA-01: Regras de segurança do Firestore com isAdmin() role-based + deployadas — v1.0
 - ✓ INFRA-02: Modelos UserModel, SlotModel, BookingModel, BlockedDateModel com serialização Firestore — v1.0
-- ✓ PWA-01: App instalável como PWA; iOS install banner; apple-mobile-web-app-title = "Vida Ativa"; live em vida-ativa-94ba0.web.app — v1.0
+- ✓ PWA-01: App instalável como PWA; iOS install banner; live em vida-ativa-94ba0.web.app — v1.0
 - ✓ PWA-02: Interface mobile-first com BottomNavigationBar e roteamento go_router — v1.0
 - ✓ AUTH-01: Login com Google (signInWithPopup) — v1.0
 - ✓ AUTH-02: Login com email/senha — v1.0
@@ -45,7 +41,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ SOCIAL-01: Usuário pode ver o nome do cliente que reservou cada horário na agenda — v2.0
 - ✓ SOCIAL-02: Usuário pode adicionar campo de texto com participantes ao fazer reserva — v2.0
 - ✓ ADMN-09: Admin pode ver nome do cliente e participantes diretamente na listagem de reservas — v2.0
-- ✓ SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp com mensagem pré-formatada — v2.0
+- ✓ SOCIAL-03: Usuário pode compartilhar reserva confirmada via WhatsApp — v2.0
 - ✓ PROF-01: Usuário pode cadastrar número de telefone no fluxo de registro — v2.0
 - ✓ PROF-02: Usuário pode editar telefone via BottomSheet no perfil — v2.0
 - ✓ ADMN-07: Admin pode alternar para visão de cliente sem sair da conta — v2.0
@@ -54,63 +50,75 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ UI-02: Agenda exibe horários com layout inspirado no Google Calendar — v2.0
 - ✓ UI-03: Ajustes gerais de UI — consistência visual, espaçamentos, tipografia — v2.0
 
-### Active (v3.0)
+### Validated (v3.0)
+
+- ✓ ADMN-10: Admin vê label da semana atual e pode navegar entre semanas; day chips exibem data real — v3.0
+- ✓ ADMN-11: Admin pode tocar em qualquer reserva e abrir bottomsheet com detalhe + ações — v3.0
+- ✓ BOOK-04: Cliente pode tocar em qualquer reserva em "Minhas Reservas" e abrir bottomsheet com detalhe — v3.0
+- ✓ BOOK-06: Na tela de confirmação de reserva, exibir aviso de pagamento — v3.0
+- ✓ BOOK-05: Cliente pode criar reserva recorrente semanal com gestão de conflitos — v3.0
+- ✓ NOTF-01: Admin recebe web push notification (FCM) quando nova reserva é criada — v3.0
+
+### Validated (v4.0)
+
+- ✓ PIX-01: Após reserva, cliente vê PixPaymentScreen com QR code e copia-e-cola gerados pelo Mercado Pago — v4.0
+- ✓ PIX-02: Reserva criada com status `pending_payment`; slot bloqueado durante janela de pagamento — v4.0
+- ✓ PIX-03: Cliente vê countdown timer; após expirar mostra botão "Gerar novo QR" sem refazer reserva — v4.0
+- ✓ PIX-04: Quando MP confirma pagamento, status atualiza para `confirmed` automaticamente sem refresh — v4.0
+- ✓ PIX-05: `handlePixWebhook` verifica assinatura MP, processa idempotente (txId como chave), retorna 202 imediatamente — v4.0
+- ✓ PIX-06: Admin vê badge de status de pagamento; botão "Confirmar manualmente" disponível — v4.0
+- ✓ PIX-07: Reservas `pending_payment` expiram após 45min e slot liberado via `expireUnpaidBookings` — v4.0
+- ✓ D-01 a D-13: Admin configura credenciais Mercado Pago sem redeploy; kill switch Pix; regras Firestore isolam credenciais — v4.0
+
+### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
 
-### Future (v3.0+)
-
-- Login com número de telefone (OTP via SMS) — complexidade web reCAPTCHA; deferido de v1
-- Notificação push quando reserva é confirmada/recusada — infra significativa; v3
-- Lembrete automático antes do horário reservado — v3
-- Prazo mínimo de cancelamento configurável pelo admin — v3
-- Domínio customizado (ex: vidaativa.com.br) — pode ser configurado manualmente no console Firebase Hosting
-
 ### Out of Scope
 
-- Pagamento online — pagamento é presencial; fora do escopo explícito
-- Múltiplas academias / multi-tenant — v1/v2 é exclusivo para Academia Vida Ativa
+- Login com número de telefone (OTP via SMS) — complexidade web reCAPTCHA; deferido
+- Notificação push para cliente quando reserva confirmada/recusada — v5+
+- Lembrete automático antes do horário reservado — v5+
+- Prazo mínimo de cancelamento configurável pelo admin — v5+
+- Domínio customizado — configurável manualmente no console Firebase Hosting
+- Múltiplas academias / multi-tenant — v1/v2 exclusivo para Academia Vida Ativa
 - Chat / mensagens entre usuário e admin — WhatsApp já cobre isso
-- App nativo iOS/Android — PWA é suficiente
-- Ver nome de outros clientes no slot — era privacidade em v1; decisão revertida em v2.0 a pedido do dono da academia (SOCIAL-01)
-- Suporte offline completo — conflita com booking transactions; deferido
-- Dashboard de métricas/relatórios de ocupação — Alta complexidade; pode ser v3+
+- App nativo iOS/Android — PWA suficiente
+- Dashboard de métricas/relatórios de ocupação — v5+
+- Suporte offline completo — conflita com booking transactions
 
 ## Context
 
-- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view
-- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/blockedDates`, `/config/booking` — serialização Firestore + Equatable
-- **Slots recorrentes** (ex: toda segunda às 08h); bookings são instâncias para uma data específica
+- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, Cloud Functions (Node.js 20), Mercado Pago SDK, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view, bloc_test, mocktail
+- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/bookings/{id}/payment/{txId}`, `/blockedDates`, `/config/booking`, `/config/mercadopago`, `/config/pricing`
+- **BookingModel.status:** `pending` | `confirmed` | `cancelled` | `rejected` | `pending_payment` | `expired` | `refunded`
 - **BookingModel.generateId(slotId, date)** → ID determinístico `{slotId}_{date}` — anti-double-booking via Transaction
 - **Perfis:** `client` (reserva) e `admin` (gerencia) — `role: String` no Firestore; go_router guard + Firestore rules
-- **ViewMode (admin/client):** estado in-memory no AuthAuthenticated; admin pode ver app como cliente sem logout
-- **Estrutura de pastas:** `lib/features/{auth,schedule,booking,admin}/ui/` + `lib/core/{models,theme,router,pwa,utils}`
-- **Codebase:** ~6,236 linhas de Dart (v2.0) — +2,405 desde v1.0
-- **Monitoramento:** Sentry com kReleaseMode guard; DSN via --dart-define; SentryUser com Firebase UID apenas (sem PII)
-- **Deploy:** `firebase deploy --only hosting,firestore:rules` — atomiza app + rules em único comando
-
-## Constraints
-
-- **Stack:** Flutter Web / Firebase — já decidido e configurado
-- **Plataforma:** PWA only — web-first, mobile via browser/instalação
-- **Pagamento:** Fora do escopo — só agendamento
+- **Cloud Functions:** `notifyAdminNewBooking`, `createPixPayment`, `handlePixWebhook`, `expireUnpaidBookings`, `cancelPixPayment`, `adminConfirmPixPayment`, `updateSlotPricesFromTiers`
+- **Credenciais MP:** admin salva via SettingsCubit → Firestore `config/mercadopago`; CFs leem Firestore-first, Secret Manager fallback; cliente nunca lê (allow read: if false)
+- **Codebase:** ~8,250 linhas Dart + ~700 linhas JS Cloud Functions (v4.0)
+- **Monitoramento:** Sentry com kReleaseMode guard; DSN via --dart-define
+- **Testes:** flutter_test + bloc_test + mocktail; 36 testes unitários cobrindo BookingModel, PriceTierModel, SettingsCubit, AppRouter, AuthCubit
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Flutter Web como PWA | Academia já usa dispositivos variados; PWA evita app store | ✓ Funcionou — app instalável no Android/iOS |
-| Firebase Auth com Google + email/password | Clientes têm Google; email como fallback | ✓ Implementado; phone auth deferido para v3 |
-| Confirmação de reserva configurável | Academia pode querer aprovação manual no início | ✓ Toggle automático/manual no painel admin |
-| Slots recorrentes + bookings por data | Separa configuração do horário da instância de reserva | ✓ Cleanly separados; generateId() previne double-booking |
-| isAdmin() via role field no Firestore | Sem custom claims, sem Admin SDK | ✓ role == "admin" — simples e funcional |
-| iOS install banner sempre que acessado via Safari | Sem localStorage "shown once" — simplicidade | ✓ SnackBar não intrusivo via addPostFrameCallback |
-| dart:ui_web para iOS detection | dart:js deprecated; dart:ui_web nativo ao Flutter | ✓ Sem JS interop necessário |
-| ViewMode como estado in-memory no BLoC | Admin toggle é UX preference, não dado persistido | ✓ Sem round-trip Firestore; reset no logout é comportamento correto |
-| Sentry com kReleaseMode guard | Evitar ruído no dashboard durante dev; DSN via --dart-define | ✓ Erros de produção capturados; 0 DSN no source code |
-| calendar_view: 2.0.0 pin exato | 2.x pode ter breaking changes por minor version | ✓ DayView estável; SlotEventTile integrado sem regressão |
-| WhatsApp share via wa.me/?text= (sem número) | Universal link — funciona sem WhatsApp instalado no web | ✓ Compartilhamento funciona em todos os browsers |
-| FieldValue.delete() para campos nullable no Firestore | Evitar strings vazias no banco; padrão consistente | ✓ Aplicado em participants (Phase 07), phone (Phase 08) |
+| Flutter Web como PWA | Academia já usa dispositivos variados; PWA evita app store | ✓ App instalável Android/iOS |
+| Firebase Auth Google + email/password | Clientes têm Google; email como fallback | ✓ Implementado |
+| Confirmação de reserva configurável | Academia pode querer aprovação manual | ✓ Toggle automático/manual no painel admin |
+| Slots recorrentes + bookings por data | Separa configuração do horário da instância | ✓ generateId() previne double-booking |
+| isAdmin() via role field no Firestore | Sem custom claims, sem Admin SDK | ✓ Simples e funcional |
+| ViewMode como estado in-memory no BLoC | Admin toggle é UX preference, não dado persistido | ✓ Reset no logout é comportamento correto |
+| Sentry com kReleaseMode guard | Evitar ruído no dashboard durante dev | ✓ Erros de produção capturados |
+| Mercado Pago @mercadopago/sdk-node v2.0.0 | Mature API, exemplos extensos para Pix QR | ✓ createPixPayment funcional |
+| PaymentRecord em `/bookings/{id}/payment/{txId}` | Isola dados de pagamento do booking doc | ✓ txId como chave de idempotência no webhook |
+| Webhook retorna 202 antes de qualquer async | Previne retry do Mercado Pago em slow processing | ✓ handlePixWebhook implementado |
+| Pix confirmado bypassa modo de aprovação manual | Pagamento já é confirmação suficiente | ✓ Admin pode cancelar manualmente depois |
+| Credenciais MP em Firestore (primary) + Secret Manager (fallback) | Admin atualiza sem redeploy de CF | ✓ SettingsCubit → Firestore; getMpAccessToken/getMpWebhookSecret helpers |
+| config/mercadopago allow read: if false | Token nunca exposto ao Flutter SDK | ✓ Regra Firestore específica tem precedência sobre wildcard |
+| SettingsLoaded contém apenas bool flags (não valores dos tokens) | Segurança — token nunca no estado Flutter | ✓ isAccessTokenConfigured: bool |
+| expireUnpaidBookings a cada 15min (não 45min) | Margem de segurança maior que expiresAt de 30min | ✓ Bookings expiram no máximo ~15min após vencimento |
 
 ---
-*Last updated: 2026-03-31 after v2.0 milestone*
+*Last updated: 2026-05-08 after v4.0 milestone*

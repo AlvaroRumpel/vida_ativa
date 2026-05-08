@@ -1,0 +1,1103 @@
+{
+  "createdAt": "2026-04-06T05:59:56.485Z",
+  "project": "vida-ativa-94ba0",
+  "slots": [
+    {
+      "id": "063IMiWbEQl9YGXWOYgh",
+      "dayOfWeek": 6,
+      "startTime": "16:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "14R5i9eDeRtaFYqoLDjU",
+      "dayOfWeek": 6,
+      "startTime": "17:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "1TSpZDH9hBWfabEytdKA",
+      "dayOfWeek": 6,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "1yLuWeSdeZrqPUsjifLB",
+      "dayOfWeek": 1,
+      "startTime": "16:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "23Ek5YzuHKnae3pP8uF1",
+      "dayOfWeek": 2,
+      "startTime": "14:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "28SEYPgulnsmISQrBZOv",
+      "dayOfWeek": 4,
+      "startTime": "10:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "2tWPkjSzcgeLXYGJtTW5",
+      "dayOfWeek": 6,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "2v5CvBpTrS8r1b2hOBz3",
+      "dayOfWeek": 2,
+      "startTime": "15:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "3IRHqTzL4YfNA2Ntvh0R",
+      "dayOfWeek": 4,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "3eHy69v1fNXfHwB6xr05",
+      "dayOfWeek": 4,
+      "startTime": "11:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "3sIg6nkDaehsJUsR8Kly",
+      "dayOfWeek": 6,
+      "startTime": "11:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "4PpUVQIPuOba5B1IfFWZ",
+      "dayOfWeek": 7,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "4SghNNXpqmOnvkkRuzOe",
+      "dayOfWeek": 2,
+      "startTime": "12:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "5LVg54lER0DC8rfK5JRW",
+      "dayOfWeek": 1,
+      "startTime": "09:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "5M1KY6FZglNk7uQDuRFN",
+      "dayOfWeek": 2,
+      "startTime": "09:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "69wau5vwY6HzSSgRrpoN",
+      "dayOfWeek": 5,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw",
+      "dayOfWeek": 2,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "6OmD15MhS0lUw3rHfMEu",
+      "dayOfWeek": 1,
+      "startTime": "08:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "6YgmPV43GfEycqK9dziH",
+      "dayOfWeek": 1,
+      "startTime": "12:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "6cQHRaSTI4BWFc7asEsZ",
+      "dayOfWeek": 4,
+      "startTime": "15:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "7fBsgV1KcB8VYGsYnXVv",
+      "dayOfWeek": 7,
+      "startTime": "15:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "7fYaoosd0DcFFieVdqg2",
+      "dayOfWeek": 4,
+      "startTime": "16:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "857hX8fG3Nef2uoD4ooP",
+      "dayOfWeek": 7,
+      "startTime": "10:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp",
+      "dayOfWeek": 4,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "8lURC6pHNium7P2XPqXs",
+      "dayOfWeek": 2,
+      "startTime": "08:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "92OJgVv9Iz2U24coTSOD",
+      "dayOfWeek": 3,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "9AiX8IVr86uge0yfq8Ei",
+      "dayOfWeek": 4,
+      "startTime": "08:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "9JvUGcL7LkPVVOUz0u07",
+      "dayOfWeek": 7,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "9MMhNus7BAqcf4tsfITE",
+      "dayOfWeek": 5,
+      "startTime": "16:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "AFyRzVnxBrEesGhd9yiH",
+      "dayOfWeek": 5,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "B4TR5oI5f3SKFM4IgpKs",
+      "dayOfWeek": 5,
+      "startTime": "09:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "BRdcMIxgjwHpiwtd0SAT",
+      "dayOfWeek": 6,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "BXpFdJn5Z91loPgolPKz",
+      "dayOfWeek": 3,
+      "startTime": "11:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "DOW4wh3nT0rbtAOovzLw",
+      "dayOfWeek": 7,
+      "startTime": "09:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "EFCWvMbuK0fejBtmmwdi",
+      "dayOfWeek": 2,
+      "startTime": "10:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "EKXsHTMkOA5dnALwKFAn",
+      "dayOfWeek": 5,
+      "startTime": "08:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "FAws31UsbTqUuiIjYyKX",
+      "dayOfWeek": 5,
+      "startTime": "10:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "FzEy3RVQjqeuGIWlXTCY",
+      "dayOfWeek": 6,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "GErvMlEh8mWYiE8zysHt",
+      "dayOfWeek": 7,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "Gp5e7tNaMyMkKN2kmxqO",
+      "dayOfWeek": 7,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "GtMNi0pPYDzL3HongdIQ",
+      "dayOfWeek": 6,
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "IonFaQLFX79qBqrgzu7m",
+      "dayOfWeek": 6,
+      "startTime": "14:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "J6a6ZZNPZ7rIyirTQAMq",
+      "dayOfWeek": 1,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "JNZtgjzChN6jULTdBXXt",
+      "dayOfWeek": 5,
+      "startTime": "13:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "Jxkjwm82bHg6QtK504Mc",
+      "dayOfWeek": 2,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "LdGcqtfQxR8DQBV028Ai",
+      "dayOfWeek": 7,
+      "startTime": "13:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "Mh1rcoxOgBLa8X3Mm0SD",
+      "dayOfWeek": 7,
+      "startTime": "11:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "Mp5wavTUImxRitNilmXw",
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true,
+      "dayOfWeek": 5
+    },
+    {
+      "id": "NGoROmbIymlaLgncdy4m",
+      "dayOfWeek": 1,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "Nk01vTSbx8ivHWr5wHae",
+      "dayOfWeek": 5,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "OHVXVt49PMF9qfFh0boY",
+      "dayOfWeek": 6,
+      "startTime": "08:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "OVVJvxi4WTviXvPtNDrx",
+      "dayOfWeek": 5,
+      "startTime": "17:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "QlkMfZnx1BSC9LhlKIvB",
+      "dayOfWeek": 1,
+      "startTime": "10:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "RBR8b8PudnJOhZSFECgf",
+      "dayOfWeek": 3,
+      "startTime": "08:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "SaJW4FdCnhbdANokx5D2",
+      "dayOfWeek": 4,
+      "startTime": "22:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "SnRAYkV2hhKGcAq7eAgy",
+      "dayOfWeek": 2,
+      "startTime": "13:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "THZWGOyEiERQiaJdYv8r",
+      "dayOfWeek": 3,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "TpKBTQjUUupqjLtsfXUF",
+      "dayOfWeek": 7,
+      "startTime": "17:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "VMdLVeQYZIBvnoasesSo",
+      "dayOfWeek": 1,
+      "startTime": "11:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "WW0Pn9kFZbKYeltMaH9i",
+      "dayOfWeek": 3,
+      "startTime": "16:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "WoJvjWE06DgMFkqYHn86",
+      "dayOfWeek": 3,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "YhzjzmfKT6mF4yJV68w8",
+      "dayOfWeek": 1,
+      "startTime": "20:00",
+      "price": 70,
+      "isActive": true
+    },
+    {
+      "id": "YzIvORTFtCoaQucyyUDS",
+      "dayOfWeek": 3,
+      "startTime": "13:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "Z0ysSMUNtDbSJmf7qCcq",
+      "dayOfWeek": 1,
+      "startTime": "17:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "aaAIzmPMNmsGpkFhRuhS",
+      "dayOfWeek": 4,
+      "startTime": "09:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "b2LywDXhyPMepT7fGT51",
+      "dayOfWeek": 6,
+      "startTime": "13:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "bj092l87QS08lHGYA23f",
+      "dayOfWeek": 5,
+      "startTime": "19:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "c1pKBBKP5sg399ISMUyG",
+      "dayOfWeek": 1,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "caKlvHDDQAa6QMUFnMqW",
+      "dayOfWeek": 3,
+      "startTime": "15:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "cbLgKYBqmd7faKc4JsZl",
+      "dayOfWeek": 2,
+      "startTime": "18:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "cnAGjbLkmFoCY0YtbMtH",
+      "dayOfWeek": 5,
+      "startTime": "11:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "dIoNDrYbKD9WgPfGLFGI",
+      "dayOfWeek": 6,
+      "startTime": "09:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "dS1XZxyjp52NlRXIl3UA",
+      "dayOfWeek": 5,
+      "startTime": "15:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "fcz6mjjMcFGzt4u6Lx3t",
+      "dayOfWeek": 6,
+      "startTime": "15:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "gXLTi9cdAl3X60ZgZOaU",
+      "dayOfWeek": 3,
+      "startTime": "14:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "hdU24Ppz4VJlPQ24Xdqp",
+      "dayOfWeek": 6,
+      "startTime": "12:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "i6SzupSZdtqE6lU4wkFa",
+      "dayOfWeek": 5,
+      "startTime": "14:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "ipmqM2p26ijyi3qJ236B",
+      "dayOfWeek": 4,
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "kIVCYLa5gMSX7oEeqXou",
+      "dayOfWeek": 3,
+      "startTime": "09:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "kWvToe3DPgAeKBMqun7f",
+      "dayOfWeek": 6,
+      "startTime": "10:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "mMPXzCLV8U90AoQ7pROX",
+      "dayOfWeek": 3,
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "mYCOFEWLNsXY4yEIy4cn",
+      "dayOfWeek": 7,
+      "startTime": "12:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "mifrxDxgqcMt7LFLb6Rv",
+      "dayOfWeek": 2,
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "mqgoTUvabvjsDNe0hIbK",
+      "dayOfWeek": 7,
+      "startTime": "20:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "nRjmQ1pULaH8D2iSS0SI",
+      "dayOfWeek": 1,
+      "startTime": "13:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "nXD0GriwxnEBHmaYxUmT",
+      "dayOfWeek": 4,
+      "startTime": "17:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "oepliViaJQRastVnOwBM",
+      "dayOfWeek": 4,
+      "startTime": "14:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "oohFr1XuSUAgazr2scQO",
+      "dayOfWeek": 3,
+      "startTime": "17:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "pZQXP6Z7lFSgGODGnBRf",
+      "dayOfWeek": 4,
+      "startTime": "12:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "rm161PYNwPyLBkwhfi3m",
+      "dayOfWeek": 4,
+      "startTime": "13:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "si9SDMe74PHkaACRoM4f",
+      "dayOfWeek": 3,
+      "startTime": "10:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "sqqYIlmCPjOf6Vw1Dxz9",
+      "dayOfWeek": 5,
+      "startTime": "12:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "sw7jZ5L4zVd52n12AEJ4",
+      "dayOfWeek": 2,
+      "startTime": "11:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "tv26wy1jEPSc4pXqP6fV",
+      "dayOfWeek": 3,
+      "startTime": "12:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "uBLfZZVJPV8IgPyaks1G",
+      "dayOfWeek": 3,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "uQUAd4nGU1Kp05EMchsu",
+      "dayOfWeek": 1,
+      "startTime": "19:00",
+      "isActive": true,
+      "price": 70
+    },
+    {
+      "id": "xKLDmSBXI4XUpp6GaCkV",
+      "dayOfWeek": 7,
+      "startTime": "16:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "xSyGY5dHapjpuwS7PJsD",
+      "dayOfWeek": 2,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "xb8TeAzcnqwARLJnV4S0",
+      "dayOfWeek": 2,
+      "startTime": "16:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "xjmX2vcAL2Vz7MBHuxsF",
+      "dayOfWeek": 4,
+      "startTime": "21:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "y9qSVxmMnT8rbu4PTuoI",
+      "dayOfWeek": 7,
+      "startTime": "14:00",
+      "price": 80,
+      "isActive": true
+    },
+    {
+      "id": "yKqsFXKKh1gtZYaix3jd",
+      "dayOfWeek": 2,
+      "startTime": "17:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "yXNrAWvovpfTWId0NMBJ",
+      "dayOfWeek": 1,
+      "startTime": "15:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "z1oi5Xptl4f7G8KWZh97",
+      "dayOfWeek": 1,
+      "startTime": "14:00",
+      "price": 60,
+      "isActive": true
+    },
+    {
+      "id": "z3QtteqkUH3pPsu6i28J",
+      "dayOfWeek": 7,
+      "startTime": "08:00",
+      "price": 80,
+      "isActive": true
+    }
+  ],
+  "bookings": [
+    {
+      "id": "3IRHqTzL4YfNA2Ntvh0R_2026-04-02",
+      "slotId": "3IRHqTzL4YfNA2Ntvh0R",
+      "date": "2026-04-02",
+      "userId": "YmzzL1QHvmUolclEeBmWf8Yiz8I2",
+      "createdAt": {
+        "_seconds": 1775095351,
+        "_nanoseconds": 968000000
+      },
+      "startTime": "18:00",
+      "price": 80,
+      "userDisplayName": "Cristian Deon",
+      "participants": "Cristian",
+      "cancelledAt": {
+        "_seconds": 1775161210,
+        "_nanoseconds": 25000000
+      },
+      "status": "cancelled"
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw_2026-03-31",
+      "slotId": "6LYXXI3pbLlxcC6bITIw",
+      "date": "2026-03-31",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774962959,
+        "_nanoseconds": 635000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia",
+      "status": "confirmed"
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw_2026-04-07",
+      "slotId": "6LYXXI3pbLlxcC6bITIw",
+      "date": "2026-04-07",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774963377,
+        "_nanoseconds": 538000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia",
+      "status": "confirmed"
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw_2026-04-14",
+      "slotId": "6LYXXI3pbLlxcC6bITIw",
+      "date": "2026-04-14",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963407,
+        "_nanoseconds": 73000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw_2026-04-21",
+      "slotId": "6LYXXI3pbLlxcC6bITIw",
+      "date": "2026-04-21",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963434,
+        "_nanoseconds": 76000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "6LYXXI3pbLlxcC6bITIw_2026-04-28",
+      "slotId": "6LYXXI3pbLlxcC6bITIw",
+      "date": "2026-04-28",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963468,
+        "_nanoseconds": 894000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp_2026-04-02",
+      "slotId": "8T9EYLBmzP1NJYmG8cZp",
+      "date": "2026-04-02",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774963354,
+        "_nanoseconds": 694000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia",
+      "status": "confirmed"
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp_2026-04-09",
+      "slotId": "8T9EYLBmzP1NJYmG8cZp",
+      "date": "2026-04-09",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774963392,
+        "_nanoseconds": 321000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia",
+      "status": "confirmed"
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp_2026-04-16",
+      "slotId": "8T9EYLBmzP1NJYmG8cZp",
+      "date": "2026-04-16",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963419,
+        "_nanoseconds": 881000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp_2026-04-23",
+      "slotId": "8T9EYLBmzP1NJYmG8cZp",
+      "date": "2026-04-23",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963447,
+        "_nanoseconds": 86000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "8T9EYLBmzP1NJYmG8cZp_2026-04-30",
+      "slotId": "8T9EYLBmzP1NJYmG8cZp",
+      "date": "2026-04-30",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1774963480,
+        "_nanoseconds": 564000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia"
+    },
+    {
+      "id": "NGoROmbIymlaLgncdy4m_2026-03-30",
+      "slotId": "NGoROmbIymlaLgncdy4m",
+      "date": "2026-03-30",
+      "userId": "U6dilvUtfrWSpkU9JadwkZMr0g92",
+      "createdAt": {
+        "_seconds": 1774888835,
+        "_nanoseconds": 288000000
+      },
+      "startTime": "21:00",
+      "price": 80,
+      "userDisplayName": "",
+      "participants": "Graciele",
+      "cancelledAt": {
+        "_seconds": 1774905354,
+        "_nanoseconds": 406000000
+      },
+      "status": "cancelled"
+    },
+    {
+      "id": "THZWGOyEiERQiaJdYv8r_2026-04-01",
+      "slotId": "THZWGOyEiERQiaJdYv8r",
+      "date": "2026-04-01",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774965178,
+        "_nanoseconds": 408000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Patrick",
+      "status": "confirmed"
+    },
+    {
+      "id": "THZWGOyEiERQiaJdYv8r_2026-04-08",
+      "slotId": "THZWGOyEiERQiaJdYv8r",
+      "date": "2026-04-08",
+      "userId": "vGtL5U9FmTe5RWnwlgrDETbFQ4F3",
+      "createdAt": {
+        "_seconds": 1775136240,
+        "_nanoseconds": 643000000
+      },
+      "startTime": "19:00",
+      "price": 80,
+      "userDisplayName": "",
+      "status": "confirmed",
+      "participants": "Bruna"
+    },
+    {
+      "id": "WoJvjWE06DgMFkqYHn86_2026-04-01",
+      "slotId": "WoJvjWE06DgMFkqYHn86",
+      "date": "2026-04-01",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774965170,
+        "_nanoseconds": 346000000
+      },
+      "startTime": "18:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Patrick",
+      "status": "confirmed"
+    },
+    {
+      "id": "WoJvjWE06DgMFkqYHn86_2026-04-08",
+      "slotId": "WoJvjWE06DgMFkqYHn86",
+      "date": "2026-04-08",
+      "userId": "vGtL5U9FmTe5RWnwlgrDETbFQ4F3",
+      "createdAt": {
+        "_seconds": 1775136246,
+        "_nanoseconds": 265000000
+      },
+      "startTime": "18:00",
+      "price": 80,
+      "userDisplayName": "",
+      "status": "confirmed",
+      "participants": "Bruna"
+    },
+    {
+      "id": "YhzjzmfKT6mF4yJV68w8_2026-03-30",
+      "slotId": "YhzjzmfKT6mF4yJV68w8",
+      "date": "2026-03-30",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774887278,
+        "_nanoseconds": 963000000
+      },
+      "startTime": "20:00",
+      "price": 70,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Patrick",
+      "cancelledAt": {
+        "_seconds": 1774901099,
+        "_nanoseconds": 702000000
+      },
+      "status": "cancelled"
+    },
+    {
+      "id": "mMPXzCLV8U90AoQ7pROX_2026-04-01",
+      "slotId": "mMPXzCLV8U90AoQ7pROX",
+      "date": "2026-04-01",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774965187,
+        "_nanoseconds": 596000000
+      },
+      "startTime": "20:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Patrick",
+      "status": "confirmed"
+    },
+    {
+      "id": "mifrxDxgqcMt7LFLb6Rv_2026-03-31",
+      "slotId": "mifrxDxgqcMt7LFLb6Rv",
+      "date": "2026-03-31",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774962971,
+        "_nanoseconds": 770000000
+      },
+      "startTime": "20:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Sabóia",
+      "status": "confirmed"
+    },
+    {
+      "id": "uBLfZZVJPV8IgPyaks1G_2026-04-01",
+      "slotId": "uBLfZZVJPV8IgPyaks1G",
+      "date": "2026-04-01",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1775062025,
+        "_nanoseconds": 575000000
+      },
+      "startTime": "21:00",
+      "price": 80,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Higor",
+      "status": "confirmed"
+    },
+    {
+      "id": "uQUAd4nGU1Kp05EMchsu_2026-03-30",
+      "slotId": "uQUAd4nGU1Kp05EMchsu",
+      "date": "2026-03-30",
+      "userId": "QdzwEEpRFIZNUfObYsw55V4YkaT2",
+      "createdAt": {
+        "_seconds": 1774887262,
+        "_nanoseconds": 579000000
+      },
+      "startTime": "19:00",
+      "price": 70,
+      "userDisplayName": "Higor Lichtenecker",
+      "participants": "Patrick",
+      "cancelledAt": {
+        "_seconds": 1774901103,
+        "_nanoseconds": 868000000
+      },
+      "status": "cancelled"
+    },
+    {
+      "id": "uQUAd4nGU1Kp05EMchsu_2026-04-06",
+      "slotId": "uQUAd4nGU1Kp05EMchsu",
+      "date": "2026-04-06",
+      "userId": "rJ0KcZTJLjQK2ZhSM6Lsugl4R2l1",
+      "status": "pending",
+      "createdAt": {
+        "_seconds": 1775158085,
+        "_nanoseconds": 663000000
+      },
+      "startTime": "19:00",
+      "price": 70,
+      "userDisplayName": "Isadora Schievelbein"
+    },
+    {
+      "id": "xSyGY5dHapjpuwS7PJsD_2026-03-31",
+      "slotId": "xSyGY5dHapjpuwS7PJsD",
+      "date": "2026-03-31",
+      "userId": "U6dilvUtfrWSpkU9JadwkZMr0g92",
+      "createdAt": {
+        "_seconds": 1774966828,
+        "_nanoseconds": 60000000
+      },
+      "startTime": "21:00",
+      "price": 80,
+      "userDisplayName": "Graciele Borges Pinto",
+      "participants": "Graciele Borges Pinto",
+      "status": "confirmed"
+    }
+  ]
+}

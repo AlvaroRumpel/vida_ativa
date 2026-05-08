@@ -12,6 +12,7 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
   final String _adminUid;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
   String _confirmationMode = 'manual';
+  bool _pixEnabled = true;
 
   AdminBookingCubit({
     required FirebaseFirestore firestore,
@@ -28,6 +29,7 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
     final configSnap =
         await _firestore.collection('config').doc('booking').get();
     _confirmationMode = configSnap.data()?['confirmationMode'] ?? 'manual';
+    _pixEnabled = configSnap.data()?['pixEnabled'] ?? true;
   }
 
   Future<void> selectDate(DateTime date) async {
@@ -48,6 +50,7 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
           bookings,
           selectedDate: date,
           confirmationMode: _confirmationMode,
+          pixEnabled: _pixEnabled,
         ));
       },
       onError: (e, s) {
@@ -84,6 +87,24 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
         current.bookings,
         selectedDate: current.selectedDate,
         confirmationMode: mode,
+        pixEnabled: _pixEnabled,
+      ));
+    }
+  }
+
+  Future<void> setPixEnabled(bool enabled) async {
+    await _firestore
+        .collection('config')
+        .doc('booking')
+        .set({'pixEnabled': enabled}, SetOptions(merge: true));
+    _pixEnabled = enabled;
+    final current = state;
+    if (current is AdminBookingLoaded) {
+      emit(AdminBookingLoaded(
+        current.bookings,
+        selectedDate: current.selectedDate,
+        confirmationMode: _confirmationMode,
+        pixEnabled: enabled,
       ));
     }
   }

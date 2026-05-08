@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_fcm_cubit.dart';
+import 'package:vida_ativa/features/admin/cubit/settings_cubit.dart';
 import 'package:vida_ativa/features/admin/ui/blocked_dates_tab.dart';
 import 'package:vida_ativa/features/admin/ui/booking_management_tab.dart';
 import 'package:vida_ativa/features/admin/ui/pricing_tab.dart';
+import 'package:vida_ativa/features/admin/ui/settings_tab.dart';
 import 'package:vida_ativa/features/admin/ui/slot_management_tab.dart';
 import 'package:vida_ativa/features/admin/ui/users_management_tab.dart';
 
@@ -27,7 +30,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _fcmCubit = AdminFcmCubit();
     _fcmCubit.init();
 
@@ -92,6 +95,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 Tab(text: 'Reservas'),
                 Tab(text: 'Usuarios'),
                 Tab(text: 'Preços'),
+                Tab(text: 'Ajustes'),
               ],
             ),
           ),
@@ -122,12 +126,18 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: const [
-                    SlotManagementTab(),
-                    BlockedDatesTab(),
-                    BookingManagementTab(),
-                    UsersManagementTab(),
-                    PricingTab(),
+                  children: [
+                    const SlotManagementTab(),
+                    const BlockedDatesTab(),
+                    const BookingManagementTab(),
+                    const UsersManagementTab(),
+                    const PricingTab(),
+                    BlocProvider(
+                      create: (_) => SettingsCubit(
+                        firestore: FirebaseFirestore.instance,
+                      ),
+                      child: const SettingsTab(),
+                    ),
                   ],
                 ),
               ),

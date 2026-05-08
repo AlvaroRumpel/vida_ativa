@@ -1,5 +1,15 @@
 # Milestones
 
+## v4.0 Pagamento Pix (Shipped: 2026-05-08)
+
+**Phases completed:** 2 phases, 3 plans, 4 tasks
+
+**Key accomplishments:**
+
+- (none recorded)
+
+---
+
 ## v3.0 Aprimoramentos de Reserva & Notificações (Shipped: 2026-04-06)
 
 **Phases completed:** 4 phases (13–16), 10 plans

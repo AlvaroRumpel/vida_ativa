@@ -72,3 +72,6 @@ app.*.map.json
 /android/app/release
 
 sentry.properties
+scripts/deploy.dart
+# Added by code-review-graph
+.code-review-graph/

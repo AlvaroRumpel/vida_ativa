@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vida_ativa/core/utils/snack_helper.dart';
+import 'package:vida_ativa/features/booking/ui/pix_payment_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
@@ -15,11 +17,13 @@ import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 class BookingConfirmationSheet extends StatefulWidget {
   final SlotViewModel viewModel;
   final BookingCubit bookingCubit;
+  final bool pixEnabled;
 
   const BookingConfirmationSheet({
     super.key,
     required this.viewModel,
     required this.bookingCubit,
+    this.pixEnabled = true,
   });
 
   @override
@@ -33,6 +37,26 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
   final TextEditingController _participantsController = TextEditingController();
   bool _isRecurrent = false;
   List<RecurrenceEntry> _availableRecurrenceEntries = [];
+  bool _requiresConfirmation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchConfirmationMode();
+  }
+
+  Future<void> _fetchConfirmationMode() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('config')
+          .doc('booking')
+          .get();
+      final mode = snap.data()?['confirmationMode'] ?? 'manual';
+      if (mounted) setState(() => _requiresConfirmation = mode != 'automatic');
+    } catch (_) {
+      // keep default true
+    }
+  }
 
   Future<void> _handleConfirmRecurring() async {
     if (_availableRecurrenceEntries.isEmpty) return;
@@ -45,7 +69,10 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       final outcomes = await widget.bookingCubit.bookRecurring(
         entries: _availableRecurrenceEntries,
         startTime: widget.viewModel.slot.startTime,
-        userDisplayName: authState.user.displayName,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
+        paymentMethod: 'on_arrival',
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
@@ -76,7 +103,59 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     }
   }
 
-  Future<void> _handleConfirm() async {
+  /// Fluxo Pix: cria booking com pending_payment, navega para PixPaymentScreen.
+  Future<void> _handlePayPix() async {
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+
+    final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+    final bookingId = BookingModel.generateId(
+      widget.viewModel.slot.id,
+      widget.viewModel.dateString,
+    );
+
+    try {
+      await widget.bookingCubit.bookSlot(
+        slotId: widget.viewModel.slot.id,
+        dateString: widget.viewModel.dateString,
+        price: widget.viewModel.slot.price,
+        startTime: widget.viewModel.slot.startTime,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
+        paymentMethod: 'pix',
+        participants: _participantsController.text.trim().isEmpty
+            ? null
+            : _participantsController.text.trim(),
+      );
+    } on Exception catch (e, s) {
+      final str = e.toString();
+      final isExpected =
+          str.contains('slot_already_booked') || str.contains('slot_already_passed');
+      if (!isExpected) await Sentry.captureException(e, stackTrace: s);
+      final msg = str.contains('slot_already_booked')
+          ? 'Este horario acabou de ser reservado.'
+          : str.contains('slot_already_passed')
+              ? 'Este horario ja passou.'
+              : 'Falha na conexao. Tente novamente.';
+      if (mounted) setState(() { _isSubmitting = false; _errorMessage = msg; });
+      return;
+    }
+
+    if (!mounted) return;
+    final rootNav = Navigator.of(context, rootNavigator: true);
+    Navigator.pop(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      rootNav.push(MaterialPageRoute(
+        builder: (_) => PixPaymentScreen(bookingId: bookingId),
+      ));
+    });
+  }
+
+  /// Fluxo presencial: cria booking com on_arrival, fecha sheet.
+  Future<void> _handlePayOnArrival() async {
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
@@ -88,18 +167,21 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         dateString: widget.viewModel.dateString,
         price: widget.viewModel.slot.price,
         startTime: widget.viewModel.slot.startTime,
-        userDisplayName: authState.user.displayName,
+        userDisplayName: authState.user.displayName.isNotEmpty
+            ? authState.user.displayName
+            : authState.user.email,
+        paymentMethod: 'on_arrival',
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
       );
-      if (mounted) {
-        Navigator.pop(context);
-        SnackHelper.success(context, 'Reserva feita!');
-      }
+      if (!mounted) return;
+      Navigator.pop(context);
+      SnackHelper.success(context, 'Reserva confirmada!');
     } on Exception catch (e, s) {
       final str = e.toString();
-      final isExpected = str.contains('slot_already_booked') || str.contains('slot_already_passed');
+      final isExpected =
+          str.contains('slot_already_booked') || str.contains('slot_already_passed');
       if (!isExpected) await Sentry.captureException(e, stackTrace: s);
       final msg = str.contains('slot_already_booked')
           ? 'Este horario acabou de ser reservado.'
@@ -153,8 +235,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Esta reserva so sera confirmada apos o pagamento. '
-              'Aguarde a confirmacao do estabelecimento.',
+              'Esta reserva será confirmada após aprovação do estabelecimento.',
               style: TextStyle(
                 fontSize: 13,
                 color: Color(0xFFE65100),
@@ -208,8 +289,10 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                   .format(widget.viewModel.slot.price),
             ),
             const SizedBox(height: 16),
-            _paymentWarningBanner(),
-            const SizedBox(height: 16),
+            if (_requiresConfirmation && !widget.pixEnabled) ...[
+              _paymentWarningBanner(),
+              const SizedBox(height: 16),
+            ],
             // Recurrence toggle
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -273,31 +356,80 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               ),
             ],
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : (_isRecurrent ? _handleConfirmRecurring : _handleConfirm),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (!_isRecurrent) ...[
+              if (widget.pixEnabled) ...[
+                const Text(
+                  'Como voce prefere pagar?',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                 ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: _isSubmitting ? null : _handlePayPix,
+                  icon: const Icon(Icons.qr_code, size: 20),
+                  label: const Text('Pagar com Pix'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: _isSubmitting ? null : _handlePayOnArrival,
+                  icon: const Icon(Icons.handshake_outlined, size: 20),
+                  label: const Text('Pagar na hora'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ] else ...[
+                FilledButton(
+                  onPressed: _isSubmitting ? null : _handlePayOnArrival,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Confirmar reserva'),
+                ),
+              ],
+            ] else ...[
+              FilledButton(
+                onPressed: _isSubmitting ? null : _handleConfirmRecurring,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(_availableRecurrenceEntries.isEmpty
+                        ? 'Reservar semanalmente'
+                        : 'Reservar ${_availableRecurrenceEntries.length} reserva${_availableRecurrenceEntries.length != 1 ? "s" : ""}'),
               ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(_isRecurrent
-                      ? (_availableRecurrenceEntries.isEmpty
-                          ? 'Reservar semanalmente'
-                          : 'Reservar ${_availableRecurrenceEntries.length} reserva${_availableRecurrenceEntries.length != 1 ? 's' : ''}')
-                      : 'Reservar'),
-            ),
+            ],
           ],
         ),
       ),

@@ -8,6 +8,7 @@ import 'package:vida_ativa/features/booking/cubit/booking_state.dart';
 import 'package:vida_ativa/core/utils/snack_helper.dart';
 import 'package:vida_ativa/features/booking/ui/booking_card.dart';
 import 'package:vida_ativa/features/booking/ui/client_booking_detail_sheet.dart';
+import 'package:vida_ativa/features/booking/ui/pix_payment_screen.dart';
 
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
@@ -40,12 +41,12 @@ class MyBookingsScreen extends StatelessWidget {
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
     final upcoming = bookings
-        .where((b) => b.date.compareTo(todayString) >= 0 && !b.isCancelled)
+        .where((b) => b.date.compareTo(todayString) >= 0 && !b.isCancelled && !b.isRefunded)
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
     final past = bookings
-        .where((b) => b.date.compareTo(todayString) < 0 || b.isCancelled)
+        .where((b) => b.date.compareTo(todayString) < 0 || b.isCancelled || b.isRefunded)
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -83,7 +84,21 @@ class MyBookingsScreen extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => _showDetailSheet(context, b, true),
+                onTap: () {
+                  if (b.isPendingPayment && b.paymentId != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PixPaymentScreen(
+                          bookingId: b.id,
+                          paymentId: b.paymentId,
+                        ),
+                      ),
+                    );
+                  } else {
+                    _showDetailSheet(context, b, true);
+                  }
+                },
                 child: BookingCard(
                   booking: b,
                   isFuture: true,
@@ -159,7 +174,7 @@ class MyBookingsScreen extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(dialogContext);
               try {
-                await context.read<BookingCubit>().cancelBooking(booking.id);
+                await context.read<BookingCubit>().cancelBooking(booking);
                 if (context.mounted) {
                   SnackHelper.success(context, 'Reserva cancelada.');
                 }
