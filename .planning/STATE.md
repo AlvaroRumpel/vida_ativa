@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Pagamento Pix
-status: Milestone complete
-stopped_at: Phase 19 context gathered
-last_updated: "2026-05-08T05:56:32.359Z"
+status: SHIPPED
+stopped_at: v4.0 milestone archived and tagged
+last_updated: "2026-05-08T14:00:00.000Z"
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-06)
+See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
 **Current focus:** Phase 18 — webhook-+-confirmacao-em-tempo-real
