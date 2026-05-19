@@ -75,3 +75,6 @@ sentry.properties
 scripts/deploy.dart
 # Added by code-review-graph
 .code-review-graph/
+
+# Graphify cache (generated, large, no value in git)
+graphify-out/cache/
