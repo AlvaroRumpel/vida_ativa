@@ -1,381 +1,341 @@
-# Domain Pitfalls
+# Domain Pitfalls: Dashboard & Sport Field Integration
 
-**Domain:** Flutter Web PWA + Firebase — Court Booking / Scheduling App
-**Researched:** 2026-03-19
-**Confidence note:** Web/WebFetch tools unavailable this session. All findings draw on training knowledge (cutoff August 2025) of Flutter Web, FlutterFire, and Firebase. Confidence levels reflect that source limit.
+**Domain:** Flutter Web PWA + Firebase — Court Booking with Analytics & Sport Selection
+**Researched:** 2026-05-19
+**Confidence:** HIGH (Firestore aggregation patterns documented; write-time aggregation standard)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, data integrity failures, or security holes.
+Mistakes that cause rewrites or data integrity failures.
 
----
+### Pitfall 1: Real-Time Listeners on Aggregation Queries (Dashboard Stalls)
 
-### Pitfall 1: Firestore Double Booking (Race Condition on Slot Reservation)
+**What goes wrong:** Trying to use `.snapshots()` on Firestore aggregation queries (`count()`, `sum()`) to get real-time dashboard updates. Aggregation queries do NOT support real-time listeners — you get a single read result, then the listener completes and never emits again. Dashboard shows stale data and admin doesn't notice.
 
-**What goes wrong:** Two users simultaneously tap "Book" on the same available slot. Both read the booking document as `status: available`, both pass the client-side availability check, and both write a booking — resulting in two confirmed bookings for the same slot/date.
+**Why it happens:** Developer assumes aggregation queries work like normal Firestore queries with streams. Training data or documentation skimming suggests real-time is always possible.
 
-**Why it happens:** Firestore reads and writes are not atomic by default. A client-side check (`if slot is available, then create booking`) is a non-atomic read-modify-write. Any concurrent request that reads between your read and your write will see the same "available" state.
-
-**Consequences:** Two clients own the same court hour. Admin discovers the conflict at check-in. Trust in the system collapses; the app gets abandoned in favor of WhatsApp again.
+**Consequences:** Dashboard appears to load but metrics are frozen. Admin makes decisions on old data. Revenue and occupancy numbers don't update when new bookings arrive.
 
 **Prevention:**
-Use a Firestore Transaction (or a Cloud Function as a transactional gate) to enforce single-writer semantics:
+Use **write-time aggregation** instead: update counter documents in Cloud Functions whenever a booking state changes, not on read. Counter documents are normal Firestore documents — they support real-time listeners.
 
 ```dart
-// Correct approach — transaction-based booking
-await FirebaseFirestore.instance.runTransaction((transaction) async {
-  final bookingRef = FirebaseFirestore.instance
-      .collection('bookings')
-      .doc('${slotId}_${dateString}');
+// WRONG — aggregation queries don't support snapshots()
+_firestore
+    .collection('bookings')
+    .count()
+    .snapshots()  // ← FAILS: count() returns Future, not Stream
+    .listen((snapshot) { ... });
 
-  final snapshot = await transaction.get(bookingRef);
-
-  if (snapshot.exists && snapshot.data()?['status'] != 'available') {
-    throw Exception('slot_taken');
-  }
-
-  transaction.set(bookingRef, {
-    'slotId': slotId,
-    'date': dateString,
-    'userId': currentUserId,
-    'status': 'pending', // or 'confirmed' if auto-confirm
-    'createdAt': FieldValue.serverTimestamp(),
-  });
-});
-```
-
-The document ID `${slotId}_${dateString}` serves as the natural uniqueness key. The transaction retries automatically on contention and throws if the document was written between read and write.
-
-**Alternative (simpler for small scale):** Use a Cloud Function triggered by an HTTP call instead of direct Firestore writes. The function reads and writes atomically server-side, and returns a typed error on conflict.
-
-**Detection (warning signs):**
-- Client does an `if (available) { write }` pattern without a transaction
-- Booking status is computed on client before the write
-- No uniqueness constraint on `slotId + date` document ID
-
-**Phase to address:** Booking feature implementation phase (Phase 2/3 of roadmap). Do not ship booking writes without this. Confidence: HIGH (core Firestore behavior, well-documented).
-
----
-
-### Pitfall 2: Firestore Security Rules Left Open or Overly Permissive
-
-**What goes wrong:** Default Firestore rules in test mode allow all reads/writes to anyone. Deploying to production with `allow read, write: if true` means any person with the Firebase project config (which is in your compiled JS bundle) can read all bookings, impersonate users, delete data, or spam the database.
-
-**Why it happens:** FlutterFire `flutterfire configure` creates `firebase_options.dart` with the API key visible in the bundle. Firebase API keys are not secret — they identify the project. Security must come entirely from Firestore rules. This is already flagged in CONCERNS.md but the risk is higher than stated: **rules are your only server-side enforcement layer.**
-
-**Consequences:** PII leak (phone numbers, user profiles), data corruption, runaway Firestore read/write costs from abuse.
-
-**Prevention:**
-Write rules that:
-1. Enforce authentication for all writes
-2. Scope reads to the authenticated user's own data OR admin role
-3. Validate fields server-side (type, length, no extra fields)
-4. Use a custom claim or a `/users/{uid}` role field to gate admin operations
-
-Example skeleton:
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    match /users/{uid} {
-      allow read, write: if request.auth.uid == uid;
-      allow read: if isAdmin();
-    }
-
-    match /bookings/{bookingId} {
-      allow read: if request.auth != null &&
-        (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if request.auth != null; // further validated in transaction/CF
-      allow update, delete: if isAdmin() ||
-        (resource.data.userId == request.auth.uid && resource.data.status == 'pending');
-    }
-
-    match /slots/{slotId} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
-    }
-
-    match /blockedDates/{dateId} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
-    }
-  }
-}
+// RIGHT — listen to pre-computed counter document
+_firestore
+    .collection('config')
+    .doc('dashboard')
+    .collection('realtime')
+    .doc('current')
+    .snapshots()  // ← Works: counter doc is real document
+    .listen((snapshot) { ... });
 ```
 
 **Detection:**
-- `firebase.rules` file contains `allow read, write: if true`
-- Rules not version-controlled (no `firestore.rules` file in repo)
-- No `isAdmin()` helper enforced on admin-only collections
+- Code tries to call `.snapshots()` on aggregation query result
+- Dashboard updates only on manual refresh, not when new bookings arrive
+- No Cloud Functions trigger updating counter documents
 
-**Phase to address:** Before any feature that writes user data goes to a deployed environment. Confidence: HIGH.
-
----
-
-### Pitfall 3: Phone Auth on Flutter Web — reCAPTCHA and Domain Whitelist Failures
-
-**What goes wrong:** `signInWithPhoneNumber()` on Flutter Web requires an invisible or visible reCAPTCHA challenge rendered in the browser. This fails or behaves unexpectedly in several scenarios:
-- The app domain is not whitelisted in Firebase Console → Auth silently fails or throws `auth/unauthorized-domain`
-- `localhost` works during dev but the deployed domain is not added → breaks immediately after first deploy
-- The `RecaptchaVerifier` widget is attached to a DOM element that Flutter Web's canvas renderer doesn't expose cleanly → `recaptcha-container` div is never rendered
-- Ad blockers and privacy browsers (Firefox strict mode, Brave) block reCAPTCHA scripts → user gets stuck with no feedback
-
-**Why it happens:** Flutter Web renders via HTML Canvas or HTML renderer. The `firebase_auth` web plugin injects a standard JS reCAPTCHA, but if the Flutter widget tree doesn't expose a real DOM element with the right ID, the verifier can't mount.
-
-**Consequences:** Phone Auth appears to work in dev, breaks on first user trial in production. Debugging is hard because the error is in the JS layer, not in Dart.
-
-**Prevention:**
-1. Add all deployment domains to Firebase Console → Authentication → Settings → Authorized domains (including custom domains, not just `*.web.app`)
-2. Use the invisible reCAPTCHA approach: `RecaptchaVerifier(auth, 'recaptcha-container', {'size': 'invisible'})` and ensure the container element actually exists in the DOM — use `HtmlElementView` if needed
-3. Test Phone Auth explicitly in a deployed preview environment before declaring it done, not just on localhost
-4. Have a fallback UX message when reCAPTCHA fails (ad blocker detected)
-5. Consider making Google Sign-In the primary auth method and treating Phone Auth as secondary, since Google Sign-In has fewer web-specific failure modes
-
-**Detection:**
-- `auth/unauthorized-domain` error in browser console
-- reCAPTCHA spinner never resolves
-- Works on localhost, fails on `*.web.app` domain
-
-**Phase to address:** Auth implementation phase. Test on deployed URL, not only locally. Confidence: HIGH (documented Flutter Web + Firebase Auth known issue).
+**Phase to address:** Dashboard implementation (Phase 1-2 of v5.0). Confidence: HIGH (Firestore docs explicit that agg queries don't support real-time).
 
 ---
 
-### Pitfall 4: PWA Service Worker Caches Stale App Shell After Deployment
+### Pitfall 2: Counter Document Contention at High Write Volume
 
-**What goes wrong:** Flutter Web generates a service worker (`flutter_service_worker.js`) that aggressively caches the app shell. After deploying an update, users with the PWA installed continue running the old version indefinitely — they never see the update. This is especially painful if a critical bug fix or data model change is deployed.
+**What goes wrong:** A single `/config/dashboard/realtime/current` document is updated by every booking state change. At >1 write/sec, Firestore throttles to serialize writes to the same document. Dashboard updates slow down or fail with `RESOURCE_EXHAUSTED` error.
 
-**Why it happens:** The Flutter Web service worker uses a cache-first strategy. The browser only checks for updates when the service worker script itself changes — but if the user already has the old worker active, the update check may be deferred until the tab is closed and reopened. Many mobile PWA users never close tabs.
+**Why it happens:** Naive implementation updates one central counter. At low volume (Vida Ativa ~0.2 bookings/sec peak), this is fine. But scaling assumption is wrong.
 
-**Consequences:** User books a slot with old UI behavior while backend data model has changed. Booking failures, confusing errors. Admin sees data that clients can't see.
+**Consequences:** Dashboard becomes unreliable during peak hours. Update failures are silently logged to Sentry, but metrics diverge from truth.
 
 **Prevention:**
-1. In `web/index.html`, configure the service worker registration to use `serviceWorkerVersion` and check for updates on page focus:
+**Use distributed counters** for high-volume scenarios:
+- Split counter across N shards: `/config/dashboard/realtime/shard_0`, `shard_1`, etc.
+- Randomly select a shard on each write
+- Sum shards on read (aggregate query works for this)
+- For Vida Ativa (current: ~0.2 bookings/sec), single counter is fine. Flag for Phase review if volume grows >5 bookings/min.
+
 ```javascript
-// Force reload when new service worker is available
-navigator.serviceWorker.addEventListener('controllerchange', () => {
-  window.location.reload();
-});
+// Single counter (current app, OK)
+await admin.firestore()
+  .collection('config')
+  .doc('dashboard')
+  .collection('realtime')
+  .doc('current')
+  .update({ totalRevenue: FieldValue.increment(price) });
+
+// Distributed shards (if needed at scale)
+const shardCount = 10;
+const shardId = Math.floor(Math.random() * shardCount);
+await admin.firestore()
+  .collection('config')
+  .doc('dashboard')
+  .collection('realtime')
+  .doc(`shard_${shardId}`)
+  .update({ totalRevenue: FieldValue.increment(price) });
 ```
-2. Add an in-app "update available" banner that prompts the user to refresh
-3. Use Firebase Hosting's cache headers on `flutter_service_worker.js` with `Cache-Control: no-cache` so the worker file is always re-fetched
-4. Test the update flow explicitly: deploy v1, install PWA, deploy v2, verify v2 loads
-5. Keep the data model backwards-compatible during the transition window when users may be on different app versions
 
 **Detection:**
-- Users reporting "it worked yesterday but not today" after a deploy
-- Browser DevTools → Application → Service Workers shows old version still active
-- `flutter_service_worker.js` served with long cache TTL from Firebase Hosting
+- `RESOURCE_EXHAUSTED` errors in Sentry during peak hours
+- Cloud Functions trigger retries frequently
+- Dashboard update latency >5 seconds during busy periods
 
-**Phase to address:** First deployment phase and any phase that changes the data model. Confidence: HIGH (well-known Flutter Web PWA issue).
+**Phase to address:** Dashboard implementation. Monitor during Phase 2 testing. Current app volume doesn't require shards, but design for it.
 
 ---
 
-### Pitfall 5: Firestore Offline Behavior Creates Ghost Bookings
+### Pitfall 3: Computing Heatmap Grid on Every Dashboard Load
 
-**What goes wrong:** Firestore SDK has built-in offline persistence enabled by default on web (in newer SDK versions) and always on mobile. When a user creates a booking while offline, the write is queued locally and the UI shows "success." When connectivity returns, the write is flushed — but if the slot was taken by someone else in the meantime, the booking write may conflict with existing data. The user already saw "booking confirmed."
+**What goes wrong:** Dashboard loads and runs a Firestore query to group bookings by `(hour, dayOfWeek)`, computing the heatmap grid live. With 5,000+ bookings in the database, this query is slow (seconds) and expensive (thousands of read units per load).
 
-**Why it happens:** Offline persistence optimistically reflects writes locally. The conflict is only detected server-side when the offline queue flushes. Without proper error handling on the write promise, the user never learns the booking failed.
+**Why it happens:** Simplicity — compute on read instead of pre-computing. Works fine with 100 bookings, breaks at 1,000+.
 
-**Consequences:** User shows up for a slot that was taken by someone else. Both users believe they have a valid booking.
+**Consequences:** Dashboard load time >10 seconds. Heatmap is expensive to update. Admin gets frustrated and stops using the tool.
 
 **Prevention:**
-1. For the booking creation flow specifically, disable offline persistence or use `serverTimestamp` + transaction to detect conflicts
-2. After a booking write, listen to the booking document's `status` field with a real-time listener — if status reverts or the doc disappears, show an error
-3. Show a "confirming..." state after the write, not "confirmed", until the server round-trip completes
-4. For web specifically, consider disabling offline persistence for the booking collection since false-positive confirmations are worse than write failures:
-```dart
-// Disable persistence for web to avoid stale booking state
-if (kIsWeb) {
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: false,
-  );
-}
+Pre-compute heatmap grid in the scheduled Cloud Function (`scheduledDailyAggregation`). Store `hourlyGrid` as a nested object in the counter document. On read, it's already computed.
+
+```javascript
+// Cloud Function: compute heatmap once per day
+const hourlyGrid: { [key: string]: { [day: string]: number } } = {};
+snapshots.forEach((doc) => {
+  const hour = doc.data().startTime; // "08:00"
+  const dayName = getDayName(doc.data().date);
+  if (!hourlyGrid[hour]) hourlyGrid[hour] = {};
+  hourlyGrid[hour][dayName] = (hourlyGrid[hour][dayName] || 0) + 1;
+});
+
+// Store pre-computed grid
+await db.collection('config').doc('dashboard')
+  .collection('day').doc('current').set({
+    hourlyGrid,
+    lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
 ```
-5. Always handle the transaction Future's error case and display it to the user
+
+Then in Dart, read the pre-computed grid:
+
+```dart
+final metrics = await _firestore
+    .collection('config').doc('dashboard')
+    .collection('day').doc('current').get();
+final hourlyGrid = metrics.data()?['hourlyGrid'];
+// Render immediately, no computation needed
+```
 
 **Detection:**
-- Booking write does not await the result or ignores the Future
-- UI transitions to "confirmed" state before server acknowledgment
-- No error handling on `runTransaction()` or `set()` calls
+- Dashboard load time increases with database size
+- Heatmap query is slow; profiler shows complex grouping
+- Heatmap is computed in Flutter, not pre-stored
 
-**Phase to address:** Booking implementation phase. Confidence: MEDIUM (offline behavior is documented; specific interaction with booking transactions requires careful testing).
+**Phase to address:** Dashboard implementation (Phase 1-2). Confidence: HIGH (pre-computation is standard pattern).
+
+---
+
+### Pitfall 4: Sport Dropdown Shows Admin List Before It's Loaded
+
+**What goes wrong:** BookingForm renders with an empty sport dropdown while `SportConfigCubit` is still loading `/config/sports`. User taps the dropdown, sees "loading..." or blank, and assumes the feature is broken or that no sports are configured.
+
+**Why it happens:** Cubit streams load asynchronously; UI doesn't gate the dropdown on `SportConfigLoaded` state.
+
+**Consequences:** Confusing UX; users skip the sport field thinking it's broken.
+
+**Prevention:**
+Gate the dropdown render on `SportConfigLoaded` state:
+
+```dart
+BlocBuilder<SportConfigCubit, SportConfigState>(
+  builder: (context, state) {
+    if (state is SportConfigLoaded) {
+      return Dropdown(
+        items: [
+          DropdownMenuItem(child: Text('Nenhum')),
+          ...state.sports.map((s) => DropdownMenuItem(child: Text(s))),
+        ],
+      );
+    } else if (state is SportConfigError) {
+      return Text('Erro ao carregar esportes');
+    }
+    // SportConfigInitial: don't render dropdown yet
+    return SizedBox();
+  },
+)
+```
+
+Load SportConfigCubit in `main.dart` before any booking screen, so it's ready when needed.
+
+**Detection:**
+- Sport dropdown appears empty on booking form
+- Test: restart app, navigate to booking form immediately → blank dropdown
+- SportConfigLoaded state is never reached
+
+**Phase to address:** Sport field implementation (Phase 1-2 of v5.0). Confidence: HIGH (standard BLoC pattern).
 
 ---
 
 ## Moderate Pitfalls
 
----
+### Pitfall 5: Forgetting to Handle Null Sport Field in Queries & Display
 
-### Pitfall 6: Admin Role Enforcement Only on Client Side
+**What goes wrong:** Filter query: `bookings.where('sport', '==', 'Futevôlei')` excludes all old bookings with `sport: null`. Sport distribution chart shows fewer bookings than actual total. Admin thinks the feature isn't working.
 
-**What goes wrong:** Admin screens are hidden from the UI for non-admin users, but the Firestore writes for admin actions (create slot, block date, confirm booking) are not gated server-side. Any user who discovers the API can call those writes directly.
+**Why it happens:** Firestore `where` clauses exclude `null` by default. Developer forgets that old bookings have no sport field.
 
-**Prevention:**
-- Never use UI visibility as a security boundary
-- All admin writes must be gated by the `isAdmin()` rule in Firestore security rules (see Pitfall 2)
-- Consider using a Cloud Function for sensitive admin operations so business logic runs server-side
-
-**Phase to address:** Admin feature phase. Confidence: HIGH.
-
----
-
-### Pitfall 7: Recurring Slot Generation — Unbounded Document Creation
-
-**What goes wrong:** If recurring slots are expanded eagerly (creating one booking-slot document per occurrence per day for the next year), you quickly accumulate thousands of documents. Querying "this week's available slots" becomes expensive and slow.
-
-**Why it happens:** Simple implementation: "create weekly slots" → loop over next 52 weeks → write 52 documents per slot type.
+**Consequences:** Metrics are inconsistent. Sport distribution chart doesn't add up to total bookings.
 
 **Prevention:**
-- Store slots as recurring rules (`dayOfWeek`, `time`, `price`) in `/slots` — do NOT pre-expand them
-- Generate the actual available dates dynamically in the client query or a Cloud Function: query `/slots` for recurring config, then check `/bookings` and `/blockedDates` to determine availability
-- This is already the data model described in PROJECT.md (slots = recurring config, bookings = instances) — do not deviate from this
+1. Explicitly handle null in queries (if needed):
+```dart
+// Get bookings for a sport OR null
+final query = _firestore.collection('bookings')
+    .where(Filter.or(
+      Filter('sport', '==', 'Futevôlei'),
+      Filter('sport', '==', null),
+    ));
+```
+
+2. More commonly: in aggregations, treat null as "unspecified" sport:
+```javascript
+const sport = booking.sport || 'unspecified';
+sportBreakdown[sport] = (sportBreakdown[sport] || 0) + 1;
+```
+
+3. In display, show null gracefully:
+```dart
+Text(booking.sport ?? 'Esporte não informado')
+```
 
 **Detection:**
-- Code that loops `DateTime.now()` + 7 days for N weeks and creates documents
-- `/slots` collection growing unboundedly
+- Sport distribution chart shows 20 bookings, but total confirmed is 50
+- Queries for "all Futevôlei bookings" miss results
 
-**Phase to address:** Schedule display and admin slot management phases. Confidence: HIGH.
+**Phase to address:** Dashboard + Sport field implementation. Confidence: HIGH.
 
 ---
 
-### Pitfall 8: Flutter Web Canvas Renderer — Touch Event and Input Field Issues
+### Pitfall 6: Cloud Functions Timeout or Fail Silently
 
-**What goes wrong:** Flutter Web defaults to the CanvasKit renderer, which renders everything in a `<canvas>` element. This causes:
-- Native browser autofill does not work on form fields (phone number, name)
-- Some virtual keyboards on mobile browsers behave incorrectly
-- Pinch-to-zoom and long-press context menus are intercepted by Flutter
-- Copy-paste from password managers fails for phone number inputs
+**What goes wrong:** Scheduled batch aggregation function (`scheduledDailyAggregation`) times out or hits a quota error, but there's no alert. Admin checks dashboard next day and sees outdated metrics.
 
-**Why it happens:** CanvasKit renders Flutter's own text fields, not HTML `<input>` elements, so the browser cannot apply autofill heuristics.
+**Why it happens:** No error handling, no monitoring, no retry policy.
+
+**Consequences:** Dashboard metrics become unreliable over time. Admin loses trust in the tool.
 
 **Prevention:**
-- Use the HTML renderer for web (`flutter build web --web-renderer html`) or the auto renderer which falls back to HTML on mobile
-- Alternatively, accept the limitation and ensure phone number input has a clear numeric keyboard hint and a format hint label
-- Test all auth flows on actual mobile browsers (Chrome Android, Safari iOS) before considering a phase done
+1. Add Sentry logging to Cloud Functions:
+```javascript
+import * as Sentry from "@sentry/node";
+
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+export const scheduledDailyAggregation = functions
+  .pubsub
+  .schedule('0 1 * * *')
+  .onRun(async (context) => {
+    try {
+      // ... aggregation logic ...
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error; // Let Cloud Functions retry
+    }
+  });
+```
+
+2. Set function timeout appropriately (max 540s for gen 2):
+```bash
+firebase deploy --only functions --memory 512MB
+```
+
+3. Monitor Cloud Functions logs in Firebase Console → Cloud Functions → Logs
 
 **Detection:**
-- Phone number field does not trigger numeric keypad on mobile
-- Browser autofill popup never appears
-- Users complain they can't paste their phone number
+- Cloud Functions logs show `INTERNAL`, `TIMEOUT`, or unhandled errors
+- No Sentry alert configured for CF errors
+- Dashboard metrics suddenly stop updating
 
-**Phase to address:** Auth UI phase. Confidence: MEDIUM (renderer behavior changes between Flutter versions; verify with current Flutter Web release).
-
----
-
-### Pitfall 9: Firebase Hosting Cache — API Responses Served Stale
-
-**What goes wrong:** Firebase Hosting serves static files with aggressive CDN caching. If you accidentally configure it to cache dynamic content (e.g., a Cloud Function URL proxied through Hosting), you get stale responses served to all users globally until the CDN edge cache expires.
-
-**Prevention:**
-- Separate static assets (Flutter app bundle) from dynamic endpoints in `firebase.json` rewrites
-- Always set `Cache-Control: no-cache` on any rewrite that proxies to Cloud Functions
-- Test booking availability display after making a change to the database — if it shows stale data, check Hosting cache headers
-
-**Detection:**
-- Data displayed in the app doesn't reflect recent Firestore writes
-- `curl -I` on the app URL shows `Cache-Control: max-age=3600` on dynamic routes
-
-**Phase to address:** Deployment / Firebase Hosting configuration phase. Confidence: MEDIUM.
-
----
-
-### Pitfall 10: Missing Loading and Error States on Firestore Streams
-
-**What goes wrong:** `StreamBuilder` widgets that listen to Firestore collections show a blank or broken UI during the initial load or when the stream errors. Users see an empty schedule and assume there are no slots, then book via WhatsApp anyway — defeating the app's purpose.
-
-**Prevention:**
-- Every `StreamBuilder` must handle `ConnectionState.waiting`, `ConnectionState.active` with no data, and `snapshot.hasError` explicitly
-- Use a skeleton loader or shimmer during initial load
-- For the schedule view (most critical screen), prioritize a clear "loading" → "available" → "empty" → "error" state machine
-
-**Phase to address:** Schedule display phase. Confidence: HIGH.
+**Phase to address:** Dashboard implementation. Confidence: HIGH.
 
 ---
 
 ## Minor Pitfalls
 
----
+### Pitfall 7: Denormalizing Sport to Every BookingModel (Causes Inconsistency)
 
-### Pitfall 11: Firestore Timestamps — Client Clock Skew
+**What goes wrong:** Instead of storing sport in `/config/sports` list, sport values are hardcoded or duplicated across booking documents. Admin changes "Futevôlei" to "Futsal", but old bookings still say "Futevôlei".
 
-**What goes wrong:** Using `DateTime.now()` for `createdAt` fields stores the client device's time, which may be wrong. Time-ordered queries return incorrect results.
+**Why it happens:** Lazy implementation; denormalization seems simpler initially.
 
-**Prevention:** Always use `FieldValue.serverTimestamp()` for any timestamp that will be used in ordering or business logic. Confidence: HIGH.
-
----
-
-### Pitfall 12: PWA Install Prompt — iOS Safari Limitations
-
-**What goes wrong:** iOS Safari does not support the `beforeinstallprompt` event. The standard "Add to Home Screen" PWA install prompt does not appear on iOS. Users must manually use the Share menu.
+**Consequences:** Inconsistent sport names across the database; reports don't group correctly.
 
 **Prevention:**
-- On iOS, show a custom in-app banner explaining how to install ("Tap Share → Add to Home Screen")
-- Use `navigator.standalone` detection to know if the app is already installed and hide the banner
-- Do not block functionality behind PWA installation
+Store sport as a STRING value (not an object). Admin manages the allowed list in `/config/sports`. Bookings reference the string, not the config. This is already the pattern in the architecture doc.
 
-**Phase to address:** PWA installation / onboarding phase. Confidence: HIGH.
+**Detection:**
+- Multiple variations of same sport name ("Futevôlei", "futevolei", "FUTEVOLEI")
+- Sport name changes require backfill query
 
----
-
-### Pitfall 13: Firestore Security Rules `get()` Calls Add Read Costs
-
-**What goes wrong:** The `isAdmin()` helper using `get()` in rules executes a Firestore read for every security evaluation. On a busy app, admin role checks on list queries trigger many additional reads.
-
-**Prevention:**
-- For v1 scale (small academy, low traffic), this is acceptable
-- If costs become a concern: use Firebase Auth custom claims for the admin role instead of a Firestore document lookup — custom claims are available in rules as `request.auth.token.admin`
-
-**Phase to address:** Auth / admin phase. Low priority for v1. Confidence: HIGH.
+**Phase to address:** Sport field implementation. Confidence: HIGH.
 
 ---
 
-### Pitfall 14: `go_router` (or any router) Losing State on PWA Hard Reload
+### Pitfall 8: Dashboard DashboardCubit Not Closed on Dispose
 
-**What goes wrong:** If the user navigates to `/booking/slotId` and refreshes the page (or the PWA relaunches), Flutter Web needs to handle the deep-link URL. Without proper `go_router` path configuration and a Firebase Hosting rewrite rule for SPAs, the hard reload returns a 404.
+**What goes wrong:** DashboardCubit stream subscription is never cancelled when the dashboard screen is closed. After opening/closing the dashboard multiple times, many streams are still active, consuming memory and CPU.
+
+**Why it happens:** Forgot to override `close()` method and cancel the subscription.
+
+**Consequences:** Memory leak; app becomes sluggish after repeated dashboard navigation.
 
 **Prevention:**
-- Add a catch-all rewrite in `firebase.json`:
-```json
-{
-  "hosting": {
-    "rewrites": [{"source": "**", "destination": "/index.html"}]
+Always cancel streams in Cubit `close()`:
+
+```dart
+class DashboardCubit extends Cubit<DashboardState> {
+  StreamSubscription<DocumentSnapshot>? _sub;
+
+  @override
+  Future<void> close() {
+    _sub?.cancel();
+    return super.close();
   }
 }
 ```
-- Configure `go_router` with named routes and ensure all deep-linkable paths are handled
 
-**Phase to address:** Routing / navigation phase (early). Confidence: HIGH.
+**Detection:**
+- App slows down after opening dashboard many times
+- Profiler shows many active Firestore listeners
+- Memory usage grows over time
+
+**Phase to address:** Dashboard implementation. Confidence: HIGH (standard BLoC pattern).
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Auth implementation | Phone Auth reCAPTCHA fails on deployed domain | Add all domains to Firebase Console before testing; test on deployed URL |
-| Auth implementation | Canvas renderer blocks autofill/keyboard | Switch to HTML renderer for web builds |
-| Booking write flow | Double booking race condition | Firestore Transaction with deterministic document ID as uniqueness key |
-| Booking write flow | Ghost bookings from offline queue | Disable web persistence for booking collection; listen to booking status post-write |
-| Schedule display | Empty UI during stream load | Handle all ConnectionState cases in StreamBuilder |
-| Admin features | Admin writes unprotected server-side | Enforce `isAdmin()` in Firestore security rules before shipping admin UI |
-| Slot management | Eager slot expansion creates thousands of documents | Keep slots as recurring rules; expand dynamically in queries |
-| First deployment | PWA caches old app shell after updates | Configure service worker update strategy; test the update flow explicitly |
-| Deployment config | SPA hard reload returns 404 | Add catch-all `**` → `index.html` rewrite in `firebase.json` |
-| Firestore rules | Rules never version-controlled or deployed | Commit `firestore.rules` to repo; deploy with `firebase deploy --only firestore:rules` |
+| Phase | Likely Pitfall | Mitigation |
+|-------|---------------|------------|
+| Dashboard Cubit | Real-time agg queries fail | Use write-time aggregation (counter doc) not aggregation queries |
+| Dashboard Cubit | Heatmap load is slow | Pre-compute hourly grid in scheduled CF |
+| Cloud Functions | Counter document contention | Monitor write latency; use shards if >5 bookings/min |
+| Sport Config Cubit | Dropdown empty on first load | Gate dropdown render on SportConfigLoaded state |
+| Queries + Aggregation | Null sport field excluded | Handle null as "unspecified"; treat in grouping |
+| Cloud Functions | Batch job fails silently | Log to Sentry; set appropriate timeout; monitor logs |
+| BookingModel migration | Sport inconsistency | Store as string, not object; admin manages /config/sports list |
 
 ---
 
 ## Sources
 
-- Training knowledge: Flutter Web documentation (flutter.dev), FlutterFire documentation (firebase.flutter.dev), Firebase documentation (firebase.google.com) — knowledge cutoff August 2025
-- Project context: `f:/_geral/Projetos/vida_ativa/.planning/PROJECT.md`
-- Existing concerns: `f:/_geral/Projetos/vida_ativa/.planning/codebase/CONCERNS.md`
-- Confidence: HIGH for Firestore transaction behavior, security rules enforcement, Phone Auth domain requirements, and PWA service worker caching (all stable, well-documented behaviors). MEDIUM for Flutter renderer-specific input behavior (changes between Flutter versions) and Firestore offline/transaction interaction (requires project-specific testing to confirm).
-- Note: External search tools unavailable this session. Recommend verifying Phone Auth reCAPTCHA behavior against current FlutterFire changelog before the auth implementation phase.
+- [Firestore Aggregation Queries Documentation](https://firebase.google.com/docs/firestore/query-data/aggregation-queries)
+- [Write-Time Aggregations Solution](https://firebase.google.com/docs/firestore/solutions/aggregation)
+- [Distributed Counters Pattern](https://firebase.google.com/docs/firestore/solutions/counters)
+- [Cloud Functions Timeout Configuration](https://firebase.google.com/docs/functions/manage-functions)
+- [BLoC Library Close Method](https://bloclibrary.dev/)
