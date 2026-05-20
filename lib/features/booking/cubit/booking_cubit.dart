@@ -15,8 +15,10 @@ class BookingCubit extends Cubit<BookingState> {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
   bool _pixEnabled = false;
   String _confirmationMode = 'manual';
+  final _configReady = Completer<void>();
 
   bool get pixEnabled => _pixEnabled;
+  String get confirmationMode => _confirmationMode;
 
   BookingCubit({
     required FirebaseFirestore firestore,
@@ -29,21 +31,26 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> _loadConfig() async {
-    final results = await Future.wait([
-      _firestore.collection('config').doc('booking').get(),
-      _firestore.collection('config').doc('mercadopago').get(),
-    ]);
-    final bookingData = results[0].data();
-    final mpData = results[1].data();
+    try {
+      final results = await Future.wait([
+        _firestore.collection('config').doc('booking').get(),
+        _firestore.collection('config').doc('mercadopago').get(),
+      ]);
+      final bookingData = results[0].data();
+      final mpData = results[1].data();
 
-    final pixToggle = bookingData?['pixEnabled'] ?? false;
-    final hasAccessToken =
-        (mpData?['accessToken'] ?? '').toString().isNotEmpty;
-    final hasWebhookSecret =
-        (mpData?['webhookSecret'] ?? '').toString().isNotEmpty;
+      final pixToggle = bookingData?['pixEnabled'] ?? false;
+      final hasAccessToken =
+          (mpData?['accessToken'] ?? '').toString().isNotEmpty;
+      final hasWebhookSecret =
+          (mpData?['webhookSecret'] ?? '').toString().isNotEmpty;
 
-    _pixEnabled = pixToggle && hasAccessToken && hasWebhookSecret;
-    _confirmationMode = bookingData?['confirmationMode'] ?? 'manual';
+      _pixEnabled = pixToggle && hasAccessToken && hasWebhookSecret;
+      _confirmationMode = bookingData?['confirmationMode'] ?? 'manual';
+      _configReady.complete();
+    } catch (e) {
+      _configReady.completeError(e);
+    }
   }
 
   void _startStream() {
@@ -76,6 +83,7 @@ class BookingCubit extends Cubit<BookingState> {
     String? recurrenceGroupId,
     String? sport,
   }) async {
+    await _configReady.future; // ensures config is loaded before proceeding
     // Guard: prevent booking a slot that has already passed today
     final now = DateTime.now();
     final todayString =
