@@ -40,25 +40,14 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
   String? _selectedSport;
   bool _isRecurrent = false;
   List<RecurrenceEntry> _availableRecurrenceEntries = [];
-  bool _requiresConfirmation = true;
+  late bool _requiresConfirmation;
 
   @override
   void initState() {
     super.initState();
-    _fetchConfirmationMode();
-  }
-
-  Future<void> _fetchConfirmationMode() async {
-    try {
-      final snap = await FirebaseFirestore.instance
-          .collection('config')
-          .doc('booking')
-          .get();
-      final mode = snap.data()?['confirmationMode'] ?? 'manual';
-      if (mounted) setState(() => _requiresConfirmation = mode != 'automatic');
-    } catch (_) {
-      // keep default true
-    }
+    // Derive from cubit — single source of truth, no extra Firestore fetch.
+    _requiresConfirmation =
+        widget.bookingCubit.confirmationMode != 'automatic';
   }
 
   Future<void> _handleConfirmRecurring() async {
