@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:calendar_view/calendar_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -82,7 +83,7 @@ class _SlotDayViewState extends State<SlotDayView> {
     return (hours.reduce(max) + 1).clamp(1, 24);
   }
 
-  void _showBookingSheet(SlotViewModel viewModel) {
+  Future<void> _showBookingSheet(SlotViewModel viewModel) async {
     final bookingCubit = _bookingCubit;
     if (bookingCubit == null) return;
 
@@ -118,7 +119,19 @@ class _SlotDayViewState extends State<SlotDayView> {
       return;
     }
 
-    showModalBottomSheet(
+    // Read sports list from Firestore before opening sheet (Opção A do RESEARCH).
+    // Doc may not exist yet on first launch — handle null gracefully.
+    final sportsSnap = await FirebaseFirestore.instance
+        .collection('config')
+        .doc('sports')
+        .get();
+    final sports = (sportsSnap.data()?['sports'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        const <String>[];
+    if (!mounted) return;
+
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -128,6 +141,7 @@ class _SlotDayViewState extends State<SlotDayView> {
         viewModel: viewModel,
         bookingCubit: bookingCubit,
         pixEnabled: bookingCubit.pixEnabled,
+        sports: sports,
       ),
     );
   }
