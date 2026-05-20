@@ -130,6 +130,6 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 | 17. Pix QR Generation | v4.0 | 2/2 | Complete | 2026-04-08 |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 3/3 | Complete | 2026-04-09 |
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
-| 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete   | 2026-05-20 |
+| 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete    | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 0/? | Not started | - |
 | 22. UI do Dashboard | v5.0 | 0/? | Not started | - |

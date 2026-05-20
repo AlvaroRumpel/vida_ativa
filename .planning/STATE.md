@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
 status: verifying
-last_updated: "2026-05-20T20:26:54.147Z"
+last_updated: "2026-05-20T21:48:34.850Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 3
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 ## Current Position
 
-Phase: 20 (infraestrutura-de-esporte) — EXECUTING
-Plan: 3 of 3
+Phase: 21
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-05-20
 
