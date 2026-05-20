@@ -203,6 +203,8 @@ class BookingCubit extends Cubit<BookingState> {
   /// Batch-cancels all bookings in a recurrence group dated on or after [fromDateInclusive].
   /// Uses Firestore WriteBatch for atomic commit of all cancellations.
   /// Safety: filters by userId so user can only cancel their own bookings.
+  /// Only touches active statuses — skips already-terminal docs and Pix
+  /// pending_payment bookings (which require the cancelPixPayment CF instead).
   Future<void> cancelGroupFuture({
     required String recurrenceGroupId,
     required String fromDateInclusive, // "YYYY-MM-DD"
@@ -211,10 +213,18 @@ class BookingCubit extends Cubit<BookingState> {
         .collection('bookings')
         .where('recurrenceGroupId', isEqualTo: recurrenceGroupId)
         .where('date', isGreaterThanOrEqualTo: fromDateInclusive)
+        .where('status', whereIn: ['pending', 'confirmed', 'pending_payment'])
         .get();
 
     final batch = _firestore.batch();
     for (final doc in snap.docs) {
+      final data = doc.data();
+      // Pix pending_payment has a live MP order — cannot batch-cancel.
+      // The user must cancel it individually via cancelBooking() → CF.
+      if (data['paymentMethod'] == 'pix' &&
+          data['status'] == 'pending_payment') {
+        continue;
+      }
       batch.update(doc.reference, {
         'status': 'cancelled',
         'cancelledAt': Timestamp.fromDate(DateTime.now()),
