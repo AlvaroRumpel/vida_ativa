@@ -54,18 +54,22 @@ Exceptions:
 Source: `lib/core/theme/app_theme.dart` — `GoogleFonts.nunitoTextTheme()` applied globally.
 All font sizes and weights below match patterns observed in existing UI files.
 
+Exactly 4 sizes declared (max allowed):
+
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 13px | 400 (regular) | 1.4 |
-| Heading (sheet title) | 22px | 700 (bold) | 1.2 |
 | Section title | 16px | 600 (semibold) via `textTheme.titleMedium` | 1.3 |
+| Heading (sheet title) | 22px | 700 (bold) | 1.2 |
+| Display | 22px | 700 (bold) | 1.2 |
 
 Notes:
+- Label distinction removed — use Body (14px / w400) for all form labels including `DropdownButtonFormField`
+- Sport chip label: use Body (14px / w600) — 12px removed; compensate with tighter chip padding `EdgeInsets.symmetric(horizontal: 6, vertical: 2)`
+- 13px size removed — consolidated into Body (14px)
 - Sheet titles ("Confirmar Reserva", "Detalhes da Reserva"): 22px / w700 — source: existing sheets
 - Section titles in SettingsTab: `textTheme.titleMedium` (Material 3 default: ~16px semibold)
-- Sport chip label: 12px / w600 — matches status chip pattern in `AdminBookingCard`
-- `DropdownButtonFormField` label: 16px / 400 — Flutter default; "Esporte (opcional)"
+- `DropdownButtonFormField` label: 14px / 400 — same as Body; "Esporte (opcional)"
 
 ---
 
@@ -101,7 +105,7 @@ Sport chip color palette — deterministic hash algorithm (source: CONTEXT.md D-
 | 6 | `Color(0xFFF9FBE7)` | `Color(0xFF558B2F)` — Lime |
 | 7 | `Color(0xFFFFF8E1)` | `Color(0xFFF57F17)` — Amber |
 
-Chip sizing: `padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2)` — matches status chip in `AdminBookingCard` line 135.
+Chip sizing: `padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2)` — tighter padding compensates for larger 14px font; vertical aligned to 4px grid.
 
 ---
 
@@ -110,9 +114,9 @@ Chip sizing: `padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2)` — mat
 ### New: `SportChip` widget
 - Widget type: stateless `Container` with `BoxDecoration` — same pattern as status chip in `AdminBookingCard`
 - Inputs: `String sportName` (non-null, caller checks nullability before rendering)
-- Rendering: color from hash palette above; label text = `sportName`; font: 12px / w600
+- Rendering: color from hash palette above; label text = `sportName`; font: 14px / w600
 - Border radius: `BorderRadius.circular(12)` — matches status chip
-- Padding: `EdgeInsets.symmetric(horizontal: 8, vertical: 2)`
+- Padding: `EdgeInsets.symmetric(horizontal: 6, vertical: 2)`
 - Null guard: caller (AdminBookingCard, AdminBookingDetailSheet) renders chip only when `booking.sport != null`
 
 ### Modified: `BookingConfirmationSheet`
@@ -135,9 +139,37 @@ Chip sizing: `padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2)` — mat
 - New section "Esportes" appended after existing Mercado Pago section
 - Structure: `Divider` → `Text('Esportes', style: textTheme.titleMedium)` → `BlocBuilder<SportConfigCubit, SportConfigState>` → sport list UI
 - Sport list: `ReorderableListView` with `ListTile` per sport (CONTEXT.md D-06)
-- Each `ListTile`: trailing `IconButton(icon: Icon(Icons.delete_outline), color: Colors.red)` for remove (CONTEXT.md D-08)
-- Add sport: `Row` with `TextField` (inline, `Expanded`) + `IconButton(icon: Icon(Icons.add), color: primaryGreen)` (CONTEXT.md D-07)
+- Each `ListTile`: trailing `IconButton` for remove — see Accessibility section below
+- Add sport: `Row` with `TextField` (inline, `Expanded`) + `IconButton` for add — see Accessibility section below
 - Save button: `FilledButton` with `backgroundColor: AppTheme.primaryGreen`, label "Salvar Esportes"
+
+---
+
+## Accessibility
+
+### Icon-only Buttons
+
+All icon-only `IconButton` widgets MUST include both `tooltip` and `semanticLabel`.
+
+| Button | Icon | tooltip | semanticLabel | color |
+|--------|------|---------|---------------|-------|
+| Delete sport (ListTile trailing) | `Icons.delete_outline` | `'Remover esporte'` | `'Remover esporte'` | `Colors.red` |
+| Add sport (Row trailing) | `Icons.add` | `'Adicionar esporte'` | `'Adicionar esporte'` | `AppTheme.primaryGreen` |
+
+Implementation pattern:
+```dart
+IconButton(
+  icon: Icon(Icons.delete_outline),
+  color: Colors.red,
+  tooltip: 'Remover esporte',
+  onPressed: () { ... },
+)
+// Wrap with Semantics for semanticLabel:
+Semantics(
+  label: 'Remover esporte',
+  child: IconButton(...),
+)
+```
 
 ---
 
