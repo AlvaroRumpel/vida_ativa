@@ -74,6 +74,7 @@ class BookingCubit extends Cubit<BookingState> {
     required String paymentMethod, // 'pix' | 'on_arrival'
     String? participants,
     String? recurrenceGroupId,
+    String? sport,
   }) async {
     // Guard: prevent booking a slot that has already passed today
     final now = DateTime.now();
@@ -117,6 +118,7 @@ class BookingCubit extends Cubit<BookingState> {
         participants: participants,
         recurrenceGroupId: recurrenceGroupId,
         paymentMethod: paymentMethod, // NEW
+        sport: sport,
       );
       tx.set(ref, booking.toFirestore());
     });
@@ -133,6 +135,7 @@ class BookingCubit extends Cubit<BookingState> {
     required String userDisplayName,
     required String paymentMethod, // NEW
     String? participants,
+    String? sport,
   }) async {
     final groupId = const Uuid().v4();
 
@@ -148,6 +151,7 @@ class BookingCubit extends Cubit<BookingState> {
             participants: participants,
             recurrenceGroupId: groupId,
             paymentMethod: paymentMethod, // NEW
+            sport: sport,
           );
           return RecurrenceOutcome.success(entry.dateString);
         } on Exception catch (e, s) {
