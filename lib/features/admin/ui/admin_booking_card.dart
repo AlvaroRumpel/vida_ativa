@@ -105,6 +105,7 @@ class AdminBookingCard extends StatelessWidget {
         ],
       ),
     );
+    if (!context.mounted) return;
     if (confirmed == true) {
       await cubit.confirmBooking(booking.id);
     }
@@ -129,6 +130,7 @@ class AdminBookingCard extends StatelessWidget {
         ],
       ),
     );
+    if (!context.mounted) return;
     if (confirmed == true) {
       await cubit.rejectBooking(booking.id);
     }
