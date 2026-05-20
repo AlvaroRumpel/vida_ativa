@@ -218,6 +218,7 @@ class _SportsSectionState extends State<_SportsSection> {
   List<String> _localSports = const <String>[];
   bool _isSaving = false;
   bool _initialized = false;
+  bool _isDirty = false; // true when user has unsaved local changes
 
   @override
   void dispose() {
@@ -229,6 +230,9 @@ class _SportsSectionState extends State<_SportsSection> {
     if (!_initialized) {
       _localSports = List<String>.from(stateSports);
       _initialized = true;
+    } else if (!_isDirty) {
+      // Sync remote updates only when user has no unsaved local changes.
+      setState(() => _localSports = List<String>.from(stateSports));
     }
   }
 
@@ -244,17 +248,22 @@ class _SportsSectionState extends State<_SportsSection> {
       return;
     }
     setState(() {
+      _isDirty = true;
       _localSports = List<String>.from(_localSports)..add(name);
       _addController.clear();
     });
   }
 
   void _removeSport(String sport) {
-    setState(() => _localSports = List<String>.from(_localSports)..remove(sport));
+    setState(() {
+      _isDirty = true;
+      _localSports = List<String>.from(_localSports)..remove(sport);
+    });
   }
 
   void _reorder(int oldIndex, int newIndex) {
     setState(() {
+      _isDirty = true;
       if (newIndex > oldIndex) newIndex--;
       final updated = List<String>.from(_localSports);
       final item = updated.removeAt(oldIndex);
@@ -267,7 +276,10 @@ class _SportsSectionState extends State<_SportsSection> {
     setState(() => _isSaving = true);
     try {
       await context.read<SportConfigCubit>().saveSports(_localSports);
-      if (mounted) SnackHelper.success(context, 'Esportes salvos.');
+      if (mounted) {
+        _isDirty = false; // clear dirty flag on successful save
+        SnackHelper.success(context, 'Esportes salvos.');
+      }
     } catch (_) {
       if (mounted) SnackHelper.error(context, 'Erro ao salvar esportes. Tente novamente.');
     } finally {
