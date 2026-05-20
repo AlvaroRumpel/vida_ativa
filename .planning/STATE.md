@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
-status: IN_PROGRESS
-stopped_at: Phase 20 — not started
-last_updated: "2026-05-19T00:00:00.000Z"
+status: executing
+last_updated: "2026-05-20T20:12:54.905Z"
+last_activity: 2026-05-20
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 33
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Milestone v5.0 — Dashboard & Esportes
+**Current focus:** Phase 20 — infraestrutura-de-esporte
 
 ## Current Position
 
-Phase: 20 — Infraestrutura de Esporte (not started)
-Plan: —
-Status: Roadmap created, ready to plan Phase 20
-Last activity: 2026-05-19 — Roadmap v5.0 created (phases 20–22)
+Phase: 20 (infraestrutura-de-esporte) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-05-20
 
 ```
 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0/3 phases)
@@ -54,6 +54,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [v5.0 Architecture]: Contadores em /config/dashboard/{period}; segue padrão existente de /config/pricing
 - [v5.0 Architecture]: fl_chart para gráficos de linha/barra/pizza/donut; flutter_heatmap_calendar para heatmap hora×dia
 - [v5.0 Architecture]: SportConfigCubit gerencia /config/sports; DashboardCubit gerencia /config/dashboard
+- [Phase 20]: sport field is String? not enum — allows free-text extension without migration
+- [Phase 20]: SportConfigCubit uses set() without merge for full document replacement per RESEARCH anti-pattern guidance
+- [Phase 20]: _initializingDefaults flag prevents _writeDefaults loop on stream re-emit
 
 ### Roadmap Evolution
 

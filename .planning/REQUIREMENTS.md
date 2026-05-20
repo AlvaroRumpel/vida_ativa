@@ -30,8 +30,8 @@
 
 - [ ] **SPORT-01**: Cliente pode selecionar esporte opcional ao criar reserva via dropdown
 - [ ] **SPORT-02**: Admin pode gerenciar lista de esportes nas configurações (adicionar, remover, reordenar)
-- [ ] **SPORT-03**: Sistema inicializa lista de esportes com padrão: Vôlei, Beach Tênis, Futevôlei
-- [ ] **SPORT-04**: Reservas existentes sem campo de esporte continuam funcionando normalmente (campo nullable, sem quebra)
+- [x] **SPORT-03**: Sistema inicializa lista de esportes com padrão: Vôlei, Beach Tênis, Futevôlei
+- [x] **SPORT-04**: Reservas existentes sem campo de esporte continuam funcionando normalmente (campo nullable, sem quebra)
 
 ## Futuro (v6.0+)
 
@@ -74,8 +74,8 @@
 | DASH-12 | Phase 21 | Pending |
 | SPORT-01 | Phase 20 | Pending |
 | SPORT-02 | Phase 20 | Pending |
-| SPORT-03 | Phase 20 | Pending |
-| SPORT-04 | Phase 20 | Pending |
+| SPORT-03 | Phase 20 | Complete |
+| SPORT-04 | Phase 20 | Complete |
 
 **Coverage:**
 - v5.0 requirements: 16 total
