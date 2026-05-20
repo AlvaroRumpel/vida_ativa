@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
 status: executing
-last_updated: "2026-05-20T20:12:54.905Z"
+last_updated: "2026-05-20T20:20:58.367Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 ## Current Position
 
 Phase: 20 (infraestrutura-de-esporte) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-20
 
@@ -57,6 +57,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 20]: sport field is String? not enum — allows free-text extension without migration
 - [Phase 20]: SportConfigCubit uses set() without merge for full document replacement per RESEARCH anti-pattern guidance
 - [Phase 20]: _initializingDefaults flag prevents _writeDefaults loop on stream re-emit
+- [Phase 20]: Sports list passed as constructor param to BookingConfirmationSheet (not BlocBuilder) — avoids admin cubit coupling in client UI
+- [Phase 20]: One-shot Firestore read per sheet open for sports list — no stream, refresh on next open
 
 ### Roadmap Evolution
 
