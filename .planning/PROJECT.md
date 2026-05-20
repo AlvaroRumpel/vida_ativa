@@ -70,6 +70,14 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ PIX-07: Reservas `pending_payment` expiram após 45min e slot liberado via `expireUnpaidBookings` — v4.0
 - ✓ D-01 a D-13: Admin configura credenciais Mercado Pago sem redeploy; kill switch Pix; regras Firestore isolam credenciais — v4.0
 
+## Current Milestone: v5.0 Dashboard & Esportes
+
+**Goal:** Admin vê insights completos com gráficos (ocupação, receita, clientes, esportes) e clientes escolhem esporte opcional na reserva.
+
+**Target features:**
+- Dashboard admin com toggle semana/mês/ano: receita total, ticket médio, taxa de conversão, split Pix vs presencial, ocupação (%), heatmap hora×dia, dias mais movimentados, reservas por status, taxa de abandono, clientes únicos/novos, top 5 frequentes, taxa de retorno, no-show on_arrival, distribuição por esporte, gráficos de linha/barra
+- Campo opcional de esporte na reserva (Vôlei, Beach Tênis, Futevôlei — lista configurável pelo admin)
+
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
@@ -120,5 +128,22 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | SettingsLoaded contém apenas bool flags (não valores dos tokens) | Segurança — token nunca no estado Flutter | ✓ isAccessTokenConfigured: bool |
 | expireUnpaidBookings a cada 15min (não 45min) | Margem de segurança maior que expiresAt de 30min | ✓ Bookings expiram no máximo ~15min após vencimento |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-05-08 after v4.0 milestone*
+*Last updated: 2026-05-19 after v5.0 milestone start*
