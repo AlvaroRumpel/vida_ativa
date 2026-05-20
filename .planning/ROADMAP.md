@@ -6,6 +6,7 @@
 - ✅ **v2.0 Funcionalidades Sociais & Admin** — Phases 7–11 (shipped 2026-03-31)
 - ✅ **v3.0 Aprimoramentos de Reserva & Notificações** — Phases 12–16 (shipped 2026-04-06)
 - ✅ **v4.0 Pagamento Pix** — Phases 17–19 (shipped 2026-05-08)
+- 🔄 **v5.0 Dashboard & Esportes** — Phases 20–22 (in progress)
 
 ## Phases
 
@@ -60,6 +61,49 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 
 </details>
 
+### v5.0 Dashboard & Esportes (Phases 20–22)
+
+- [ ] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva
+- [ ] **Phase 21: Backend do Dashboard** - Cloud Functions de agregação write-time (onBookingStateChange + scheduledDailyAggregation); schema /config/dashboard; DashboardCubit; regras Firestore
+- [ ] **Phase 22: UI do Dashboard** - DashboardScreen com toggle semana/mês/ano; gráficos fl_chart (linha, barra, pizza, donut); heatmap hora×dia; métricas de clientes
+
+## Phase Details
+
+### Phase 20: Infraestrutura de Esporte
+**Goal**: Clientes podem selecionar esporte ao reservar e admin pode gerenciar a lista de esportes
+**Depends on**: Phase 19 (BookingModel já estendido com payment fields — padrão de extensão nullable)
+**Requirements**: SPORT-01, SPORT-02, SPORT-03, SPORT-04
+**Success Criteria** (what must be TRUE):
+  1. Cliente vê dropdown "Esporte (opcional)" no formulário de reserva e pode selecionar Vôlei, Beach Tênis ou Futevôlei
+  2. Admin vê seção "Esportes" nas configurações e pode adicionar, remover e reordenar esportes da lista
+  3. Sistema popula automaticamente a lista padrão (Vôlei, Beach Tênis, Futevôlei) se /config/sports não existir
+  4. Reservas antigas sem campo de esporte abrem normalmente sem erro ou dado ausente visível inesperado
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 21: Backend do Dashboard
+**Goal**: Dados agregados de ocupação, receita e clientes estão disponíveis e atualizados no Firestore para consumo pela UI
+**Depends on**: Phase 20 (campo sport em BookingModel necessário para agregação por esporte)
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-09, DASH-10, DASH-11, DASH-12
+**Success Criteria** (what must be TRUE):
+  1. Ao confirmar ou cancelar uma reserva, os contadores em /config/dashboard atualizam automaticamente via Cloud Function sem intervenção manual
+  2. Documentos de agregação diária existem para semana, mês e ano correntes com campos de receita, ocupação, contagem de clientes e distribuição por esporte
+  3. DashboardCubit carrega dados de /config/dashboard e expõe estados de loading, dados e erro corretamente
+  4. Regras Firestore permitem admin ler /config/dashboard mas bloqueiam escrita direta do cliente Flutter (somente Cloud Functions escrevem)
+**Plans**: TBD
+
+### Phase 22: UI do Dashboard
+**Goal**: Admin vê painel completo com gráficos e métricas interativas de ocupação, receita e clientes
+**Depends on**: Phase 21 (DashboardCubit com dados disponíveis)
+**Requirements**: DASH-05, DASH-06, DASH-07, DASH-08
+**Success Criteria** (what must be TRUE):
+  1. Admin alterna entre períodos semana/mês/ano e todos os cards de métrica (ocupação, receita, ticket médio, taxa de conversão, no-show) atualizam na mesma tela
+  2. Admin vê gráfico de linha ou barra com evolução de receita ao longo do período selecionado
+  3. Admin vê heatmap hora×dia indicando os horários mais reservados da semana
+  4. Admin vê gráfico pizza com distribuição de reservas por status e, quando há dados de esporte, gráfico donut de distribuição por esporte
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -83,3 +127,6 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 | 17. Pix QR Generation | v4.0 | 2/2 | Complete | 2026-04-08 |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 3/3 | Complete | 2026-04-09 |
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
+| 20. Infraestrutura de Esporte | v5.0 | 0/? | Not started | - |
+| 21. Backend do Dashboard | v5.0 | 0/? | Not started | - |
+| 22. UI do Dashboard | v5.0 | 0/? | Not started | - |

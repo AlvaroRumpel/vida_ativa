@@ -60,28 +60,28 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| DASH-07 | — | Pending |
-| DASH-08 | — | Pending |
-| DASH-09 | — | Pending |
-| DASH-10 | — | Pending |
-| DASH-11 | — | Pending |
-| DASH-12 | — | Pending |
-| SPORT-01 | — | Pending |
-| SPORT-02 | — | Pending |
-| SPORT-03 | — | Pending |
-| SPORT-04 | — | Pending |
+| DASH-01 | Phase 21 | Pending |
+| DASH-02 | Phase 21 | Pending |
+| DASH-03 | Phase 21 | Pending |
+| DASH-04 | Phase 21 | Pending |
+| DASH-05 | Phase 22 | Pending |
+| DASH-06 | Phase 22 | Pending |
+| DASH-07 | Phase 22 | Pending |
+| DASH-08 | Phase 22 | Pending |
+| DASH-09 | Phase 21 | Pending |
+| DASH-10 | Phase 21 | Pending |
+| DASH-11 | Phase 21 | Pending |
+| DASH-12 | Phase 21 | Pending |
+| SPORT-01 | Phase 20 | Pending |
+| SPORT-02 | Phase 20 | Pending |
+| SPORT-03 | Phase 20 | Pending |
+| SPORT-04 | Phase 20 | Pending |
 
 **Coverage:**
 - v5.0 requirements: 16 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-19*
-*Last updated: 2026-05-19 after milestone v5.0 definition*
+*Last updated: 2026-05-19 after roadmap v5.0 created*
