@@ -70,6 +70,13 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ PIX-07: Reservas `pending_payment` expiram após 45min e slot liberado via `expireUnpaidBookings` — v4.0
 - ✓ D-01 a D-13: Admin configura credenciais Mercado Pago sem redeploy; kill switch Pix; regras Firestore isolam credenciais — v4.0
 
+### Validated (v5.0 — Phase 20)
+
+- ✓ SPORT-01: Cliente vê dropdown "Esporte (opcional)" no formulário de reserva e pode selecionar esporte — Validated in Phase 20
+- ✓ SPORT-02: Admin vê seção "Esportes" nas configurações e pode adicionar, remover e reordenar esportes — Validated in Phase 20
+- ✓ SPORT-03: Sistema popula automaticamente lista padrão se /config/sports não existir — Validated in Phase 20
+- ✓ SPORT-04: Reservas antigas sem campo esporte abrem normalmente sem erro — Validated in Phase 20
+
 ## Current Milestone: v5.0 Dashboard & Esportes
 
 **Goal:** Admin vê insights completos com gráficos (ocupação, receita, clientes, esportes) e clientes escolhem esporte opcional na reserva.
@@ -98,7 +105,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 ## Context
 
 - **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, Cloud Functions (Node.js 20), Mercado Pago SDK, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view, bloc_test, mocktail
-- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/bookings/{id}/payment/{txId}`, `/blockedDates`, `/config/booking`, `/config/mercadopago`, `/config/pricing`
+- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/bookings/{id}/payment/{txId}`, `/blockedDates`, `/config/booking`, `/config/mercadopago`, `/config/pricing`, `/config/sports`
 - **BookingModel.status:** `pending` | `confirmed` | `cancelled` | `rejected` | `pending_payment` | `expired` | `refunded`
 - **BookingModel.generateId(slotId, date)** → ID determinístico `{slotId}_{date}` — anti-double-booking via Transaction
 - **Perfis:** `client` (reserva) e `admin` (gerencia) — `role: String` no Firestore; go_router guard + Firestore rules
@@ -146,4 +153,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 after v5.0 milestone start*
+*Last updated: 2026-05-20 — Phase 20 complete (sport infrastructure: SPORT-01..SPORT-04 validated)*
