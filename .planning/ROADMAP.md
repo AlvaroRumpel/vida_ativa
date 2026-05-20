@@ -63,7 +63,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 
 ### v5.0 Dashboard & Esportes (Phases 20–22)
 
-- [ ] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva
+- [x] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva (completed 2026-05-20)
 - [ ] **Phase 21: Backend do Dashboard** - Cloud Functions de agregação write-time (onBookingStateChange + scheduledDailyAggregation); schema /config/dashboard; DashboardCubit; regras Firestore
 - [ ] **Phase 22: UI do Dashboard** - DashboardScreen com toggle semana/mês/ano; gráficos fl_chart (linha, barra, pizza, donut); heatmap hora×dia; métricas de clientes
 
@@ -81,7 +81,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 **Plans**: 3 plans
 - [x] 20-01-PLAN.md — BookingModel sport field + SportConfigCubit + AdminScreen provider (foundation, Wave 1)
 - [x] 20-02-PLAN.md — Cliente UX: dropdown no BookingConfirmationSheet + propagação em bookSlot/bookRecurring (Wave 2)
-- [ ] 20-03-PLAN.md — Admin UX: seção Esportes no SettingsTab + chip em AdminBookingCard/DetailSheet (Wave 2)
+- [x] 20-03-PLAN.md — Admin UX: seção Esportes no SettingsTab + chip em AdminBookingCard/DetailSheet (Wave 2)
 **UI hint**: yes
 
 ### Phase 21: Backend do Dashboard
@@ -130,6 +130,6 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 | 17. Pix QR Generation | v4.0 | 2/2 | Complete | 2026-04-08 |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 3/3 | Complete | 2026-04-09 |
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
-| 20. Infraestrutura de Esporte | v5.0 | 2/3 | In Progress|  |
+| 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete   | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 0/? | Not started | - |
 | 22. UI do Dashboard | v5.0 | 0/? | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
-status: executing
-last_updated: "2026-05-20T20:20:58.367Z"
+status: verifying
+last_updated: "2026-05-20T20:26:54.147Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 Phase: 20 (infraestrutura-de-esporte) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-20
 
 ```
@@ -59,6 +59,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 20]: _initializingDefaults flag prevents _writeDefaults loop on stream re-emit
 - [Phase 20]: Sports list passed as constructor param to BookingConfirmationSheet (not BlocBuilder) — avoids admin cubit coupling in client UI
 - [Phase 20]: One-shot Firestore read per sheet open for sports list — no stream, refresh on next open
+- [Phase 20]: _initialized flag em _SportsSectionState evita reset da lista local a cada re-emit do stream
+- [Phase 20]: Chip em AdminBookingCard usa Container+BoxDecoration — sem Material Chip widget
 
 ### Roadmap Evolution
 
