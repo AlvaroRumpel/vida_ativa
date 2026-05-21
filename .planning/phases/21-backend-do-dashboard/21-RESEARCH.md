@@ -140,6 +140,7 @@ TRANSIÇÃO (before != null → after != null):
 
 ```javascript
 // Source: functions/index.js (notifyAdminNewBooking — padrão base)
+// Path Firestore RESOLVIDO (ver Q-1 abaixo): collection('config').doc('dashboard').collection('periods').doc(period)
 exports.onBookingStateChange = onDocumentWritten('bookings/{bookingId}', async (event) => {
   const before = event.data.before?.data();
   const after = event.data.after?.data();
@@ -159,18 +160,11 @@ exports.onBookingStateChange = onDocumentWritten('bookings/{bookingId}', async (
 
   const batch = db.batch();
   for (const period of periods) {
-    const ref = db.collection('config').doc('dashboard').collection('data').doc(period);
-    // NOTE: /config/dashboard/{period} — dashboard é doc, period é subcollection? Ver D-01.
-    // D-01 usa /config/dashboard/{period} como path — provavelmente collection('config').doc('dashboard')
-    // não existe; o correto é collection('config').doc(period) onde period in ['week','month','year']
-    // MAS isso conflita com o wildcard /config/{docId}.
-    // DECISÃO DO PROJETO: path é /config/dashboard com subdoc week/month/year.
-    // Firebase paths: collection('config').doc('dashboard').collection('dashboard').doc(period) — 5 segmentos
-    // OU: considerar que dashboard é subcollection de config.
-    // VERIFICAR: estrutura exata do path — ver seção Open Questions Q-1.
-    batch.update(ref, Object.fromEntries(
+    const ref = db.collection('config').doc('dashboard').collection('periods').doc(period);
+    // set+merge handles first-deploy case where doc does not exist (Pitfall 1)
+    batch.set(ref, Object.fromEntries(
       Object.entries(deltas).map(([k, v]) => [k, admin.firestore.FieldValue.increment(v)])
-    ));
+    ), { merge: true });
   }
   batch.commit();
 });
@@ -192,7 +186,7 @@ exports.scheduledDailyAggregation = onSchedule(
     for (const period of ['week', 'month', 'year']) {
       const { startDate, endDate } = getPeriodRange(period); // compute current rolling window
       const data = await aggregateForPeriod(db, startDate, endDate);
-      await db.collection('config').doc(/* dashboard path */).set({
+      await db.collection('config').doc('dashboard').collection('periods').doc(period).set({
         period,
         startDate,
         endDate,
@@ -206,18 +200,15 @@ exports.scheduledDailyAggregation = onSchedule(
 
 ### Pattern 3: DashboardCubit — Stream em collection (não doc único)
 
-**What:** D-14 especifica que os 3 docs são carregados de uma vez. Isso requer escutar a **collection** `/config/dashboard` (não um doc único como o `PricingCubit`). Alternativa: 3 subscriptions separadas.
-
-**Recomendação (Claude's Discretion):** Usar `collectionGroup` stream ou 3 `StreamSubscription` independentes que convergem em estado. O padrão mais simples é combinar 3 streams com `StreamZip` / `Rx.combineLatest3` — ou simplesmente usar `collection().snapshots()` que retorna `QuerySnapshot` contendo todos os docs.
+**What:** D-14 especifica que os 3 docs são carregados de uma vez. Isso requer escutar a **subcollection** `periods` dentro do doc `/config/dashboard`. Resolvido em Q-1: path é `collection('config').doc('dashboard').collection('periods').snapshots()`.
 
 ```dart
 // Source: cloud_firestore docs — CollectionReference.snapshots()
-// Mais simples: escutar a subcollection toda
-// Se /config/dashboard/{period} = doc em subcollection de /config/dashboard:
+// Subcollection escutada: /config/dashboard/periods (3 docs: week, month, year)
 _sub = _firestore
     .collection('config')
     .doc('dashboard')
-    .collection('periods') // nome da subcollection — ver Q-1
+    .collection('periods')
     .snapshots()
     .listen((snap) {
       // snap.docs contém week, month, year
@@ -272,13 +263,13 @@ class DashboardData {
 
 ### Pattern 5: Firestore Rules — bloco específico antes do wildcard
 
-**What:** Regra `/config/dashboard/{period}` deve aparecer ANTES do wildcard `/config/{docId}` no arquivo `firestore.rules`. Regras Firestore usam first-match por especificidade, mas para garantir, posicionar o bloco mais específico primeiro.
+**What:** Regra `/config/dashboard/periods/{period}` deve aparecer ANTES do wildcard `/config/{docId}` no arquivo `firestore.rules`. Regras Firestore usam first-match por especificidade, mas para garantir, posicionar o bloco mais específico primeiro.
 
 ```javascript
 // Source: firestore.rules (padrão existente /config/mercadopago)
-// Igual ao padrão da linha 51-54 em firestore.rules
+// Path 4 segmentos: config/dashboard/periods/{period}
 
-match /config/dashboard/{period} {
+match /config/dashboard/periods/{period} {
   allow read: if isAdmin();
   allow write: if false; // apenas Cloud Functions via admin SDK escrevem
 }
@@ -577,17 +568,33 @@ exports.scheduledDailyAggregation = onSchedule(
 
 ## Open Questions
 
-1. **Q-1: Path exato de `/config/dashboard/{period}` no Firestore**
+> **Status:** Todas as open questions originalmente identificadas foram RESOLVIDAS via decisões locked no CONTEXT.md (gathered 2026-05-20). Mantidas aqui com a resolução para rastreabilidade.
 
-   - What we know: D-01 refere-se a `/config/dashboard/{period}`. Em Firestore, paths têm alternância collection/document. `/config` é collection, `dashboard` seria document, `{period}` seria collection ou document num subcollection.
-   - What's unclear: Se `dashboard` é um documento (com subdocs `week/month/year` numa subcollection), o path no SDK seria `db.collection('config').doc('dashboard').collection('...').doc('week')`. Se dashboard for apenas a string no doc ID de `/config`, o path seria `db.collection('config').doc('week')` etc — mas isso conflita com o wildcard `/config/{docId}` de outro jeito.
-   - **Recommendation:** O path mais limpo que segue o padrão existente (`/config/pricing`, `/config/mercadopago`) é: tratar `week`, `month`, `year` como documentos **diretos** em `/config/` — ex: `db.collection('config').doc('dashboard_week')`. Mas o CONTEXT.md especifica explicitamente `/config/dashboard/{period}` — isso implica que `dashboard` é um documento e `{period}` é um subdocumento em subcollection. **Usar**: `db.collection('config').doc('dashboard').collection('periods').doc('week')` OU `db.collection('config').doc('dashboard').collection('data').doc('week')`. O nome da subcollection é Claude's Discretion. **Recomendação: nomear subcollection `periods`** para clareza — `DashboardCubit` subscreve `collection('config').doc('dashboard').collection('periods').snapshots()`.
+### Q-1: Path exato de `/config/dashboard/{period}` no Firestore — RESOLVED
 
-2. **Q-2: `active` field em `/slots` — existe esse campo?**
+- **Original question:** D-01 refere-se a `/config/dashboard/{period}`. Em Firestore, paths têm alternância collection/document. Se `dashboard` é um documento com subcollection, qual o nome da subcollection?
+- **Resolution:** RESOLVED via CONTEXT.md §D-01 + Plans 21-01/21-02/21-03.
+  - **Path final:** `collection('config').doc('dashboard').collection('periods').doc(period)` onde `period in ['week','month','year']`.
+  - **Plans status:** 21-01 (DashboardCubit), 21-02 (Cloud Functions) e 21-03 (Firestore rules) já usam esse path consistentemente. Ver:
+    - `21-01-PLAN.md` linha 55: `collection('config').doc('dashboard').collection('periods')`
+    - `21-02-PLAN.md` linhas 343-347: `db.collection('config').doc('dashboard').collection('periods').doc(period)`
+    - `21-03-PLAN.md` linhas 237-241: `match /config/dashboard/periods/{period}` (4 segmentos, regra específica antes do wildcard).
+  - **Subcollection naming:** `periods` (escolha de Claude's Discretion confirmada nos plans).
+- **Citation:** CONTEXT.md §D-01 (locked decision); 21-01-PLAN.md key_links; 21-02-PLAN.md acceptance_criteria; 21-03-PLAN.md interfaces block.
+- **Action required:** Nenhuma — plans já corretos.
 
-   - What we know: D-04 diz "CF conta `/slots` onde `active == true`". O padrão do `updateSlotPricesFromTiers` busca `/slots` por `date >= todayStr` sem filtrar por `active`.
-   - What's unclear: Se o campo `active` existe no modelo de slots atual.
-   - Recommendation: Verificar `SlotModel` antes de implementar D-04. Se `active` não existir, a query `where('active', '==', true)` retornará 0 docs — taxa de ocupação será sempre infinity/NaN. Fallback: contar todos os slots do período sem filtrar por `active`, ou usar `where('date', '>=', startDate).where('date', '<=', endDate)` como denominador.
+### Q-2: Campo `active` em `/slots` — RESOLVED
+
+- **Original question:** D-04 diz "CF conta `/slots` onde `active == true`". O campo `active` existe no SlotModel atual?
+- **Resolution:** RESOLVED via CONTEXT.md §"SlotModel CRITICAL" + Plans 21-02 acceptance criteria.
+  - **Campo correto:** O nome real é `isActive` (não `active`). CONTEXT.md afirma textualmente: "SlotModel CRITICAL: campo Dart é `isActive` (não `active`). Firestore stores key `isActive`. Query DEVE ser `.where('isActive', '==', true)`."
+  - **Plans status:** Plan 21-02 já usa o valor correto:
+    - `21-02-PLAN.md` linha 47: key_link pattern `where\\('isActive', '==', true\\)`
+    - `21-02-PLAN.md` linha 477: `db.collection('slots').where('isActive', '==', true)`
+    - `21-02-PLAN.md` linha 625: acceptance criteria exige `where('isActive', '==', true)` (não `'active'`).
+  - **D-04 interpretação:** A decisão D-04 usa "active" como termo conceitual, mas o nome técnico do campo é `isActive`. CONTEXT.md já fez essa tradução. Plans honram o nome técnico real.
+- **Citation:** CONTEXT.md §"SlotModel CRITICAL" (interfaces block do Plan 21-02); 21-02-PLAN.md key_links + acceptance_criteria; SlotModel source (`lib/core/models/slot_model.dart`).
+- **Action required:** Nenhuma — plans já corretos.
 
 ---
 
@@ -597,7 +604,7 @@ exports.scheduledDailyAggregation = onSchedule(
 |---|-------|---------|---------------|
 | A1 | `cloud_firestore`, `flutter_bloc`, `sentry_flutter`, `equatable` já no pubspec.yaml | Standard Stack | Se algum não estiver, Wave 0 precisa adicionar dependência — baixo risco |
 | A2 | Firebase emulator disponível no ambiente de desenvolvimento | Environment Availability | Testes de Firestore rules requerem emulator; fallback é deploy em staging |
-| A3 | Campo `active` existe em `/slots` documents | Open Questions Q-2 | `totalSlotsAvailable` sempre 0 se campo não existe — occupancyRate quebrado |
+| A3 | Campo `isActive` existe em `/slots` documents (resolvido em Q-2) | Open Questions Q-2 | RESOLVED — CONTEXT.md confirma campo `isActive` |
 | A4 | `onSchedule` v2 aceita objeto `{ schedule, timeZone }` como primeiro argumento | Code Examples | MEDIUM — verificado via search cross-referencing official ScheduleOptions interface |
 
 ---
@@ -609,9 +616,10 @@ exports.scheduledDailyAggregation = onSchedule(
 - `lib/features/admin/cubit/pricing_cubit.dart` — padrão StreamSubscription em `/config/`
 - `lib/features/admin/cubit/sport_config_cubit.dart` — padrão mais recente, mesma família
 - `lib/core/models/booking_model.dart` — campos existentes (status, paymentMethod, sport, price, date, userId)
+- `lib/core/models/slot_model.dart` — confirma campo `isActive` (Q-2 resolved)
 - `firestore.rules` — estrutura atual de regras
 - `lib/features/admin/ui/admin_screen.dart` — ponto de provisão do cubit
-- `.planning/phases/21-backend-do-dashboard/21-CONTEXT.md` — todas as decisões D-01..D-16
+- `.planning/phases/21-backend-do-dashboard/21-CONTEXT.md` — todas as decisões D-01..D-16 (Q-1 e Q-2 resolved)
 - `.planning/STATE.md` — decisões arquiteturais v5.0
 
 ### Secondary (MEDIUM confidence)
@@ -629,7 +637,8 @@ exports.scheduledDailyAggregation = onSchedule(
 - Standard stack: HIGH — tudo verificado no codebase existente
 - Architecture: HIGH — todos os padrões têm análogos diretos no projeto
 - Pitfalls: HIGH — baseados em comportamento documentado do Firestore (batch.update em doc inexistente) e análise do codebase
-- Open questions: 2 itens precisam de verificação antes de implementar (path exato e campo `active` em slots)
+- Open questions: 0 itens pendentes — Q-1 e Q-2 RESOLVED via CONTEXT.md
 
 **Research date:** 2026-05-20
+**Last revised:** 2026-05-20 (revision iteration 1 — closed Q-1 and Q-2 with citations to CONTEXT.md)
 **Valid until:** 2026-06-20 (firebase-functions v2 API estável)
