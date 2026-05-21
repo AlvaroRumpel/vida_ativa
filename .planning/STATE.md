@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
-status: IN_PROGRESS
-stopped_at: Phase 22 — not started
-last_updated: "2026-05-21T00:00:00.000Z"
+status: executing
+last_updated: "2026-05-21T14:49:41.962Z"
+last_activity: 2026-05-21 -- Phase 22 planning complete
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 9
-  completed_plans: 9
+  completed_plans: 6
   percent: 67
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 Phase: 22 — UI do Dashboard (not started)
 Plan: —
-Status: Phase 20 ✅ + Phase 21 ✅ complete; ready to plan Phase 22
-Last activity: 2026-05-21 — Phase 21 complete (DashboardCubit + CFs + rules verified in staging)
+Status: Ready to execute
+Last activity: 2026-05-21 -- Phase 22 planning complete
 
 ```
 Progress: [█████████████░░░░░░░] 67% (2/3 phases)
