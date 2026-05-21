@@ -251,10 +251,6 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
             const SizedBox(height: 10),
             _infoRow(Icons.group, booking.participants!),
           ],
-          if (booking.sport != null) ...[
-            const SizedBox(height: 10),
-            _infoRow(Icons.sports, booking.sport!),
-          ],
           // Inline error
           if (_errorMessage != null) ...[
             const SizedBox(height: 12),
