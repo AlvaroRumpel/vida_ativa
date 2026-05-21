@@ -986,3 +986,204 @@ exports.onBookingStateChange = onDocumentWritten('bookings/{bookingId}', async (
     throw e; // let Cloud Functions retry
   }
 });
+
+/**
+ * Recalculates ALL dashboard fields for a single period from scratch by reading
+ * /bookings, /slots, and /users. Returns a plain object to be written via set().
+ *
+ * Pure data layer — caller writes the result. Errors propagate to caller.
+ */
+async function aggregateForPeriod(db, period, startDate, endDate) {
+  // 1. All bookings created in the period (by date field, since createdAt may not align)
+  //    Per D-03/D-09/D-10/D-12, we group by booking.date (the day of the slot)
+  const bookingsSnap = await db
+    .collection('bookings')
+    .where('date', '>=', startDate)
+    .where('date', '<=', endDate)
+    .get();
+
+  let totalBookings = 0;
+  let confirmedBookings = 0;
+  let cancelledBookings = 0;
+  let pendingBookings = 0;
+  let totalSlotsBooked = 0;
+  let totalRevenue = 0;
+  let pixRevenue = 0;
+  let onArrivalRevenue = 0;
+
+  // For metrics that need raw lists
+  let onArrivalCreated = 0;
+  let onArrivalNotConfirmed = 0; // cancelled/rejected with paymentMethod=on_arrival
+  const userBookingCount = new Map(); // userId → confirmedCount in period
+  const confirmedUserIds = new Set(); // unique users with confirmed booking
+  const revenueBySportMap = new Map(); // sport (or null sentinel) → revenue
+
+  const NULL_SPORT_KEY = '__null__';
+
+  for (const doc of bookingsSnap.docs) {
+    const b = doc.data();
+    const status = b.status;
+    const price = Number(b.price) || 0;
+    const paymentMethod = b.paymentMethod;
+
+    // Skip expired and refunded (consistent with write-time counters)
+    if (status === 'expired' || status === 'refunded') continue;
+
+    totalBookings++;
+
+    if (status === 'pending') pendingBookings++;
+    else if (status === 'cancelled' || status === 'rejected') cancelledBookings++;
+    else if (status === 'confirmed') {
+      confirmedBookings++;
+      totalSlotsBooked++;
+      totalRevenue += price;
+      if (paymentMethod === 'pix') pixRevenue += price;
+      else if (paymentMethod === 'on_arrival') onArrivalRevenue += price;
+      confirmedUserIds.add(b.userId);
+      userBookingCount.set(b.userId, (userBookingCount.get(b.userId) || 0) + 1);
+
+      // revenueBySport (DASH-12) only counts confirmed bookings
+      const sportKey = b.sport == null ? NULL_SPORT_KEY : b.sport;
+      revenueBySportMap.set(sportKey, (revenueBySportMap.get(sportKey) || 0) + price);
+    }
+
+    // No-show tracking (D-11): on_arrival bookings created in window that ended cancelled/rejected
+    if (paymentMethod === 'on_arrival') {
+      onArrivalCreated++;
+      if (status === 'cancelled' || status === 'rejected') onArrivalNotConfirmed++;
+    }
+  }
+
+  // 2. totalSlotsAvailable: count /slots where isActive==true AND date in [startDate, endDate]
+  //    (D-04 + Q-2 resolution: SlotModel uses isActive, not active)
+  const slotsSnap = await db
+    .collection('slots')
+    .where('isActive', '==', true)
+    .where('date', '>=', startDate)
+    .where('date', '<=', endDate)
+    .get();
+  const totalSlotsAvailable = slotsSnap.size;
+
+  // 3. Calculated metrics
+  const occupancyRate = totalSlotsAvailable > 0
+    ? totalSlotsBooked / totalSlotsAvailable
+    : 0;
+  const avgTicket = confirmedBookings > 0
+    ? totalRevenue / confirmedBookings
+    : 0;
+  const conversionRate = totalBookings > 0
+    ? confirmedBookings / totalBookings
+    : 0;
+  const noShowRate = onArrivalCreated > 0
+    ? onArrivalNotConfirmed / onArrivalCreated
+    : 0;
+
+  // 4. uniqueClients (DASH-09): count of distinct userIds with confirmed booking in period
+  const uniqueClients = confirmedUserIds.size;
+
+  // 5. newClients (DASH-09 + D-09): clients whose FIRST EVER confirmed booking date is in this period.
+  //    Query ALL confirmed bookings (historical) for the userIds in confirmedUserIds and find min date.
+  let newClients = 0;
+  for (const userId of confirmedUserIds) {
+    const firstSnap = await db
+      .collection('bookings')
+      .where('userId', '==', userId)
+      .where('status', '==', 'confirmed')
+      .orderBy('date', 'asc')
+      .limit(1)
+      .get();
+    if (!firstSnap.empty) {
+      const firstDate = firstSnap.docs[0].data().date;
+      if (firstDate >= startDate && firstDate <= endDate) {
+        newClients++;
+      }
+    }
+  }
+
+  // 6. returnRate (DASH-11): % of unique confirmed clients with >1 confirmed booking in period
+  let returningCount = 0;
+  for (const count of userBookingCount.values()) {
+    if (count > 1) returningCount++;
+  }
+  const returnRate = uniqueClients > 0 ? returningCount / uniqueClients : 0;
+
+  // 7. topClients (DASH-10): top 5 by bookingCount desc, with displayName lookup
+  const sortedClients = [...userBookingCount.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  const topClients = [];
+  for (const [userId, bookingCount] of sortedClients) {
+    const userDoc = await db.collection('users').doc(userId).get();
+    const displayName = userDoc.data()?.displayName || 'Cliente';
+    topClients.push({ userId, displayName, bookingCount });
+  }
+
+  // 8. revenueBySport (DASH-12): convert map to array, null sport → sport:null
+  const revenueBySport = [...revenueBySportMap.entries()].map(([key, revenue]) => ({
+    sport: key === NULL_SPORT_KEY ? null : key,
+    revenue,
+  }));
+
+  return {
+    period,
+    startDate,
+    endDate,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    totalBookings,
+    confirmedBookings,
+    cancelledBookings,
+    pendingBookings,
+    totalSlotsBooked,
+    totalRevenue,
+    pixRevenue,
+    onArrivalRevenue,
+    totalSlotsAvailable,
+    occupancyRate,
+    avgTicket,
+    conversionRate,
+    noShowRate,
+    uniqueClients,
+    newClients,
+    returnRate,
+    topClients,
+    revenueBySport,
+  };
+}
+
+/**
+ * Phase 21 — Runs daily at 03:00 America/Sao_Paulo. Recalculates ALL dashboard
+ * fields for the 3 rolling windows (week/month/year) from scratch, overwriting
+ * any drift introduced by the write-time counters.
+ *
+ * Per D-08: 03:00 BRT. Per D-07: complex metrics (topClients, returnRate,
+ * uniqueClients, newClients, noShowRate, conversionRate, revenueBySport) live
+ * exclusively here. D+1 lag is acceptable.
+ *
+ * Per Pitfall 4: timeZone MUST be specified in options object — bare string
+ * defaults to UTC.
+ */
+exports.scheduledDailyAggregation = onSchedule(
+  { schedule: 'every day 03:00', timeZone: 'America/Sao_Paulo' },
+  async (event) => {
+    const db = admin.firestore();
+    const ranges = getCurrentPeriodRanges();
+
+    for (const period of ['week', 'month', 'year']) {
+      const { startDate, endDate } = ranges[period];
+      try {
+        const data = await aggregateForPeriod(db, period, startDate, endDate);
+        await db
+          .collection('config')
+          .doc('dashboard')
+          .collection('periods')
+          .doc(period)
+          .set(data); // FULL overwrite per D-08
+        console.log(`scheduledDailyAggregation: period=${period} startDate=${startDate} endDate=${endDate} totalBookings=${data.totalBookings} confirmed=${data.confirmedBookings} revenue=${data.totalRevenue} slotsAvail=${data.totalSlotsAvailable}`);
+      } catch (e) {
+        // Per Claude's Discretion: log + Sentry runtime captures. Do NOT throw —
+        // continue with other periods so one bad period doesn't block the others.
+        console.error(`scheduledDailyAggregation period=${period} failed:`, e);
+      }
+    }
+  }
+);
