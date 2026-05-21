@@ -28,51 +28,6 @@ class AdminBookingCard extends StatelessWidget {
     };
   }
 
-  // Paleta determinística para chip de esporte (UI-SPEC §Color)
-  static const List<Color> _sportBgColors = [
-    Color(0xFFE3F2FD), // blue bg
-    Color(0xFFE8F5E9), // green bg
-    Color(0xFFFFF3E0), // orange bg
-    Color(0xFFF3E5F5), // purple bg
-    Color(0xFFFCE4EC), // pink bg
-    Color(0xFFE0F7FA), // teal bg
-    Color(0xFFF9FBE7), // lime bg
-    Color(0xFFFFF8E1), // amber bg
-  ];
-
-  static const List<Color> _sportFgColors = [
-    Color(0xFF1565C0),
-    Color(0xFF2E7D32),
-    Color(0xFFE65100),
-    Color(0xFF6A1B9A),
-    Color(0xFFC62828),
-    Color(0xFF00695C),
-    Color(0xFF558B2F),
-    Color(0xFFF57F17),
-  ];
-
-  int _sportColorIndex(String sport) =>
-      sport.hashCode.abs() % _sportBgColors.length;
-
-  Widget _buildSportChip(String sport) {
-    final i = _sportColorIndex(sport);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: _sportBgColors[i],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        sport,
-        style: TextStyle(
-          color: _sportFgColors[i],
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
   String _statusLabel(String status, String? paymentMethod) {
     return switch ((status, paymentMethod)) {
       ('pending', _) => 'Aguardando',
@@ -105,7 +60,6 @@ class AdminBookingCard extends StatelessWidget {
         ],
       ),
     );
-    if (!context.mounted) return;
     if (confirmed == true) {
       await cubit.confirmBooking(booking.id);
     }
@@ -130,7 +84,6 @@ class AdminBookingCard extends StatelessWidget {
         ],
       ),
     );
-    if (!context.mounted) return;
     if (confirmed == true) {
       await cubit.rejectBooking(booking.id);
     }
@@ -214,10 +167,6 @@ class AdminBookingCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ],
-                    if (booking.sport != null) ...[
-                      const SizedBox(height: 4),
-                      _buildSportChip(booking.sport!),
                     ],
                     if (booking.startTime != null) ...[
                       const SizedBox(height: 4),
