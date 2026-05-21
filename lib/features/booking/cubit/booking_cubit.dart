@@ -15,10 +15,8 @@ class BookingCubit extends Cubit<BookingState> {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
   bool _pixEnabled = false;
   String _confirmationMode = 'manual';
-  final _configReady = Completer<void>();
 
   bool get pixEnabled => _pixEnabled;
-  String get confirmationMode => _confirmationMode;
 
   BookingCubit({
     required FirebaseFirestore firestore,
@@ -31,26 +29,21 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> _loadConfig() async {
-    try {
-      final results = await Future.wait([
-        _firestore.collection('config').doc('booking').get(),
-        _firestore.collection('config').doc('mercadopago').get(),
-      ]);
-      final bookingData = results[0].data();
-      final mpData = results[1].data();
+    final results = await Future.wait([
+      _firestore.collection('config').doc('booking').get(),
+      _firestore.collection('config').doc('mercadopago').get(),
+    ]);
+    final bookingData = results[0].data();
+    final mpData = results[1].data();
 
-      final pixToggle = bookingData?['pixEnabled'] ?? false;
-      final hasAccessToken =
-          (mpData?['accessToken'] ?? '').toString().isNotEmpty;
-      final hasWebhookSecret =
-          (mpData?['webhookSecret'] ?? '').toString().isNotEmpty;
+    final pixToggle = bookingData?['pixEnabled'] ?? false;
+    final hasAccessToken =
+        (mpData?['accessToken'] ?? '').toString().isNotEmpty;
+    final hasWebhookSecret =
+        (mpData?['webhookSecret'] ?? '').toString().isNotEmpty;
 
-      _pixEnabled = pixToggle && hasAccessToken && hasWebhookSecret;
-      _confirmationMode = bookingData?['confirmationMode'] ?? 'manual';
-      _configReady.complete();
-    } catch (e) {
-      _configReady.completeError(e);
-    }
+    _pixEnabled = pixToggle && hasAccessToken && hasWebhookSecret;
+    _confirmationMode = bookingData?['confirmationMode'] ?? 'manual';
   }
 
   void _startStream() {
@@ -81,9 +74,7 @@ class BookingCubit extends Cubit<BookingState> {
     required String paymentMethod, // 'pix' | 'on_arrival'
     String? participants,
     String? recurrenceGroupId,
-    String? sport,
   }) async {
-    await _configReady.future; // ensures config is loaded before proceeding
     // Guard: prevent booking a slot that has already passed today
     final now = DateTime.now();
     final todayString =
@@ -126,7 +117,6 @@ class BookingCubit extends Cubit<BookingState> {
         participants: participants,
         recurrenceGroupId: recurrenceGroupId,
         paymentMethod: paymentMethod, // NEW
-        sport: sport,
       );
       tx.set(ref, booking.toFirestore());
     });
@@ -143,7 +133,6 @@ class BookingCubit extends Cubit<BookingState> {
     required String userDisplayName,
     required String paymentMethod, // NEW
     String? participants,
-    String? sport,
   }) async {
     final groupId = const Uuid().v4();
 
@@ -159,7 +148,6 @@ class BookingCubit extends Cubit<BookingState> {
             participants: participants,
             recurrenceGroupId: groupId,
             paymentMethod: paymentMethod, // NEW
-            sport: sport,
           );
           return RecurrenceOutcome.success(entry.dateString);
         } on Exception catch (e, s) {
@@ -203,8 +191,6 @@ class BookingCubit extends Cubit<BookingState> {
   /// Batch-cancels all bookings in a recurrence group dated on or after [fromDateInclusive].
   /// Uses Firestore WriteBatch for atomic commit of all cancellations.
   /// Safety: filters by userId so user can only cancel their own bookings.
-  /// Only touches active statuses — skips already-terminal docs and Pix
-  /// pending_payment bookings (which require the cancelPixPayment CF instead).
   Future<void> cancelGroupFuture({
     required String recurrenceGroupId,
     required String fromDateInclusive, // "YYYY-MM-DD"
@@ -213,18 +199,10 @@ class BookingCubit extends Cubit<BookingState> {
         .collection('bookings')
         .where('recurrenceGroupId', isEqualTo: recurrenceGroupId)
         .where('date', isGreaterThanOrEqualTo: fromDateInclusive)
-        .where('status', whereIn: ['pending', 'confirmed', 'pending_payment'])
         .get();
 
     final batch = _firestore.batch();
     for (final doc in snap.docs) {
-      final data = doc.data();
-      // Pix pending_payment has a live MP order — cannot batch-cancel.
-      // The user must cancel it individually via cancelBooking() → CF.
-      if (data['paymentMethod'] == 'pix' &&
-          data['status'] == 'pending_payment') {
-        continue;
-      }
       batch.update(doc.reference, {
         'status': 'cancelled',
         'cancelledAt': Timestamp.fromDate(DateTime.now()),

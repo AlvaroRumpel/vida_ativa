@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_fcm_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/settings_cubit.dart';
-import 'package:vida_ativa/features/admin/cubit/sport_config_cubit.dart';
 import 'package:vida_ativa/features/admin/ui/blocked_dates_tab.dart';
 import 'package:vida_ativa/features/admin/ui/booking_management_tab.dart';
 import 'package:vida_ativa/features/admin/ui/pricing_tab.dart';
@@ -133,19 +132,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     const BookingManagementTab(),
                     const UsersManagementTab(),
                     const PricingTab(),
-                    MultiBlocProvider(
-                      providers: [
-                        BlocProvider(
-                          create: (_) => SettingsCubit(
-                            firestore: FirebaseFirestore.instance,
-                          ),
-                        ),
-                        BlocProvider(
-                          create: (_) => SportConfigCubit(
-                            firestore: FirebaseFirestore.instance,
-                          ),
-                        ),
-                      ],
+                    BlocProvider(
+                      create: (_) => SettingsCubit(
+                        firestore: FirebaseFirestore.instance,
+                      ),
                       child: const SettingsTab(),
                     ),
                   ],

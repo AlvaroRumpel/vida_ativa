@@ -789,3 +789,200 @@ exports.updateSlotPricesFromTiers = onCall({}, async (request) => {
     throw new HttpsError('internal', error.message);
   }
 });
+
+// ─── Phase 21: Dashboard Aggregation Helpers ─────────────────────────────────
+
+/**
+ * Formats a JS Date as 'YYYY-MM-DD' using LOCAL date components.
+ * Avoids UTC offset bugs from toISOString().
+ */
+function toDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * Returns the date ranges (Mon-Sun, 1st-last, Jan1-Dec31) for the current rolling
+ * windows. D-02: week is Monday to Sunday of current ISO week.
+ */
+function getCurrentPeriodRanges() {
+  const now = new Date();
+  const jsDay = now.getDay(); // 0=Sun..6=Sat
+  const dayOfWeek = jsDay === 0 ? 7 : jsDay; // 1=Mon..7=Sun
+  const monday = new Date(now);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(now.getDate() - (dayOfWeek - 1));
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const yearEnd = new Date(now.getFullYear(), 11, 31);
+
+  return {
+    week: { startDate: toDateStr(monday), endDate: toDateStr(sunday) },
+    month: { startDate: toDateStr(monthStart), endDate: toDateStr(monthEnd) },
+    year: { startDate: toDateStr(yearStart), endDate: toDateStr(yearEnd) },
+  };
+}
+
+/**
+ * Given a booking date 'YYYY-MM-DD', returns the subset of ['week','month','year']
+ * whose current rolling window contains that date. Empty array = no update needed.
+ */
+function getActivePeriods(bookingDate) {
+  if (!bookingDate) return [];
+  const ranges = getCurrentPeriodRanges();
+  return ['week', 'month', 'year'].filter(
+    (p) => bookingDate >= ranges[p].startDate && bookingDate <= ranges[p].endDate
+  );
+}
+
+/**
+ * Computes per-counter deltas for a booking status transition.
+ * Returns an object {field: signedDelta} (no FieldValue wrap yet — caller wraps).
+ * Returns {} for transitions that do not affect dashboard counters.
+ *
+ * Status transitions covered (per RESEARCH §Pattern 1):
+ *   CREATE pending           → +1 pending, +1 total
+ *   CREATE confirmed         → +1 confirmed, +1 total, +price revenue split, +1 slotsBooked
+ *   CREATE pending_payment   → +1 total
+ *   pending → confirmed      → -1 pending, +1 confirmed, +price revenue split, +1 slotsBooked
+ *   pending_payment → confirmed → +1 confirmed, +price revenue split (pix), +1 slotsBooked
+ *   pending → cancelled|rejected → -1 pending, +1 cancelled
+ *   confirmed → cancelled|rejected → -1 confirmed, +1 cancelled, -price revenue split, -1 slotsBooked
+ *   pending_payment → cancelled → +1 cancelled
+ *   pending_payment → expired → IGNORED (no dashboard impact)
+ */
+function computeDeltas(before, after) {
+  const beforeStatus = before?.status;
+  const afterStatus = after?.status;
+  const price = Number(after?.price) || 0;
+  const paymentMethod = after?.paymentMethod; // 'pix' | 'on_arrival' | undefined
+  const deltas = {};
+
+  const addRevenue = (sign) => {
+    deltas.totalRevenue = (deltas.totalRevenue || 0) + sign * price;
+    if (paymentMethod === 'pix') {
+      deltas.pixRevenue = (deltas.pixRevenue || 0) + sign * price;
+    } else if (paymentMethod === 'on_arrival') {
+      deltas.onArrivalRevenue = (deltas.onArrivalRevenue || 0) + sign * price;
+    }
+  };
+
+  // CREATE — before is null/undefined
+  if (!before) {
+    if (afterStatus === 'pending') {
+      deltas.totalBookings = 1;
+      deltas.pendingBookings = 1;
+    } else if (afterStatus === 'confirmed') {
+      deltas.totalBookings = 1;
+      deltas.confirmedBookings = 1;
+      deltas.totalSlotsBooked = 1;
+      addRevenue(+1);
+    } else if (afterStatus === 'pending_payment') {
+      deltas.totalBookings = 1;
+    }
+    return deltas;
+  }
+
+  // TRANSITIONS
+  const t = `${beforeStatus}->${afterStatus}`;
+  switch (t) {
+    case 'pending->confirmed':
+      deltas.pendingBookings = -1;
+      deltas.confirmedBookings = 1;
+      deltas.totalSlotsBooked = 1;
+      addRevenue(+1);
+      break;
+    case 'pending_payment->confirmed':
+      deltas.confirmedBookings = 1;
+      deltas.totalSlotsBooked = 1;
+      // pending_payment is always pix in this codebase
+      addRevenue(+1);
+      break;
+    case 'pending->cancelled':
+    case 'pending->rejected':
+      deltas.pendingBookings = -1;
+      deltas.cancelledBookings = 1;
+      break;
+    case 'confirmed->cancelled':
+    case 'confirmed->rejected':
+      deltas.confirmedBookings = -1;
+      deltas.cancelledBookings = 1;
+      deltas.totalSlotsBooked = -1;
+      addRevenue(-1);
+      break;
+    case 'pending_payment->cancelled':
+      deltas.cancelledBookings = 1;
+      break;
+    case 'pending_payment->expired':
+      // intentionally ignored — does not affect dashboard
+      break;
+    default:
+      // unknown transition — no-op
+      break;
+  }
+  return deltas;
+}
+
+/**
+ * Phase 21 — Dashboard write-time aggregation.
+ *
+ * Listens for any change in /bookings and applies atomic increments to
+ * /config/dashboard/periods/{week|month|year} based on the status transition.
+ *
+ * Uses set({...}, {merge: true}) to handle first-deploy case where the
+ * dashboard docs do not yet exist (batch.update() would fail with NOT_FOUND).
+ */
+exports.onBookingStateChange = onDocumentWritten('bookings/{bookingId}', async (event) => {
+  const before = event.data?.before?.data();
+  const after = event.data?.after?.data();
+
+  if (!after) return; // deletion — ignore (cancellation uses status update, not delete)
+
+  const bookingDate = after.date;
+  const periods = getActivePeriods(bookingDate);
+  if (periods.length === 0) {
+    console.log(`onBookingStateChange: booking date ${bookingDate} outside rolling windows — skip`);
+    return;
+  }
+
+  const rawDeltas = computeDeltas(before, after);
+  if (Object.keys(rawDeltas).length === 0) {
+    return; // no-op transition
+  }
+
+  const db = admin.firestore();
+  const fvIncrement = admin.firestore.FieldValue.increment;
+
+  const wrapped = {};
+  for (const [k, v] of Object.entries(rawDeltas)) {
+    wrapped[k] = fvIncrement(v);
+  }
+  // Always bump updatedAt
+  wrapped.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+  const batch = db.batch();
+  for (const period of periods) {
+    const ref = db
+      .collection('config')
+      .doc('dashboard')
+      .collection('periods')
+      .doc(period);
+    // set + merge handles first-deploy doc-doesn't-exist case
+    batch.set(ref, { period, ...wrapped }, { merge: true });
+  }
+
+  try {
+    await batch.commit();
+    console.log(`onBookingStateChange: booking=${event.params.bookingId} transition=${before?.status ?? 'new'}->${after.status} periods=${periods.join(',')} deltas=${JSON.stringify(rawDeltas)}`);
+  } catch (e) {
+    console.error(`onBookingStateChange failed for booking ${event.params.bookingId}:`, e);
+    throw e; // let Cloud Functions retry
+  }
+});
