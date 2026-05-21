@@ -93,7 +93,10 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
   2. Documentos de agregação diária existem para semana, mês e ano correntes com campos de receita, ocupação, contagem de clientes e distribuição por esporte
   3. DashboardCubit carrega dados de /config/dashboard e expõe estados de loading, dados e erro corretamente
   4. Regras Firestore permitem admin ler /config/dashboard mas bloqueiam escrita direta do cliente Flutter (somente Cloud Functions escrevem)
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 21-01-PLAN.md — DashboardData model + DashboardState + DashboardCubit (TDD, Wave 1)
+- [ ] 21-02-PLAN.md — Cloud Functions onBookingStateChange + scheduledDailyAggregation (Wave 1)
+- [ ] 21-03-PLAN.md — AdminScreen BlocProvider + Firestore rules + staging checkpoint (Wave 2)
 
 ### Phase 22: UI do Dashboard
 **Goal**: Admin vê painel completo com gráficos e métricas interativas de ocupação, receita e clientes
