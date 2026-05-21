@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
 status: IN_PROGRESS
-stopped_at: Phase 20 — not started
-last_updated: "2026-05-19T00:00:00.000Z"
+stopped_at: Phase 22 — not started
+last_updated: "2026-05-21T00:00:00.000Z"
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 2
+  total_plans: 9
+  completed_plans: 9
+  percent: 67
 ---
 
 # Project State
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 ## Current Position
 
-Phase: 20 — Infraestrutura de Esporte (not started)
+Phase: 22 — UI do Dashboard (not started)
 Plan: —
-Status: Roadmap created, ready to plan Phase 20
-Last activity: 2026-05-19 — Roadmap v5.0 created (phases 20–22)
+Status: Phase 20 ✅ + Phase 21 ✅ complete; ready to plan Phase 22
+Last activity: 2026-05-21 — Phase 21 complete (DashboardCubit + CFs + rules verified in staging)
 
 ```
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0/3 phases)
+Progress: [█████████████░░░░░░░] 67% (2/3 phases)
 ```
 
 ## Performance Metrics
