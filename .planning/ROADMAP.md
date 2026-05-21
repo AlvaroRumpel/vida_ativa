@@ -101,7 +101,11 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
   2. Admin vê gráfico de linha ou barra com evolução de receita ao longo do período selecionado
   3. Admin vê heatmap hora×dia indicando os horários mais reservados da semana
   4. Admin vê gráfico pizza com distribuição de reservas por status e, quando há dados de esporte, gráfico donut de distribuição por esporte
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 22-01-PLAN.md — Setup de dependências (fl_chart, flutter_heatmap_calendar) + test scaffold
+- [ ] 22-02-PLAN.md — DashboardTab widget base (toggle, KPI cards, estados) + integração AdminScreen
+- [ ] 22-03-PLAN.md — 4 gráficos fl_chart (BarChart, Heatmap, PieChart, Donut)
 **UI hint**: yes
 
 ## Progress
@@ -129,4 +133,4 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
 | 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 3/3 | Complete | 2026-05-21 |
-| 22. UI do Dashboard | v5.0 | 0/? | Not started | - |
+| 22. UI do Dashboard | v5.0 | 0/3 | Not started | - |
