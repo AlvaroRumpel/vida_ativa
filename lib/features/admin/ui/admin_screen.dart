@@ -13,6 +13,7 @@ import 'package:vida_ativa/features/admin/ui/booking_management_tab.dart';
 import 'package:vida_ativa/features/admin/ui/pricing_tab.dart';
 import 'package:vida_ativa/features/admin/ui/settings_tab.dart';
 import 'package:vida_ativa/features/admin/ui/slot_management_tab.dart';
+import 'package:vida_ativa/features/admin/ui/dashboard_tab.dart';
 import 'package:vida_ativa/features/admin/ui/users_management_tab.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -26,12 +27,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   late final AdminFcmCubit _fcmCubit;
   late final TabController _tabController;
 
-  static const int _reservasTabIndex = 2;
+  static const int _reservasTabIndex = 3;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _fcmCubit = AdminFcmCubit();
     _fcmCubit.init();
 
@@ -93,6 +94,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 controller: _tabController,
                 isScrollable: true,
                 tabs: const [
+                  Tab(text: 'Dashboard'),
                   Tab(text: 'Slots'),
                   Tab(text: 'Bloqueios'),
                   Tab(text: 'Reservas'),
@@ -130,6 +132,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   child: TabBarView(
                     controller: _tabController,
                     children: [
+                      const DashboardTab(),
                       const SlotManagementTab(),
                       const BlockedDatesTab(),
                       const BookingManagementTab(),
