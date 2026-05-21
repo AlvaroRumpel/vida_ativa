@@ -43,6 +43,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /config/dashboard/periods/{period} {
+      allow read: if isAdmin();
+      allow write: if false; // Apenas Cloud Functions via admin SDK escrevem (D-16)
+    }
+
+    match /config/dashboard {
+      // Doc placeholder — não usado como doc real, mas necessário para hierarchy
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     match /config/{docId} {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
