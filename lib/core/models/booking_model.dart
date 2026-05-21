@@ -17,6 +17,7 @@ class BookingModel extends Equatable {
   final String? paymentMethod; // 'pix' | 'on_arrival' | null
   final DateTime? expiresAt;   // Timestamp Firestore; so para Pix
   final String? paymentId;     // txId Mercado Pago; so para Pix
+  final String? sport; // SPORT-04: nullable, backward compat
 
   const BookingModel({
     required this.id,
@@ -34,6 +35,7 @@ class BookingModel extends Equatable {
     this.paymentMethod,
     this.expiresAt,
     this.paymentId,
+    this.sport,
   });
 
   /// Generates the deterministic document ID for anti-double-booking.
@@ -62,6 +64,7 @@ class BookingModel extends Equatable {
           ? (data['expiresAt'] as Timestamp).toDate()
           : null,
       paymentId: data['paymentId'] as String?,
+      sport: data['sport'] as String?,
     );
   }
 
@@ -81,6 +84,7 @@ class BookingModel extends Equatable {
       if (paymentMethod != null) 'paymentMethod': paymentMethod,
       if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),
       if (paymentId != null) 'paymentId': paymentId,
+      if (sport != null) 'sport': sport,
     };
   }
 
@@ -98,5 +102,5 @@ class BookingModel extends Equatable {
   @override
   List<Object?> get props => [id, slotId, date, userId, status, createdAt,
       cancelledAt, startTime, price, userDisplayName, participants,
-      recurrenceGroupId, paymentMethod, expiresAt, paymentId];
+      recurrenceGroupId, paymentMethod, expiresAt, paymentId, sport];
 }
