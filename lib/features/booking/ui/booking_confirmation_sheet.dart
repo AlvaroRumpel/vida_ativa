@@ -18,14 +18,12 @@ class BookingConfirmationSheet extends StatefulWidget {
   final SlotViewModel viewModel;
   final BookingCubit bookingCubit;
   final bool pixEnabled;
-  final List<String> sports; // SPORT-01 — D-04: vazia = dropdown escondido
 
   const BookingConfirmationSheet({
     super.key,
     required this.viewModel,
     required this.bookingCubit,
     this.pixEnabled = true,
-    this.sports = const <String>[],
   });
 
   @override
@@ -37,17 +35,27 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
   bool _isSubmitting = false;
   String? _errorMessage;
   final TextEditingController _participantsController = TextEditingController();
-  String? _selectedSport;
   bool _isRecurrent = false;
   List<RecurrenceEntry> _availableRecurrenceEntries = [];
-  late bool _requiresConfirmation;
+  bool _requiresConfirmation = true;
 
   @override
   void initState() {
     super.initState();
-    // Derive from cubit — single source of truth, no extra Firestore fetch.
-    _requiresConfirmation =
-        widget.bookingCubit.confirmationMode != 'automatic';
+    _fetchConfirmationMode();
+  }
+
+  Future<void> _fetchConfirmationMode() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('config')
+          .doc('booking')
+          .get();
+      final mode = snap.data()?['confirmationMode'] ?? 'manual';
+      if (mounted) setState(() => _requiresConfirmation = mode != 'automatic');
+    } catch (_) {
+      // keep default true
+    }
   }
 
   Future<void> _handleConfirmRecurring() async {
@@ -68,7 +76,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
-        sport: _selectedSport,
       );
       if (!mounted) return;
       setState(() {
@@ -122,7 +129,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
-        sport: _selectedSport,
       );
     } on Exception catch (e, s) {
       final str = e.toString();
@@ -168,7 +174,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
         participants: _participantsController.text.trim().isEmpty
             ? null
             : _participantsController.text.trim(),
-        sport: _selectedSport,
       );
       if (!mounted) return;
       Navigator.pop(context);
@@ -343,34 +348,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               maxLines: 2,
               textCapitalization: TextCapitalization.words,
             ),
-            if (widget.sports.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String?>(
-                initialValue: _selectedSport,
-                decoration: const InputDecoration(
-                  labelText: 'Esporte (opcional)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-                items: [
-                  const DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text('Não informado'),
-                  ),
-                  ...widget.sports.map(
-                    (s) => DropdownMenuItem<String?>(value: s, child: Text(s)),
-                  ),
-                ],
-                onChanged: (v) => setState(() => _selectedSport = v),
-              ),
-            ],
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
               Text(

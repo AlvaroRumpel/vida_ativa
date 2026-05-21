@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
@@ -58,22 +57,9 @@ class SlotList extends StatelessWidget {
   }
 }
 
-Future<void> _showBookingSheet(BuildContext context, SlotViewModel viewModel) async {
+void _showBookingSheet(BuildContext context, SlotViewModel viewModel) {
   final bookingCubit = context.read<BookingCubit>();
-
-  // Read sports list from Firestore before opening sheet (Opção A do RESEARCH).
-  // Doc may not exist yet on first launch — handle null gracefully.
-  final sportsSnap = await FirebaseFirestore.instance
-      .collection('config')
-      .doc('sports')
-      .get();
-  final sports = (sportsSnap.data()?['sports'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const <String>[];
-  if (!context.mounted) return;
-
-  await showModalBottomSheet(
+  showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
@@ -83,7 +69,6 @@ Future<void> _showBookingSheet(BuildContext context, SlotViewModel viewModel) as
       viewModel: viewModel,
       bookingCubit: bookingCubit,
       pixEnabled: bookingCubit.pixEnabled,
-      sports: sports,
     ),
   );
 }

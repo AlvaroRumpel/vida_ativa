@@ -63,7 +63,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 
 ### v5.0 Dashboard & Esportes (Phases 20–22)
 
-- [x] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva (completed 2026-05-20)
+- [ ] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva
 - [ ] **Phase 21: Backend do Dashboard** - Cloud Functions de agregação write-time (onBookingStateChange + scheduledDailyAggregation); schema /config/dashboard; DashboardCubit; regras Firestore
 - [ ] **Phase 22: UI do Dashboard** - DashboardScreen com toggle semana/mês/ano; gráficos fl_chart (linha, barra, pizza, donut); heatmap hora×dia; métricas de clientes
 
@@ -78,10 +78,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
   2. Admin vê seção "Esportes" nas configurações e pode adicionar, remover e reordenar esportes da lista
   3. Sistema popula automaticamente a lista padrão (Vôlei, Beach Tênis, Futevôlei) se /config/sports não existir
   4. Reservas antigas sem campo de esporte abrem normalmente sem erro ou dado ausente visível inesperado
-**Plans**: 3 plans
-- [x] 20-01-PLAN.md — BookingModel sport field + SportConfigCubit + AdminScreen provider (foundation, Wave 1)
-- [x] 20-02-PLAN.md — Cliente UX: dropdown no BookingConfirmationSheet + propagação em bookSlot/bookRecurring (Wave 2)
-- [x] 20-03-PLAN.md — Admin UX: seção Esportes no SettingsTab + chip em AdminBookingCard/DetailSheet (Wave 2)
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 21: Backend do Dashboard
@@ -93,10 +90,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
   2. Documentos de agregação diária existem para semana, mês e ano correntes com campos de receita, ocupação, contagem de clientes e distribuição por esporte
   3. DashboardCubit carrega dados de /config/dashboard e expõe estados de loading, dados e erro corretamente
   4. Regras Firestore permitem admin ler /config/dashboard mas bloqueiam escrita direta do cliente Flutter (somente Cloud Functions escrevem)
-**Plans**: 3 plans
-- [ ] 21-01-PLAN.md — DashboardData model + DashboardState + DashboardCubit (TDD, Wave 1)
-- [ ] 21-02-PLAN.md — Cloud Functions onBookingStateChange + scheduledDailyAggregation (Wave 1)
-- [ ] 21-03-PLAN.md — AdminScreen BlocProvider + Firestore rules + staging checkpoint (Wave 2)
+**Plans**: TBD
 
 ### Phase 22: UI do Dashboard
 **Goal**: Admin vê painel completo com gráficos e métricas interativas de ocupação, receita e clientes
@@ -133,6 +127,6 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 | 17. Pix QR Generation | v4.0 | 2/2 | Complete | 2026-04-08 |
 | 18. Webhook + Confirmação em Tempo Real | v4.0 | 3/3 | Complete | 2026-04-09 |
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
-| 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete    | 2026-05-20 |
+| 20. Infraestrutura de Esporte | v5.0 | 0/? | Not started | - |
 | 21. Backend do Dashboard | v5.0 | 0/? | Not started | - |
 | 22. UI do Dashboard | v5.0 | 0/? | Not started | - |
