@@ -87,7 +87,7 @@ void main() {
         expect(find.text('Semana'), findsOneWidget);
         expect(find.text('Mês'), findsOneWidget);
         expect(find.text('Ano'), findsOneWidget);
-      }, skip: true); // Wave 0 — DashboardTab nao existe ainda
+      });
     });
 
     group('kpi_cards', () {
@@ -103,7 +103,7 @@ void main() {
         expect(find.text('Ticket Médio'), findsOneWidget);
         expect(find.text('Taxa de Conversão'), findsOneWidget);
         expect(find.text('Taxa de No-Show'), findsOneWidget);
-      }, skip: true);
+      });
 
       testWidgets('mostra -- quando metricas nullable sao null',
           (tester) async {
@@ -118,7 +118,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('--'), findsWidgets);
-      }, skip: true);
+      });
     });
 
     group('revenue_chart', () {
@@ -130,7 +130,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('Receita'), findsOneWidget);
-      }, skip: true);
+      });
     });
 
     group('heatmap', () {
@@ -142,7 +142,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('Ocupação por Hora e Dia'), findsOneWidget);
-      }, skip: true);
+      });
     });
 
     group('status_pie', () {
@@ -154,7 +154,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('Distribuição de Reservas por Status'), findsOneWidget);
-      }, skip: true);
+      });
     });
 
     group('donut_sport', () {
@@ -167,7 +167,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('Nenhum dado de esporte ainda'), findsOneWidget);
-      }, skip: true);
+      });
 
       testWidgets('Donut chart renderiza quando revenueBySport tem dados',
           (tester) async {
@@ -180,7 +180,7 @@ void main() {
         ));
         await tester.pumpWidget(buildSubject(cubit));
         expect(find.text('Receita por Esporte'), findsOneWidget);
-      }, skip: true);
+      });
     });
   });
 }
