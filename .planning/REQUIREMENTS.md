@@ -14,10 +14,10 @@
 
 ### Dashboard — Visualizações
 
-- [ ] **DASH-05**: Admin vê gráfico de linha ou barra com evolução de receita ao longo do período selecionado
-- [ ] **DASH-06**: Admin vê heatmap hora×dia mostrando volume de reservas por combinação de horário e dia da semana
-- [ ] **DASH-07**: Admin vê gráfico pizza com breakdown de reservas por status (confirmadas, canceladas, expiradas, recusadas)
-- [ ] **DASH-08**: Admin vê gráfico donut com distribuição de reservas por esporte (exibido quando campo de esporte tem dados)
+- [x] **DASH-05**: Admin vê gráfico de linha ou barra com evolução de receita ao longo do período selecionado
+- [x] **DASH-06**: Admin vê heatmap hora×dia mostrando volume de reservas por combinação de horário e dia da semana
+- [x] **DASH-07**: Admin vê gráfico pizza com breakdown de reservas por status (confirmadas, canceladas, expiradas, recusadas)
+- [x] **DASH-08**: Admin vê gráfico donut com distribuição de reservas por esporte (exibido quando campo de esporte tem dados)
 
 ### Dashboard — Clientes
 
@@ -64,10 +64,10 @@
 | DASH-02 | Phase 21 | Pending |
 | DASH-03 | Phase 21 | Pending |
 | DASH-04 | Phase 21 | Pending |
-| DASH-05 | Phase 22 | Pending |
-| DASH-06 | Phase 22 | Pending |
-| DASH-07 | Phase 22 | Pending |
-| DASH-08 | Phase 22 | Pending |
+| DASH-05 | Phase 22 | Complete |
+| DASH-06 | Phase 22 | Complete |
+| DASH-07 | Phase 22 | Complete |
+| DASH-08 | Phase 22 | Complete |
 | DASH-09 | Phase 21 | Pending |
 | DASH-10 | Phase 21 | Pending |
 | DASH-11 | Phase 21 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Dashboard & Esportes
 status: executing
-last_updated: "2026-05-21T14:49:41.962Z"
-last_activity: 2026-05-21 -- Phase 22 planning complete
+last_updated: "2026-05-22T03:58:11.307Z"
+last_activity: 2026-05-21
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
-  percent: 67
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Milestone v5.0 — Dashboard & Esportes
+**Current focus:** Phase 22 — ui-do-dashboard
 
 ## Current Position
 
-Phase: 22 — UI do Dashboard (not started)
-Plan: —
+Phase: 22 (ui-do-dashboard) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-05-21 -- Phase 22 planning complete
+Last activity: 2026-05-21
 
 ```
 Progress: [█████████████░░░░░░░] 67% (2/3 phases)
@@ -54,6 +54,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [v5.0 Architecture]: Contadores em /config/dashboard/{period}; segue padrão existente de /config/pricing
 - [v5.0 Architecture]: fl_chart para gráficos de linha/barra/pizza/donut; flutter_heatmap_calendar para heatmap hora×dia
 - [v5.0 Architecture]: SportConfigCubit gerencia /config/sports; DashboardCubit gerencia /config/dashboard
+- [Phase 22-ui-do-dashboard]: BlocConsumer used for DashboardError SnackBar without breaking layout; _reservasTabIndex updated 2->3 for correct FCM navigation after Dashboard insertion
 
 ### Roadmap Evolution
 
