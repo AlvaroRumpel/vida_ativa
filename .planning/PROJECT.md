@@ -70,6 +70,13 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ PIX-07: Reservas `pending_payment` expiram após 45min e slot liberado via `expireUnpaidBookings` — v4.0
 - ✓ D-01 a D-13: Admin configura credenciais Mercado Pago sem redeploy; kill switch Pix; regras Firestore isolam credenciais — v4.0
 
+### Validated (v5.0)
+
+- ✓ DASH-05: Admin vê BarChart de receita por período (semana/mês/ano) — Phase 22
+- ✓ DASH-06: Admin vê HeatMapCalendar hora×dia indicando horários mais reservados — Phase 22
+- ✓ DASH-07: Admin vê PieChart de reservas por status (pendente/confirmado/cancelado/expirado) — Phase 22
+- ✓ DASH-08: Admin vê PieChart donut de receita por esporte — Phase 22
+
 ## Current Milestone: v5.0 Dashboard & Esportes
 
 **Goal:** Admin vê insights completos com gráficos (ocupação, receita, clientes, esportes) e clientes escolhem esporte opcional na reserva.
