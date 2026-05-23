@@ -65,7 +65,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 
 - [x] **Phase 20: Infraestrutura de Esporte** - BookingModel estendido com campo sport opcional; coleção /config/sports; SportConfigCubit; dropdown de esporte no formulário de reserva (completed 2026-05-20)
 - [x] **Phase 21: Backend do Dashboard** - Cloud Functions de agregação write-time (onBookingStateChange + scheduledDailyAggregation); schema /config/dashboard; DashboardCubit; regras Firestore (completed 2026-05-21)
-- [ ] **Phase 22: UI do Dashboard** - DashboardScreen com toggle semana/mês/ano; gráficos fl_chart (linha, barra, pizza, donut); heatmap hora×dia; métricas de clientes
+- [x] **Phase 22: UI do Dashboard** - DashboardScreen com toggle semana/mês/ano; gráficos fl_chart (linha, barra, pizza, donut); heatmap hora×dia; métricas de clientes (completed 2026-05-22)
 
 ## Phase Details
 
@@ -105,7 +105,7 @@ Full details: `.planning/milestones/v4.0-ROADMAP.md`
 Plans:
 - [x] 22-01-PLAN.md — Setup de dependências (fl_chart, flutter_heatmap_calendar) + test scaffold
 - [x] 22-02-PLAN.md — DashboardTab widget base (toggle, KPI cards, estados) + integração AdminScreen
-- [ ] 22-03-PLAN.md — 4 gráficos fl_chart (BarChart, Heatmap, PieChart, Donut)
+- [x] 22-03-PLAN.md — 4 gráficos fl_chart (BarChart, Heatmap, PieChart, Donut)
 **UI hint**: yes
 
 ## Progress
@@ -133,4 +133,4 @@ Plans:
 | 19. Admin Settings + Credenciais Pix | v4.0 | 2/2 | Complete | 2026-05-08 |
 | 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 3/3 | Complete | 2026-05-21 |
-| 22. UI do Dashboard | v5.0 | 2/3 | In Progress|  |
+| 22. UI do Dashboard | v5.0 | 3/3 | Complete    | 2026-05-23 |
