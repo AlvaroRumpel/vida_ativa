@@ -324,11 +324,15 @@ class _DashboardTabState extends State<DashboardTab> {
   }
 
   Widget _buildStatusPie(DashboardData data) {
-    final expired = (data.totalBookings -
-            data.confirmedBookings -
-            data.cancelledBookings -
-            data.pendingBookings)
-        .clamp(0, data.totalBookings);
+    final rawExpired = data.totalBookings -
+        data.confirmedBookings -
+        data.cancelledBookings -
+        data.pendingBookings;
+
+    assert(rawExpired >= 0,
+        'Dashboard data inconsistency: booking counts exceed totalBookings');
+
+    final expired = rawExpired.clamp(0, data.totalBookings);
 
     final sections = <_PieSection>[
       _PieSection(
