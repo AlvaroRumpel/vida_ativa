@@ -117,7 +117,7 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('--'), findsWidgets);
+        expect(find.text('--'), findsNWidgets(4));
       });
     });
 
