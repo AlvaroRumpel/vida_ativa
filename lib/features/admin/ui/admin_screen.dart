@@ -1,7 +1,7 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vida_ativa/core/services/fcm_navigation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
@@ -53,19 +53,28 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       );
     });
 
-    // Handle notification tap when app is in background
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      if (!mounted) return;
-      _goToReservas();
-    });
+    // Navigate to Reservas if notification was tapped before this screen mounted
+    if (navigateToReservasNotifier.value) {
+      navigateToReservasNotifier.value = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _goToReservas());
+    }
+    navigateToReservasNotifier.addListener(_onFcmNavigation);
   }
 
   void _goToReservas() {
     _tabController.animateTo(_reservasTabIndex);
   }
 
+  void _onFcmNavigation() {
+    if (navigateToReservasNotifier.value && mounted) {
+      navigateToReservasNotifier.value = false;
+      _goToReservas();
+    }
+  }
+
   @override
   void dispose() {
+    navigateToReservasNotifier.removeListener(_onFcmNavigation);
     _tabController.dispose();
     _fcmCubit.close();
     super.dispose();

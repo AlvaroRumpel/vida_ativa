@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+
+import 'core/services/fcm_navigation.dart';
 
 import 'firebase_options.dart';
 import 'firebase_options_staging.dart' as staging;
@@ -71,6 +74,9 @@ class _VidaAtivaAppState extends State<VidaAtivaApp> {
     super.initState();
     _authCubit = AuthCubit();
     _router = createRouter(_authCubit);
+    FirebaseMessaging.onMessageOpenedApp.listen((_) {
+      navigateToReservasNotifier.value = true;
+    });
   }
 
   @override
