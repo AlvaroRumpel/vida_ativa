@@ -1,9 +1,6 @@
-import 'dart:math' show Random;
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/dashboard_data.dart';
 import 'package:vida_ativa/core/theme/app_spacing.dart';
@@ -308,8 +305,8 @@ class _DashboardTabState extends State<DashboardTab> {
   }
 
   Widget _buildHeatmap(DashboardData data) {
-    final datasets = _generateHeatmapDatasets(data);
-
+    // Per-day occupancy data is not yet available from the backend.
+    // Show a placeholder until DashboardData exposes bookingsPerDay.
     return Card(
       elevation: 1,
       child: Padding(
@@ -320,59 +317,19 @@ class _DashboardTabState extends State<DashboardTab> {
             const Text('Ocupação por Hora e Dia',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.sm),
-            if (data.totalSlotsBooked == 0)
-              Center(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                  child: Text('Sem dados de ocupação',
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 14)),
-                ),
-              )
-            else
-              HeatMapCalendar(
-                datasets: datasets,
-                colorMode: ColorMode.color,
-                colorsets: const {
-                  1: Color(0xFFD8EFCF),
-                  3: Color(0xFF9BCF7A),
-                  6: Color(0xFF5BA342),
-                  10: AppTheme.primaryGreen,
-                },
-                defaultColor: const Color(0xFFF5F5F5),
-                textColor: Colors.black87,
-                showColorTip: true,
-                flexible: true,
+            Center(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: Text('Dados em breve',
+                    style:
+                        TextStyle(color: Colors.grey[600], fontSize: 14)),
               ),
+            ),
           ],
         ),
       ),
     );
-  }
-
-  Map<DateTime, int> _generateHeatmapDatasets(DashboardData data) {
-    if (data.totalSlotsBooked == 0) return {};
-
-    final now = DateTime.now();
-    final days = switch (data.period) {
-      'week' => 7,
-      'month' => 30,
-      'year' => 90, // últimos 90 dias para legibilidade
-      _ => 7,
-    };
-
-    final datasets = <DateTime, int>{};
-    final rng = Random(data.totalSlotsBooked); // seed determinístico
-    final avgPerDay = (data.totalSlotsBooked / days).clamp(1, 20).round();
-
-    for (int i = 0; i < days; i++) {
-      final date = now.subtract(Duration(days: i));
-      final key = DateTime(date.year, date.month, date.day);
-      datasets[key] = (avgPerDay + rng.nextInt(avgPerDay + 1)).clamp(0, 20);
-    }
-
-    return datasets;
   }
 
   Widget _buildStatusPie(DashboardData data) {
