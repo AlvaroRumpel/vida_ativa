@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +28,7 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
   late final AdminFcmCubit _fcmCubit;
   late final TabController _tabController;
+  StreamSubscription<dynamic>? _foregroundSub;
 
   static const int _reservasTabIndex = 3;
 
@@ -37,7 +40,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     _fcmCubit.init();
 
     // Listen for foreground messages and show a SnackBar
-    _fcmCubit.onForegroundMessage.listen((message) {
+    _foregroundSub = _fcmCubit.onForegroundMessage.listen((message) {
       if (!mounted) return;
       final title = message.notification?.title ?? 'Nova Reserva';
       final body = message.notification?.body ?? '';
@@ -74,6 +77,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
   @override
   void dispose() {
+    _foregroundSub?.cancel();
     navigateToReservasNotifier.removeListener(_onFcmNavigation);
     _tabController.dispose();
     _fcmCubit.close();
