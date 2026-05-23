@@ -26,16 +26,7 @@ class _DashboardTabState extends State<DashboardTab> {
       listener: (context, state) {
         if (state is DashboardError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              action: SnackBarAction(
-                label: 'Tentar Novamente',
-                onPressed: () {
-                  // DashboardCubit re-fetches automatically via stream.
-                  // No explicit retry method needed — stream will reconnect.
-                },
-              ),
-            ),
+            SnackBar(content: Text(state.message)),
           );
         }
       },
