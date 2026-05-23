@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
@@ -57,8 +58,17 @@ class SlotList extends StatelessWidget {
   }
 }
 
-void _showBookingSheet(BuildContext context, SlotViewModel viewModel) {
+Future<void> _showBookingSheet(BuildContext context, SlotViewModel viewModel) async {
   final bookingCubit = context.read<BookingCubit>();
+  final sportsSnap = await FirebaseFirestore.instance
+      .collection('config')
+      .doc('sports')
+      .get();
+  final sports = (sportsSnap.data()?['sports'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const <String>[];
+  if (!context.mounted) return;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -69,6 +79,7 @@ void _showBookingSheet(BuildContext context, SlotViewModel viewModel) {
       viewModel: viewModel,
       bookingCubit: bookingCubit,
       pixEnabled: bookingCubit.pixEnabled,
+      sports: sports,
     ),
   );
 }
