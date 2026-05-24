@@ -1,43 +1,39 @@
 ---
 gsd_state_version: 1.0
-milestone: v5.0
-milestone_name: Dashboard & Esportes
-status: complete
-last_updated: "2026-05-24T01:12:32.115Z"
-last_activity: 2026-05-24
+milestone: v6.0
+milestone_name: Arena Esportivo — Redesign Visual
+status: in_progress
+last_updated: "2026-05-23T00:00:00.000Z"
+last_activity: 2026-05-23
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19)
+See: .planning/PROJECT.md (updated 2026-05-23)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 22 — ui-do-dashboard
+**Current focus:** Defining requirements — Milestone v6.0
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-24
-
-```
-Progress: [█████████████░░░░░░░] 67% (2/3 phases)
-```
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-23 — Milestone v6.0 started
 
 ## Performance Metrics
 
-**Velocity (v4.0 reference):**
+**Velocity (v5.0 reference):**
 
-- Total v4.0 plans completed: 7
+- Total v5.0 plans completed: 9
 - Average duration: ~5 min/plan
 
 ## Accumulated Context
@@ -46,22 +42,16 @@ Progress: [█████████████░░░░░░░] 67% (2/
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
-- [v4.0 → v5.0]: Feature toggles (modularização) deferred to v5+ — ainda não escopo neste milestone
-- [v5.0 Scope]: Dashboard usa dados já existentes no Firestore (bookings, payments, users) — sem novo modelo de dados principal
-- [v5.0 Scope]: Campo de esporte é opcional na reserva — não quebra reservas existentes (campo ausente = não informado)
-- [v5.0 Scope]: Lista de esportes configurável pelo admin; padrão: Vôlei, Beach Tênis, Futevôlei
-- [v5.0 Architecture]: Agregação write-time via Cloud Functions (onBookingStateChange + scheduledDailyAggregation) — Firestore real-time aggregation queries não suportam listeners
-- [v5.0 Architecture]: Contadores em /config/dashboard/{period}; segue padrão existente de /config/pricing
-- [v5.0 Architecture]: fl_chart para gráficos de linha/barra/pizza/donut; flutter_heatmap_calendar para heatmap hora×dia
-- [v5.0 Architecture]: SportConfigCubit gerencia /config/sports; DashboardCubit gerencia /config/dashboard
-- [Phase 22-ui-do-dashboard]: BlocConsumer used for DashboardError SnackBar without breaking layout; _reservasTabIndex updated 2->3 for correct FCM navigation after Dashboard insertion
+- [v5.0 → v6.0]: Redesign visual aprovado via claude.ai/design — Arena Esportivo design system
+- [v6.0 Scope]: Design system baseado em protótipos JSX exportados (arena-sport.jsx + screens-sport/)
+- [v6.0 Design]: Paleta: sand #F4EFE2, ink #0E0E0C, orange #FF4D17, court #1B5E2A, sun #FFB800
+- [v6.0 Design]: Tipografia: Anton (display/horários), Manrope (UI), JetBrains Mono (eyebrows/preços)
+- [v6.0 Design]: Padrão visual: hairlines em vez de cards, underline tabs, pills só para estado crítico
+- [v6.0 Branch]: Desenvolvimento na branch v6
 
 ### Roadmap Evolution
 
-- v5.0 roadmap criado 2026-05-19: 3 phases (20–22), 16 requirements mapeados
-- Phase 20: SPORT-01..04 (campo de esporte — infraestrutura completa)
-- Phase 21: DASH-01..04, DASH-09..12 (backend de agregação + métricas de clientes)
-- Phase 22: DASH-05..08 (UI de visualizações — gráficos e heatmap)
+- v6.0 roadmap a ser criado — continuando numeração a partir da fase 22 (v5.0 encerrou na fase 22)
 
 ### Pending Todos
 
@@ -69,4 +59,4 @@ None.
 
 ### Blockers/Concerns
 
-- UI-01 ainda BLOQUEADO — cliente não entregou logo + paleta de cores
+None.

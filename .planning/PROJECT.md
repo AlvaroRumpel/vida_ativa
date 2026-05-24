@@ -89,9 +89,24 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ DASH-11: Cloud Functions onBookingStateChange e scheduledDailyAggregation deployed e funcionais — Phase 21
 - ✓ DASH-12: Admin vê chip de esporte em AdminBookingCard e info-row em AdminBookingDetailSheet — Phase 20
 
-### Active
+### Current Milestone: v6.0 Arena Esportivo — Redesign Visual
 
-- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
+**Goal:** Implementar a nova identidade visual esportiva em todas as telas do app, eliminando o "ar de IA" atual e aplicando o design system Arena Esportivo (sand/ink/laranja, Anton + Manrope + JetBrains Mono).
+
+**Target features:**
+- Sistema de design: AppTheme com paleta sport + 3 fontes (Anton/Manrope/JetBrains Mono)
+- Bottom navigation: estilo SportNav com tabs e labels mono
+- Agenda: day selector underline, slot rows hairline com Anton para horários
+- Confirmação de reserva: hora gigante Anton, linha lateral laranja, layout limpo
+- Minhas reservas: hero "Próximo" sem bloco preto, seções hairline
+- Admin tabs: underline laranja 2px substituindo fundo colorido
+- Admin slots/reservas/usuários: rows hairline, Scoreboard para horários
+- Admin dashboard: KPI grid hairline, barras simples, heatmap laranja
+- Admin preços/ajustes: layout hairline consistente
+
+## Active
+
+- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(resolvido parcialmente pelo v6.0 redesign — paleta Arena Esportivo aplicada)*
 
 ### Out of Scope
 
@@ -161,4 +176,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-23 after v5.0 milestone complete*
+*Last updated: 2026-05-23 — Milestone v6.0 Arena Esportivo started*
