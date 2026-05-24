@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'core/pwa/ios_install_detector.dart';
+import 'core/theme/app_theme.dart';
 import 'core/utils/snack_helper.dart';
 
 class AppShell extends StatefulWidget {
@@ -37,29 +38,35 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: widget.navigationShell.currentIndex,
-        onDestinationSelected: (index) => widget.navigationShell.goBranch(
-          index,
-          initialLocation: index == widget.navigationShell.currentIndex,
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.sand,
+          border: Border(top: BorderSide(color: AppTheme.line)),
         ),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.sports_volleyball_outlined),
-            selectedIcon: Icon(Icons.sports_volleyball),
-            label: 'Agenda',
+        child: NavigationBar(
+          selectedIndex: widget.navigationShell.currentIndex,
+          onDestinationSelected: (index) => widget.navigationShell.goBranch(
+            index,
+            initialLocation: index == widget.navigationShell.currentIndex,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.bookmark_border),
-            selectedIcon: Icon(Icons.bookmark),
-            label: 'Reservas',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.calendar_today_outlined),
+              selectedIcon: Icon(Icons.calendar_today),
+              label: 'AGENDA',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bookmark_border),
+              selectedIcon: Icon(Icons.bookmark),
+              label: 'RESERVAS',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person),
+              label: 'PERFIL',
+            ),
+          ],
+        ),
       ),
     );
   }
