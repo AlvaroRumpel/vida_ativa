@@ -1,5 +1,17 @@
 # Milestones
 
+## v5.0 Dashboard e Esportes (Shipped: 2026-05-24)
+
+**Phases completed:** 3 phases, 9 plans, 10 tasks
+
+**Key accomplishments:**
+
+- fl_chart ^1.2.0 and flutter_heatmap_calendar ^1.0.5 installed, plus DashboardTab test scaffold with 8 widget test cases (7 skip:true, 1 active loading state test)
+- DashboardTab StatefulWidget with period toggle, 5 KPI cards and chart stubs integrated into AdminScreen as tab index 0 (7 tabs total)
+- BarChart revenue (3 bars), HeatMapCalendar with deterministic datasets, PieChart status breakdown, and PieChart donut by sport — all 4 fl_chart/heatmap implementations replacing stubs, 9 widget tests passing
+
+---
+
 ## v4.0 Pagamento Pix (Shipped: 2026-05-08)
 
 **Phases completed:** 2 phases, 3 plans, 4 tasks

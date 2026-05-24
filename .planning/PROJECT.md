@@ -4,7 +4,7 @@
 
 PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp: clientes veem horários disponíveis, reservam pelo celular e pagam via Pix diretamente no app. Inclui confirmação automática de pagamento via webhook, expiração automática de reservas não pagas, visibilidade social entre jogadores, notificações push para admin, e painel admin completo com configuração de credenciais Mercado Pago.
 
-**Status:** v4.0 live em `vida-ativa-94ba0.web.app`
+**Status:** v5.0 live em `vida-ativa-94ba0.web.app`
 
 ## Core Value
 
@@ -72,18 +72,22 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ### Validated (v5.0)
 
+- ✓ SPORT-01: Cliente vê dropdown "Esporte (opcional)" no formulário de reserva e pode selecionar esporte da lista configurável — Phase 20
+- ✓ SPORT-02: Admin vê seção "Esportes" nas configurações e pode adicionar, remover e reordenar esportes — Phase 20
+- ✓ SPORT-03: Lista padrão (Vôlei, Beach Tênis, Futevôlei) populada automaticamente se /config/sports não existir — Phase 20
+- ✓ SPORT-04: Reservas antigas sem campo de esporte funcionam sem erro ou dado ausente — Phase 20
+- ✓ DASH-01: Ao confirmar/cancelar reserva, contadores em /config/dashboard atualizam via Cloud Function — Phase 21
+- ✓ DASH-02: Documentos de agregação existem para semana/mês/ano com receita, ocupação, clientes e distribuição por esporte — Phase 21
+- ✓ DASH-03: DashboardCubit carrega dados e expõe estados de loading, dados e erro — Phase 21
+- ✓ DASH-04: Regras Firestore permitem admin ler /config/dashboard; cliente não pode escrever — Phase 21
 - ✓ DASH-05: Admin vê BarChart de receita por período (semana/mês/ano) — Phase 22
 - ✓ DASH-06: Admin vê HeatMapCalendar hora×dia indicando horários mais reservados — Phase 22
 - ✓ DASH-07: Admin vê PieChart de reservas por status (pendente/confirmado/cancelado/expirado) — Phase 22
 - ✓ DASH-08: Admin vê PieChart donut de receita por esporte — Phase 22
-
-## Current Milestone: v5.0 Dashboard & Esportes
-
-**Goal:** Admin vê insights completos com gráficos (ocupação, receita, clientes, esportes) e clientes escolhem esporte opcional na reserva.
-
-**Target features:**
-- Dashboard admin com toggle semana/mês/ano: receita total, ticket médio, taxa de conversão, split Pix vs presencial, ocupação (%), heatmap hora×dia, dias mais movimentados, reservas por status, taxa de abandono, clientes únicos/novos, top 5 frequentes, taxa de retorno, no-show on_arrival, distribuição por esporte, gráficos de linha/barra
-- Campo opcional de esporte na reserva (Vôlei, Beach Tênis, Futevôlei — lista configurável pelo admin)
+- ✓ DASH-09: Admin alterna entre períodos semana/mês/ano e KPI cards atualizam — Phase 22
+- ✓ DASH-10: Dashboard exibe métricas de ocupação (%), receita total, ticket médio, taxa de conversão — Phase 21/22
+- ✓ DASH-11: Cloud Functions onBookingStateChange e scheduledDailyAggregation deployed e funcionais — Phase 21
+- ✓ DASH-12: Admin vê chip de esporte em AdminBookingCard e info-row em AdminBookingDetailSheet — Phase 20
 
 ### Active
 
@@ -104,14 +108,15 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ## Context
 
-- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, Cloud Functions (Node.js 20), Mercado Pago SDK, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view, bloc_test, mocktail
-- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/bookings/{id}/payment/{txId}`, `/blockedDates`, `/config/booking`, `/config/mercadopago`, `/config/pricing`
+- **Stack:** Flutter Web, Firebase Auth (Google + email/password), Cloud Firestore, Firebase Hosting, Cloud Functions (Node.js 20), Mercado Pago SDK, flutter_bloc, go_router, sentry_flutter, url_launcher, calendar_view, fl_chart, flutter_heatmap_calendar, bloc_test, mocktail
+- **Modelo de dados:** `/users`, `/slots`, `/bookings`, `/bookings/{id}/payment/{txId}`, `/blockedDates`, `/config/booking`, `/config/mercadopago`, `/config/pricing`, `/config/sports`, `/config/dashboard`, `/config/dashboard/periods/{week|month|year}`
 - **BookingModel.status:** `pending` | `confirmed` | `cancelled` | `rejected` | `pending_payment` | `expired` | `refunded`
 - **BookingModel.generateId(slotId, date)** → ID determinístico `{slotId}_{date}` — anti-double-booking via Transaction
+- **BookingModel.sport:** campo opcional String — ausente em reservas antigas (backward compat)
 - **Perfis:** `client` (reserva) e `admin` (gerencia) — `role: String` no Firestore; go_router guard + Firestore rules
-- **Cloud Functions:** `notifyAdminNewBooking`, `createPixPayment`, `handlePixWebhook`, `expireUnpaidBookings`, `cancelPixPayment`, `adminConfirmPixPayment`, `updateSlotPricesFromTiers`
+- **Cloud Functions:** `notifyAdminNewBooking`, `createPixPayment`, `handlePixWebhook`, `expireUnpaidBookings`, `cancelPixPayment`, `adminConfirmPixPayment`, `updateSlotPricesFromTiers`, `onBookingStateChange`, `scheduledDailyAggregation`
 - **Credenciais MP:** admin salva via SettingsCubit → Firestore `config/mercadopago`; CFs leem Firestore-first, Secret Manager fallback; cliente nunca lê (allow read: if false)
-- **Codebase:** ~8,250 linhas Dart + ~700 linhas JS Cloud Functions (v4.0)
+- **Codebase:** ~10,786 linhas Dart + ~1,189 linhas JS Cloud Functions (v5.0)
 - **Monitoramento:** Sentry com kReleaseMode guard; DSN via --dart-define
 - **Testes:** flutter_test + bloc_test + mocktail; 36 testes unitários cobrindo BookingModel, PriceTierModel, SettingsCubit, AppRouter, AuthCubit
 
@@ -134,6 +139,9 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 | config/mercadopago allow read: if false | Token nunca exposto ao Flutter SDK | ✓ Regra Firestore específica tem precedência sobre wildcard |
 | SettingsLoaded contém apenas bool flags (não valores dos tokens) | Segurança — token nunca no estado Flutter | ✓ isAccessTokenConfigured: bool |
 | expireUnpaidBookings a cada 15min (não 45min) | Margem de segurança maior que expiresAt de 30min | ✓ Bookings expiram no máximo ~15min após vencimento |
+| revenueBySport com lag D+1 | scheduledDailyAggregation (03:00 BRT) é o único escritor; onBookingStateChange só escreve deltas de contagem | ✓ Design intencional — aceito e documentado no UAT |
+| MultiBlocProvider para SettingsTab | SportConfigCubit adicionado ao mesmo escopo de SettingsCubit em admin_screen.dart | ✓ Sem prop drilling; cubits co-localizados onde são consumidos |
+| ValueNotifier para navegação FCM | navigateToReservasNotifier escutado em initState/_onFcmNavigation; _reservasTabIndex corrigido 2→3 após inserção do Dashboard | ✓ FCM "Ver" navega corretamente para aba Reservas |
 
 ## Evolution
 
@@ -153,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 after v5.0 milestone start*
+*Last updated: 2026-05-23 after v5.0 milestone complete*
