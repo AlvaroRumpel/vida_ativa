@@ -98,9 +98,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 TextButton.icon(
                   onPressed: () => context.go('/home'),
                   icon: const Icon(Icons.person_outline, size: 18),
-                  label: const Text('cliente →'),
+                  label: const Text('Área do Cliente'),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.orange,
+                    foregroundColor: AppTheme.primaryGreen,
                   ),
                 ),
               ],
@@ -187,7 +187,7 @@ class _NotificationBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppTheme.orange.withValues(alpha: 0.08),
+      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [

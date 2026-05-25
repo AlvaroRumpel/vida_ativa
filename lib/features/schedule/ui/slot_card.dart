@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 
@@ -10,128 +11,104 @@ class SlotCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mine = viewModel.status == SlotStatus.myBooking;
-    final booked = viewModel.status == SlotStatus.booked;
-    final blocked = viewModel.status == SlotStatus.blocked;
-    final unavailable = booked || blocked;
-
-    return GestureDetector(
-      onTap: unavailable ? null : onTap,
-      child: Opacity(
-        opacity: unavailable ? 0.45 : 1.0,
-        child: Container(
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: AppTheme.lineHair)),
-          ),
-          child: Stack(
-            children: [
-              // Orange left stripe for "mine"
-              if (mine)
-                Positioned(
-                  left: 0,
-                  top: 12,
-                  bottom: 12,
-                  child: Container(width: 3, color: AppTheme.orange),
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 4,
+              color: _statusColor(viewModel.status),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Time in Anton
-                    SizedBox(
-                      width: 88,
-                      child: Text(
-                        viewModel.slot.startTime,
-                        style: AppTheme.display(
-                          size: 42,
-                          color: mine
-                              ? AppTheme.orange
-                              : booked
-                                  ? AppTheme.concrete
-                                  : AppTheme.ink,
-                        ),
+                    Text(
+                      viewModel.slot.startTime,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 14),
-                    // Middle content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (mine) ...[
-                            Text(
-                              'SUA RESERVA',
-                              style: AppTheme.mono(
-                                size: 9.5,
-                                color: AppTheme.orange,
-                                letterSpacing: 1.8,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Confirmada · 60 min',
-                              style: AppTheme.ui(size: 13, color: AppTheme.concrete),
-                            ),
-                          ] else if (booked) ...[
-                            Text(
-                              viewModel.bookerName ?? 'Ocupado',
-                              style: AppTheme.ui(size: 13, color: AppTheme.concrete),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ] else if (blocked) ...[
-                            Text(
-                              'BLOQUEADO',
-                              style: AppTheme.mono(
-                                size: 9.5,
-                                color: AppTheme.concrete,
-                                letterSpacing: 1.6,
-                              ),
-                            ),
-                          ] else ...[
-                            _SportPrice(value: viewModel.slot.price),
-                          ],
-                        ],
+                    const Spacer(),
+                    Text(
+                      _formatPrice(viewModel.slot.price),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // Chevron for tappable rows
-                    if (!unavailable)
-                      const Icon(Icons.chevron_right, size: 18, color: AppTheme.concrete),
+                    const SizedBox(width: 12),
+                    _StatusLabel(status: viewModel.status, bookerName: viewModel.bookerName),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    ),
     );
   }
+
+  Color _statusColor(SlotStatus status) => switch (status) {
+        SlotStatus.available => AppTheme.primaryGreen,
+        SlotStatus.booked => Colors.grey,
+        SlotStatus.myBooking => Colors.grey,
+        SlotStatus.blocked => const Color(0xFFE53935),
+      };
+
+  String _formatPrice(double price) =>
+      NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(price);
 }
 
-class _SportPrice extends StatelessWidget {
-  final double value;
-  const _SportPrice({required this.value});
+class _StatusLabel extends StatelessWidget {
+  final SlotStatus status;
+  final String? bookerName;
+
+  const _StatusLabel({required this.status, this.bookerName});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text(
-            'R\$',
-            style: AppTheme.mono(size: 11, color: AppTheme.concrete, letterSpacing: 0),
+    return switch (status) {
+      SlotStatus.available => const Text(
+          'Dispon\u00edvel',
+          style: TextStyle(color: AppTheme.primaryGreen),
+        ),
+      SlotStatus.booked => Text(
+          bookerName ?? 'Ocupado',
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      SlotStatus.myBooking => Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: const Text(
+            'Minha reserva',
+            style: TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-        const SizedBox(width: 2),
-        Text(
-          value.toStringAsFixed(0),
-          style: AppTheme.display(size: 22, color: AppTheme.concrete),
+      SlotStatus.blocked => const Text(
+          'Bloqueado',
+          style: TextStyle(color: Color(0xFFE53935)),
         ),
-      ],
-    );
+    };
   }
 }

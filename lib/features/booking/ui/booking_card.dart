@@ -21,125 +21,174 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parsed = DateTime.tryParse(booking.date);
-    final dayAbbrev = parsed != null
-        ? DateFormat('EEE', 'pt_BR').format(parsed).toUpperCase().substring(0, 3)
-        : '';
-    final monthAbbrev = parsed != null
-        ? DateFormat('MMM', 'pt_BR').format(parsed).toUpperCase()
-        : '';
-
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppTheme.lineHair)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Date column
-          SizedBox(
-            width: 56,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(dayAbbrev,
-                    style: AppTheme.mono(size: 9, color: AppTheme.concrete, letterSpacing: 1.44)),
-                if (parsed != null) ...[
-                  Text(
-                    parsed.day.toString().padLeft(2, '0'),
-                    style: AppTheme.display(size: 30, color: AppTheme.ink),
-                  ),
-                  Text(monthAbbrev,
-                      style: AppTheme.mono(size: 8.5, color: AppTheme.concrete, letterSpacing: 1.44)),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Main content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (booking.startTime != null)
-                  Text(
-                    booking.startTime!,
-                    style: AppTheme.display(size: 26, color: AppTheme.ink),
-                  ),
-                const SizedBox(height: 6),
-                Row(
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(width: 4, color: _statusColor(booking.status)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _StatusPill(status: booking.status, isOnArrival: booking.isOnArrival),
+                    Text(
+                      _formatDate(booking.date),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (booking.startTime != null)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            size: 16,
+                            color: Color(0xFF9E9A95),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(booking.startTime!),
+                        ],
+                      ),
+                    if (booking.price != null)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.attach_money,
+                            size: 16,
+                            color: Color(0xFF9E9A95),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            NumberFormat.currency(
+                              locale: 'pt_BR',
+                              symbol: 'R\$',
+                            ).format(booking.price!),
+                          ),
+                        ],
+                      ),
+                    if (booking.participants != null &&
+                        booking.participants!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.group,
+                              size: 16,
+                              color: Color(0xFF9E9A95),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                booking.participants!,
+                                style: const TextStyle(
+                                  color: Color(0xFF9E9A95),
+                                  fontSize: 13,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _statusBadge(booking.status, booking: booking),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!booking.isCancelled &&
+                                !booking.isRefunded &&
+                                booking.status != 'rejected')
+                              IconButton(
+                                icon: const Icon(Icons.share, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Compartilhar via WhatsApp',
+                                onPressed: _shareWhatsApp,
+                              ),
+                            if (!booking.isCancelled &&
+                                !booking.isRefunded &&
+                                bookingCubit != null) ...[
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () =>
+                                    _showEditParticipantsDialog(context),
+                              ),
+                            ],
+                            if (isFuture && !booking.isCancelled)
+                              TextButton(
+                                onPressed: onCancel,
+                                child: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(color: Color(0xFFC62828)),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                     if (booking.recurrenceGroupId != null) ...[
-                      const SizedBox(width: 8),
-                      _QuietPill(label: 'Recorrente'),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Text(
+                          'Recorrente',
+                          style: TextStyle(
+                            color: AppTheme.primaryGreen,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ],
                 ),
-                if (booking.participants != null && booking.participants!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    booking.participants!,
-                    style: AppTheme.ui(size: 12, color: AppTheme.concrete),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          // Right: price + actions
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (booking.price != null)
-                _SportPrice(value: booking.price!),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!booking.isCancelled && !booking.isRefunded && booking.status != 'rejected')
-                    _ActionIcon(icon: Icons.share_outlined, onTap: _shareWhatsApp),
-                  if (!booking.isCancelled && !booking.isRefunded && bookingCubit != null) ...[
-                    const SizedBox(width: 4),
-                    _ActionIcon(
-                      icon: Icons.edit_outlined,
-                      onTap: () => _showEditParticipantsDialog(context),
-                    ),
-                  ],
-                  if (isFuture && !booking.isCancelled) ...[
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: onCancel,
-                      child: Text(
-                        'Cancelar',
-                        style: AppTheme.mono(size: 9, color: AppTheme.orangeDk, letterSpacing: 1.4),
-                      ),
-                    ),
-                  ],
-                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _shareWhatsApp() async {
     final nome = booking.userDisplayName ?? '';
-    final data = DateFormat("EEEE, d 'de' MMMM", 'pt_BR').format(DateTime.parse(booking.date));
+    final data = _formatDate(booking.date);
     final horario = booking.startTime ?? '';
-    final buffer = StringBuffer()
-      ..writeln('Reserva confirmada para $nome — Arena Vida Ativa')
-      ..writeln()
-      ..writeln('$data, às $horario');
+
+    final buffer = StringBuffer();
+    buffer.writeln('Reserva confirmada para $nome — Arena Vida Ativa');
+    buffer.writeln();
+    buffer.writeln('$data, as $horario');
     if (booking.participants != null && booking.participants!.isNotEmpty) {
       buffer.writeln('Participantes: ${booking.participants}');
     }
-    buffer..writeln()..write('Nos vemos na quadra!');
+    buffer.writeln();
+    buffer.write('Nos vemos na quadra!');
+
     final url = Uri(
       scheme: 'https',
       host: 'wa.me',
@@ -158,7 +207,7 @@ class BookingCard extends StatelessWidget {
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(
-            hintText: 'Ex: João, Maria, Pedro',
+            hintText: 'Ex: Joao, Maria, Pedro',
             border: OutlineInputBorder(),
           ),
           maxLength: 200,
@@ -166,7 +215,10 @@ class BookingCard extends StatelessWidget {
           textCapitalization: TextCapitalization.words,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
             child: const Text('Salvar'),
@@ -175,95 +227,75 @@ class BookingCard extends StatelessWidget {
       ),
     );
     if (result != null) {
-      await bookingCubit!.updateParticipants(booking.id, result.isEmpty ? null : result);
+      await bookingCubit!.updateParticipants(
+        booking.id,
+        result.isEmpty ? null : result,
+      );
     }
   }
-}
 
-class _StatusPill extends StatelessWidget {
-  final String status;
-  final bool isOnArrival;
-  const _StatusPill({required this.status, required this.isOnArrival});
-
-  @override
-  Widget build(BuildContext context) {
-    final (label, color) = isOnArrival
-        ? ('Pagar na hora', AppTheme.concrete)
-        : switch (status) {
-            'pending' => ('Aguardando', AppTheme.orange),
-            'pending_payment' => ('Aguardando Pix', AppTheme.orange),
-            'confirmed' => ('Confirmado', AppTheme.court),
-            'expired' => ('Expirada', AppTheme.concrete),
-            'rejected' => ('Recusado', AppTheme.orangeDk),
-            'refunded' => ('Reembolsado', AppTheme.concrete),
-            _ => ('Cancelado', AppTheme.concrete),
-          };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: AppTheme.mono(size: 9, color: color, letterSpacing: 1.6),
-      ),
-    );
+  String _formatDate(String dateString) {
+    final formatted = DateFormat(
+      'EEEE, d \'de\' MMMM',
+      'pt_BR',
+    ).format(DateTime.parse(dateString));
+    return '${formatted[0].toUpperCase()}${formatted.substring(1)}';
   }
-}
 
-class _QuietPill extends StatelessWidget {
-  final String label;
-  const _QuietPill({required this.label});
+  Color _statusColor(String status) => switch (status) {
+    'pending' => const Color(0xFFD4860A),
+    'pending_payment' => const Color(0xFFE65100),
+    'confirmed' => AppTheme.primaryGreen,
+    'expired' => Colors.grey,
+    'rejected' => Colors.red,
+    'refunded' => const Color(0xFF7B1FA2),
+    _ => Colors.grey,
+  };
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppTheme.line),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: AppTheme.mono(size: 9, color: AppTheme.concrete, letterSpacing: 1.6),
-      ),
-    );
-  }
-}
+  String _statusLabel(String status) => switch (status) {
+    'pending' => 'Aguardando',
+    'pending_payment' => 'Aguardando Pix',
+    'confirmed' => 'Confirmado',
+    'expired' => 'Expirada',
+    'rejected' => 'Recusado',
+    'refunded' => 'Reembolsado',
+    _ => 'Cancelado',
+  };
 
-class _SportPrice extends StatelessWidget {
-  final double value;
-  const _SportPrice({required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: Text('R\$',
-              style: AppTheme.mono(size: 10, color: AppTheme.concrete, letterSpacing: 0)),
+  Widget _statusBadge(String status, {BookingModel? booking}) {
+    // Special case: on_arrival confirmed bookings show different badge
+    if (booking != null && booking.isOnArrival) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1565C0).withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(20),
         ),
-        const SizedBox(width: 2),
-        Text(value.toStringAsFixed(0), style: AppTheme.display(size: 22, color: AppTheme.concrete)),
-      ],
-    );
-  }
-}
-
-class _ActionIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _ActionIcon({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(icon, size: 18, color: AppTheme.concrete),
+        child: const Text(
+          'Pagar na hora',
+          style: TextStyle(
+            color: Color(0xFF1565C0),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+    final color = _statusColor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        _statusLabel(status),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

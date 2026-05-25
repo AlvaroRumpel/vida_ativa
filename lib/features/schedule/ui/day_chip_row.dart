@@ -13,61 +13,82 @@ class DayChipRow extends StatelessWidget {
     required this.onDaySelected,
   });
 
-  static const _dayAbbrev = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+  static const _dayAbbrev = [
+    'Seg',
+    'Ter',
+    'Qua',
+    'Qui',
+    'Sex',
+    'Sáb',
+    'Dom',
+  ];
 
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppTheme.line)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 22),
-      child: Row(
-        children: List.generate(7, (i) {
-          final day = weekStart.add(Duration(days: i));
-          final isSelected = _isSameDay(day, selectedDay);
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onDaySelected(day),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isSelected ? AppTheme.orange : Colors.transparent,
-                      width: 2,
+    final today = DateTime.now();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(7, (i) {
+            final day = weekStart.add(Duration(days: i));
+            final isSelected = _isSameDay(day, selectedDay);
+            final isToday = _isSameDay(day, today);
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ChoiceChip(
+                    label: Text(
+                      '${_dayAbbrev[i]} ${day.day}',
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white
+                            : isToday
+                                ? AppTheme.brandAmber
+                                : const Color(0xFF4A4A4A),
+                        fontWeight: (isSelected || isToday)
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    selectedColor: AppTheme.primaryGreen,
+                    backgroundColor: const Color(0xFFF0EDE8),
+                    side: isSelected
+                        ? BorderSide.none
+                        : BorderSide(
+                            color: isToday
+                                ? AppTheme.brandAmber.withValues(alpha: 0.5)
+                                : const Color(0xFFCFC5B0),
+                            width: isToday ? 1.5 : 0.5,
+                          ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    onSelected: (_) => onDaySelected(day),
+                  ),
+                  const SizedBox(height: 3),
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isToday ? AppTheme.brandAmber : Colors.transparent,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                ),
-                padding: const EdgeInsets.only(top: 10, bottom: 12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _dayAbbrev[i],
-                      style: AppTheme.mono(
-                        size: 9,
-                        color: isSelected ? AppTheme.ink : AppTheme.concrete,
-                        letterSpacing: 1.44,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${day.day}',
-                      style: AppTheme.display(
-                        size: 22,
-                        color: isSelected ? AppTheme.ink : AppTheme.concrete,
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
