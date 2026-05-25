@@ -1,9 +1,9 @@
 ---
 phase: 23
 slug: design-system-navigationbar
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-25
 ---
 
@@ -38,11 +38,11 @@ created: 2026-05-25
 
 | Task ID | Plan | Wave | Requirement | Secure Behavior | Test Type | Automated Command | Status |
 |---------|------|------|-------------|-----------------|-----------|-------------------|--------|
-| 23-01-01 | 01 | 1 | DS-02 | Fontes disponíveis offline | integration | `flutter analyze --no-fatal-infos` | ⬜ pending |
-| 23-01-02 | 01 | 1 | NAV-02 | Borda hairline no nav bar | integration | `flutter analyze --no-fatal-infos` | ⬜ pending |
-| 23-01-03 | 01 | 2 | DS-01 | Sem Color(0xFF) em admin_booking_card | grep | `grep -n "Color(0x" lib/features/admin/ui/admin_booking_card.dart` → 0 results | ⬜ pending |
-| 23-01-04 | 01 | 2 | DS-01 | Sem Color(0xFF) em booking_confirmation_sheet | grep | `grep -n "Color(0x" lib/features/booking/ui/booking_confirmation_sheet.dart` → 0 results | ⬜ pending |
-| 23-01-05 | 01 | 3 | DS-01..04, NAV-01..02 | Build limpo sem erros | build | `flutter build web --release` exits 0 | ⬜ pending |
+| 23-01-01 | 01 | 1 | DS-02 | Fontes disponíveis offline | integration | `flutter analyze --no-fatal-infos` | ✅ green |
+| 23-01-02 | 01 | 1 | NAV-02 | Borda hairline no nav bar | integration | `flutter analyze --no-fatal-infos` | ✅ green |
+| 23-01-03 | 01 | 2 | DS-01 | Sem Color(0xFF) em admin_booking_card | grep | `grep -n "Color(0x" lib/features/admin/ui/admin_booking_card.dart` → 0 results | ✅ green |
+| 23-01-04 | 01 | 2 | DS-01 | Sem Color(0xFF) em booking_confirmation_sheet | grep | `grep -n "Color(0x" lib/features/booking/ui/booking_confirmation_sheet.dart` → 0 results | ✅ green |
+| 23-01-05 | 01 | 3 | DS-01..04, NAV-01..02 | Build limpo sem erros | build | `flutter build web --release` exits 0 | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

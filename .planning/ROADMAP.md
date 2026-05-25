@@ -77,7 +77,7 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
 
 **Milestone Goal:** Implementar a nova identidade visual esportiva em todas as telas do app, eliminando o "ar de IA" atual e aplicando o design system Arena Esportivo (sand/ink/laranja, Anton + Manrope + JetBrains Mono). Trabalho 100% widget-level — zero mudanças em BLoC, modelos ou Cloud Functions.
 
-- [ ] **Phase 23: Design System + NavigationBar** - Font bundling em assets/google_fonts/, verificação do AppTheme já construído, e aplicação dos tokens Arena na bottom navigation bar
+- [x] **Phase 23: Design System + NavigationBar** - Font bundling em assets/google_fonts/, verificação do AppTheme já construído, e aplicação dos tokens Arena na bottom navigation bar (completed 2026-05-25)
 - [ ] **Phase 24: Agenda (Cliente)** - SportDayStrip (day selector underline), SlotHairlineRow (rows sem Card com faixa laranja), e wordmark "VIDA ATIVA" no cabeçalho
 - [ ] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin
 - [ ] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas
@@ -137,9 +137,9 @@ Plans:
   4. Helpers AppTheme.display(), AppTheme.ui() e AppTheme.mono() produzem texto nas fontes corretas em qualquer widget que os chame
 **Plans**: 3 plans
 Plans:
-- [ ] 23-01-PLAN.md — Font bundling (assets/google_fonts/) + pubspec.yaml update + NavigationBar hairline border fix
-- [ ] 23-02-PLAN.md — Hardcoded color audit: admin_booking_card.dart + booking_confirmation_sheet.dart
-- [ ] 23-03-PLAN.md — Full build verification (flutter analyze + flutter build web --release)
+- [x] 23-01-PLAN.md — Font bundling (assets/google_fonts/) + pubspec.yaml update + NavigationBar hairline border fix
+- [x] 23-02-PLAN.md — Hardcoded color audit: admin_booking_card.dart + booking_confirmation_sheet.dart
+- [x] 23-03-PLAN.md — Full build verification (flutter analyze + flutter build web --release)
 **UI hint**: yes
 
 ### Phase 24: Agenda (Cliente)
@@ -240,7 +240,7 @@ Plans:
 | 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 3/3 | Complete | 2026-05-21 |
 | 22. UI do Dashboard | v5.0 | 3/3 | Complete | 2026-05-23 |
-| 23. Design System + NavigationBar | v6.0 | 0/3 | Not started | - |
+| 23. Design System + NavigationBar | v6.0 | 3/3 | Complete   | 2026-05-25 |
 | 24. Agenda (Cliente) | v6.0 | 0/? | Not started | - |
 | 25. Estrutura Admin | v6.0 | 0/? | Not started | - |
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 0/? | Not started | - |
