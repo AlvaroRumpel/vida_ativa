@@ -230,21 +230,21 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
+        color: AppTheme.paper,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFFFB300), width: 1),
+        border: Border.all(color: AppTheme.sun, width: 1),
       ),
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, size: 18, color: Color(0xFFE65100)),
+          Icon(Icons.info_outline, size: 18, color: AppTheme.orange),
           SizedBox(width: 8),
           Expanded(
             child: Text(
               'Esta reserva será confirmada após aprovação do estabelecimento.',
               style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFFE65100),
+                color: AppTheme.orange,
                 height: 1.4,
               ),
             ),
@@ -274,7 +274,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD0CAC0),
+                  color: AppTheme.line,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -386,7 +386,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               const SizedBox(height: 12),
               Text(
                 _errorMessage!,
-                style: const TextStyle(color: Color(0xFFC62828)),
+                style: const TextStyle(color: AppTheme.orangeDk),
               ),
             ],
             const SizedBox(height: 24),
@@ -435,7 +435,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppTheme.paper,
                           ),
                         )
                       : const Text('Confirmar reserva'),
@@ -456,7 +456,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppTheme.paper,
                         ),
                       )
                     : Text(_availableRecurrenceEntries.isEmpty
