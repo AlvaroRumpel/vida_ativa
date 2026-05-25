@@ -4,7 +4,7 @@ milestone: v6.0
 milestone_name: Arena Esportivo — Redesign Visual
 status: executing
 last_updated: "2026-05-25T20:11:09.599Z"
-last_activity: 2026-05-25 -- Phase 23 planning complete
+last_activity: 2026-05-25 -- Phase 24 planning complete
 progress:
   total_phases: 10
   completed_phases: 4
