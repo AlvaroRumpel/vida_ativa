@@ -96,8 +96,35 @@ Implementar a nova identidade visual esportiva em todas as telas do app, elimina
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DS-01..04 | — | pending |
-| NAV-01..02 | — | pending |
-| SCHED-04..06 | — | pending |
-| BOOK-07..12 | — | pending |
-| ADMN-13..29 | — | pending |
+| DS-01 | Phase 23 | Pending |
+| DS-02 | Phase 23 | Pending |
+| DS-03 | Phase 23 | Pending |
+| DS-04 | Phase 23 | Pending |
+| NAV-01 | Phase 23 | Pending |
+| NAV-02 | Phase 23 | Pending |
+| SCHED-04 | Phase 24 | Pending |
+| SCHED-05 | Phase 24 | Pending |
+| SCHED-06 | Phase 24 | Pending |
+| BOOK-07 | Phase 26 | Pending |
+| BOOK-08 | Phase 26 | Pending |
+| BOOK-09 | Phase 26 | Pending |
+| BOOK-10 | Phase 26 | Pending |
+| BOOK-11 | Phase 26 | Pending |
+| BOOK-12 | Phase 26 | Pending |
+| ADMN-13 | Phase 25 | Pending |
+| ADMN-14 | Phase 25 | Pending |
+| ADMN-15 | Phase 25 | Pending |
+| ADMN-16 | Phase 27 | Pending |
+| ADMN-17 | Phase 27 | Pending |
+| ADMN-18 | Phase 27 | Pending |
+| ADMN-19 | Phase 27 | Pending |
+| ADMN-20 | Phase 27 | Pending |
+| ADMN-21 | Phase 27 | Pending |
+| ADMN-22 | Phase 28 | Pending |
+| ADMN-23 | Phase 28 | Pending |
+| ADMN-24 | Phase 28 | Pending |
+| ADMN-25 | Phase 28 | Pending |
+| ADMN-26 | Phase 29 | Pending |
+| ADMN-27 | Phase 29 | Pending |
+| ADMN-28 | Phase 29 | Pending |
+| ADMN-29 | Phase 29 | Pending |
