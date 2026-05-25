@@ -135,7 +135,11 @@ Plans:
   2. Bottom navigation bar exibe ícone laranja e label mono uppercase para aba selecionada, e cor concrete para abas inativas
   3. Bottom navigation bar tem fundo sand com borda superior hairline e sem elevação ou sombra visível
   4. Helpers AppTheme.display(), AppTheme.ui() e AppTheme.mono() produzem texto nas fontes corretas em qualquer widget que os chame
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 23-01-PLAN.md — Font bundling (assets/google_fonts/) + pubspec.yaml update + NavigationBar hairline border fix
+- [ ] 23-02-PLAN.md — Hardcoded color audit: admin_booking_card.dart + booking_confirmation_sheet.dart
+- [ ] 23-03-PLAN.md — Full build verification (flutter analyze + flutter build web --release)
 **UI hint**: yes
 
 ### Phase 24: Agenda (Cliente)
@@ -236,7 +240,7 @@ Plans:
 | 20. Infraestrutura de Esporte | v5.0 | 3/3 | Complete | 2026-05-20 |
 | 21. Backend do Dashboard | v5.0 | 3/3 | Complete | 2026-05-21 |
 | 22. UI do Dashboard | v5.0 | 3/3 | Complete | 2026-05-23 |
-| 23. Design System + NavigationBar | v6.0 | 0/? | Not started | - |
+| 23. Design System + NavigationBar | v6.0 | 0/3 | Not started | - |
 | 24. Agenda (Cliente) | v6.0 | 0/? | Not started | - |
 | 25. Estrutura Admin | v6.0 | 0/? | Not started | - |
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 0/? | Not started | - |
