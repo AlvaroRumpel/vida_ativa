@@ -41,7 +41,7 @@ class _AppShellState extends State<AppShell> {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppTheme.sand,
-          border: Border(top: BorderSide(color: AppTheme.line)),
+          border: Border(top: BorderSide(color: AppTheme.lineHair)),
         ),
         child: NavigationBar(
           selectedIndex: widget.navigationShell.currentIndex,
