@@ -1,555 +1,192 @@
-# Architecture Patterns: Dashboard & Sport Field Integration
+# Architecture: Flutter Design System Integration — v6.0 Arena Esportivo
 
-**Project:** Vida Ativa (vida_ativa)
-**Researched:** 2026-05-19
-**Scope:** v5.0 Dashboard (real-time metrics, aggregation strategy) + Sport Field (optional booking attribute)
-**Confidence:** HIGH (existing codebase analysis + Firestore official docs)
-
----
-
-## Executive Summary
-
-Two integrations required:
-
-1. **Dashboard Aggregation:** Admin sees real-time metrics (revenue, conversion, occupancy, sport splits). Firestore aggregation queries cannot use real-time listeners, so we use **write-time aggregation** (updating counter documents on each booking state change) + Cloud Functions scheduled batch refresh (hourly/daily) for non-real-time breakdowns.
-
-2. **Sport Field:** Add optional `sport: String?` field to BookingModel. No schema migration needed—Firestore tolerates optional fields on existing documents. Store admin-configurable sport list in `/config/sports` (following existing `/config/pricing` pattern).
+**Project:** Vida Ativa — Visual Redesign
+**Date:** 2026-05-23
+**Confidence:** HIGH (direct codebase inspection)
 
 ---
 
-## Recommended Architecture
+## Current State Audit
 
-```
-┌─────────────────────────────────────┐
-│  Flutter Web (Admin Dashboard)      │
-│  - DashboardCubit (StreamBuilder)   │
-│  - Real-time counter listen         │
-│  - Period filtering (week/month/year)│
-└──────────────┬──────────────────────┘
-               │
-               ├─→ Real-Time: /config/dashboard/{period}
-               │   (write-time aggregation counters)
-               │
-               └─→ Batch: Scheduled CF (hourly/daily)
-                   updates /config/dashboard/{period}
+### What Already Exists (No Work Needed)
 
-Booking Flow (no UI changes needed):
-  BookingModel.sport ← (OPTIONAL)
-  /bookings/{id}     ← {sport: "Futevôlei" OR null}
-  /config/sports     ← ["Futevôlei", "Vôlei", "Beach Tênis"]
+`AppTheme.lightTheme` is already a **full Material 3 ThemeData replacement** — not partial, not a copyWith. It defines:
+- Complete `ColorScheme` with all Arena Esportivo tokens (sand, ink, orange, court, etc.)
+- `textTheme` via `GoogleFonts.manropeTextTheme()`
+- `tabBarTheme` with underline orange 2px indicator and mono labels
+- `navigationBarTheme` with orange/concrete icons + mono labels
+- `cardTheme`, `filledButtonTheme`, `outlinedButtonTheme`, `inputDecorationTheme`, `switchTheme`, `snackBarTheme`, `chipTheme`, `floatingActionButtonTheme`, `checkboxTheme`, `progressIndicatorTheme`
+- Static helpers: `AppTheme.display()`, `AppTheme.ui()`, `AppTheme.mono()`
 
-Cloud Functions:
-  - onBookingStateChange() → update /config/dashboard/realtime
-  - onBookingPaymentConfirm() → increment revenue counters
-  - scheduledDailyAggregation() → refresh /config/dashboard/day|week|month
-```
+`main.dart` feeds `AppTheme.lightTheme` directly to `MaterialApp.router(theme:)`. One assignment. Global scope.
+
+`AppSpacing` — xs/sm/md/lg/xl — used correctly in several files. No changes needed.
+
+### What Has NOT Been Updated (The Actual Work)
+
+Widgets across features still use **hardcoded pre-Arena colors and TextStyles** that bypass the theme:
+
+| Widget | Problem |
+|--------|---------|
+| `SlotCard` | `TextStyle(fontSize: 16, fontWeight: FontWeight.w600)` — no Anton; `Colors.grey`, `Color(0xFFE53935)` hardcoded status colors; `Card` wrapper with `BorderRadius.circular(8)` |
+| `DayChipRow` | `ChoiceChip` with `selectedColor: AppTheme.primaryGreen`; custom `TextStyle` with hardcoded hex colors; not the new underline-column pattern |
+| `BookingCard` | `Card` with `BorderRadius.circular(12)`; hardcoded `Color(0xFF1565C0)`, `Color(0xFF9E9A95)` etc.; no font family on text |
+| `BookingConfirmationSheet` | `OutlineInputBorder` with `BorderRadius.circular(12)` overrides theme; payment banner `Color(0xFFFFF3E0)`; buttons with custom `shape: RoundedRectangleBorder(borderRadius: circular(12))` |
+| `AdminBookingCard` | Hardcoded sport chip color palettes (`_sportBgColors`, `_sportFgColors` arrays with 8 Material colors); action buttons use `AppTheme.primaryGreen` |
+| `AdminScreen` | `_NotificationBanner` uses `AppTheme.primaryGreen` background; AppBar action uses `foregroundColor: AppTheme.primaryGreen` |
+| `MyBookingsScreen` | Section headers use plain `TextStyle(fontSize: 18, fontWeight: FontWeight.bold)` — no mono/Anton |
 
 ---
 
-## Component Boundaries
+## Architecture Decisions
 
-### Data Layer
+### 1. ThemeData.copyWith vs Full Replacement
 
-#### 1. BookingModel (Modified)
-**Current:** slotId, date, userId, status, price, paymentMethod, expiresAt, paymentId, participants, recurrenceGroupId
-**Add:** `sport: String?` (optional, nullable, defaults to null for backward compatibility)
+**Full replacement — already done.** `AppTheme.lightTheme` is the complete ThemeData object. It is wired once in `main.dart`:
 
 ```dart
-// Add to BookingModel
-final String? sport; // 'Futevôlei' | 'Vôlei' | 'Beach Tênis' | null
-
-// toFirestore() — only writes if non-null
-if (sport != null) 'sport': sport,
-
-// fromFirestore() — handles missing field gracefully
-sport: data['sport'] as String?,
+MaterialApp.router(theme: AppTheme.lightTheme)  // single source of truth
 ```
 
-**Migration:** Zero friction. Existing bookings remain unmodified. New bookings can include sport. Read-time filtering is optional.
+There is no scenario requiring `ThemeData.copyWith` for this milestone. The theme already contains every Material component override needed. **Never use `Theme(data: Theme.of(context).copyWith(...))` inside a widget subtree** — it creates invisible local overrides that survive global theme updates and make future refactoring opaque.
 
-#### 2. DashboardMetrics (New)
-Store counters in `/config/dashboard/{period}` as independent documents:
+The only legitimate `copyWith` scenario: a third-party library widget (e.g., `fl_chart`, `flutter_heatmap_calendar`) reads `Theme.of(context)` and needs local scoping. Even then, wrap only that specific library widget.
 
-```firestore
-/config/dashboard/realtime
-  ├─ totalRevenue: 5000.00 (double)
-  ├─ confirmedCount: 42 (int)
-  ├─ pendingPaymentCount: 3 (int)
-  ├─ cancelledCount: 2 (int)
-  ├─ rejectedCount: 1 (int)
-  ├─ expiredCount: 4 (int)
-  ├─ refundedCount: 0 (int)
-  ├─ pixCount: 25 (Pix payments)
-  ├─ onArrivalCount: 17 (on_arrival payments)
-  ├─ uniqueClientCount: 38 (distinct userIds)
-  ├─ newClientCount: 3 (first-time bookers this period)
-  ├─ totalSlotCount: 50 (all created slots)
-  ├─ occupiedSlotCount: 45 (booked + confirmed)
-  ├─ occupancyPercent: 90.0 (calculated field)
-  ├─ conversionPercent: 95.2 (confirmed / total)
-  ├─ avgTicket: 119.05 (totalRevenue / confirmedCount)
-  ├─ avgTicketPix: 125.00
-  ├─ avgTicketOnArrival: 110.00
-  ├─ sportBreakdown: {
-  │   "Futevôlei": 30,
-  │   "Vôlei": 10,
-  │   "Beach Tênis": 5,
-  │   "null": 2
-  │ }
-  ├─ noShowRate: 0.08 (expired / total)
-  ├─ abandonmentRate: 0.04 (pending_payment / total)
-  ├─ hourlyGrid: {
-  │   "08:00": {Mon: 8, Tue: 7, Wed: 9, Thu: 10, Fri: 8, Sat: 11, Sun: 12},
-  │   "09:00": {Mon: 7, Tue: 8, ...},
-  │   ...
-  │ }
-  ├─ topFrequentClients: [{uid, count, name}, ...]
-  ├─ returnClientCount: 12
-  ├─ dayOfWeekBreakdown: {Mon: 15, Tue: 12, ...}
-  ├─ lastUpdatedAt: Timestamp
-  ├─ period: 'realtime' | 'day' | 'week' | 'month'
-  ├─ date: '2026-05-19'
-```
+### 2. Static TextStyle Helpers in AppTheme vs Separate Class
 
-**Why this structure:**
-- Single document read = dashboard loads in 1 read instead of filtering thousands of bookings
-- Write-time updates keep real-time metrics fresh (within seconds)
-- Batch functions update period views hourly (cost-effective)
-- Heatmap grid is pre-computed, not calculated on read
+**Keep in AppTheme. Already done correctly.** `AppTheme.display()`, `AppTheme.ui()`, `AppTheme.mono()` are the right pattern because:
+- Design tokens (colors + typography) belong to the same concern
+- Already imported everywhere via `app_theme.dart` — zero extra imports
+- Named parameters (`size:`, `color:`, `weight:`, `letterSpacing:`) provide typed flexibility without explosion of methods
 
-#### 3. SportConfigModel (New)
-Store admin-configurable sports list:
+Do NOT create a separate `AppTypography` class. It adds a file and import for zero semantic gain.
 
-```firestore
-/config/sports
-  ├─ sports: ["Futevôlei", "Vôlei", "Beach Tênis"]
-  ├─ updatedAt: Timestamp
-```
+**Exception:** If a new bespoke compound widget (e.g., `SportBtn`, `ScoreboardTime`) has internal text styles that are always fixed to the component contract, inline them at the widget level. They are not reusable design tokens.
+
+### 3. Widget Restyling Order — Maximum Visual Impact
+
+Order by `(user-visible surface area) x (implementation risk)`. High impact and low risk goes first.
+
+#### Phase A — Foundation (every screen, every user)
+Touches: navigation shell + AppBar structure. All users see immediately.
+
+1. **BottomNavigationBar** — verify the shell uses `NavigationBar` (Material 3) not `BottomNavigationBar`. The `navigationBarTheme` is already configured. If using the old widget, swap it; otherwise the theme handles everything.
+2. **AppBar color fixes** — `AdminScreen` AppBar action `foregroundColor: AppTheme.primaryGreen` → `AppTheme.orange`. `AdminScreen._NotificationBanner` background → orange left-border container pattern.
+
+#### Phase B — Client Schedule (highest user traffic, biggest visual change)
+Touches: 3 self-contained widget files. No BLoC changes.
+
+3. **DayChipRow → SportDayStrip** — Full widget rewrite. Replace `ChoiceChip` with column layout: mono abbreviation + Anton number + orange 2px underline. Same callback interface `ValueChanged<DateTime>`.
+4. **SlotCard → SlotHairlineRow** — Remove `Card` wrapper. `InkWell` + `Divider` hairline. Time in `AppTheme.display(size: 42)`. Orange 3px left strip for `myBooking`. Opacity 0.45 for `booked`.
+5. **ScheduleScreen AppBar** — Replace `Icon + Text('Agenda')` with wordmark `"VIDA ATIVA"` in Anton + orange pill. Add mono eyebrow with selected date.
+
+#### Phase C — Booking Flow (second most-used by clients)
+Touches: 2 widget files. Moderate complexity due to form overrides.
+
+6. **BookingConfirmationSheet** — Delete `OutlineInputBorder` overrides on `TextField` and `DropdownButtonFormField` (let theme `UnderlineInputBorder` win). Replace payment warning `Container` (amber background + border) with orange left-border container. Replace `FilledButton`/`OutlinedButton` with local `shape: StadiumBorder()` conforming to theme. Time display → `AppTheme.display(size: 88)`.
+7. **MyBookingsScreen + BookingCard** — Section headers → `AppTheme.mono()` uppercase tracked. First upcoming booking → Anton 72px hero row. `BookingCard`: remove `Card` widget, replace with `InkWell` + hairline `Divider`, status pills in mono uppercase.
+
+#### Phase D — Admin Panel (admin-only, lower traffic)
+Touches: 5+ widget files. Lower user impact, no BLoC changes.
+
+8. **AdminScreen structure** — Add wordmark + eyebrow "Painel admin". TabBar already configured in theme (underline orange, mono labels) — just verify `Tab` text is uppercase.
+9. **AdminBookingCard** — Delete `_sportBgColors`/`_sportFgColors` arrays. Sport chip → `AppTheme.ink`/`AppTheme.orange` system. Action buttons → pill pattern (outlined, no filled background).
+10. **SlotManagementTab** — Slot rows → hairline + `AppTheme.display(size: 32)` for time. Orange color for reserved slots.
+11. **UsersManagementTab** — Avatar: `AppTheme.orange` for admin, `AppTheme.ink` for user. Rows hairline, name in `AppTheme.ui(weight: FontWeight.w700)`, email in `AppTheme.mono()`.
+12. **PricingTab** — Timeline bar 3px orange. Price in `AppTheme.display(size: 44)`. SportBtn for save button.
+13. **SettingsTab** — Switch already themed. Underline fields already themed. Labels → `AppTheme.mono()` uppercase.
+14. **DashboardTab** — KPI grid: remove card shadows, hairline borders, `AppTheme.display(size: 32)` for values, mono for labels. Bar chart: no rounded corners. Heatmap: orange intensity scale.
+
+### 4. Migration Strategy — All at Once vs Screen by Screen
+
+**Screen by screen, Phases A → B → C → D.** Ship A+B as one unit (most visible), C alone, D as the final unit.
+
+Rationale:
+- `AppTheme.lightTheme` is already global and correct. The migration is purely per-widget `build()` rewrites.
+- Each widget file is self-contained. Cross-feature regression is impossible because BLoC state is unchanged.
+- BLoC/Cubit classes, model classes, Firestore calls, and navigation logic are **zero-change** — visual work lives exclusively in `*/ui/*.dart` files.
+
+**Warning:** Do not do a global replace of `primaryGreen` → `orange`. Some `court` (green) usages are semantically correct and must stay green (e.g., confirmed booking success state in `BookingCard._statusColor('confirmed')`).
 
 ---
 
-### Cubit Layer
+## Component Boundary Map
 
-#### 1. DashboardCubit (New)
-Manages dashboard state with period selection + real-time listen.
+### New Components to Create
 
-```dart
-class DashboardCubit extends Cubit<DashboardState> {
-  final FirebaseFirestore _firestore;
-  StreamSubscription<DocumentSnapshot>? _sub;
-  String _activePeriod = 'realtime';
+These do not exist and must be written from scratch:
 
-  Future<void> setPeriod(String period) async {
-    _sub?.cancel();
-    _activePeriod = period;
-    _startStream(period);
-  }
+| Component | File Path | Purpose |
+|-----------|-----------|---------|
+| `SportDayStrip` | `lib/features/schedule/ui/sport_day_strip.dart` | Replaces DayChipRow. Column per day: mono abbrev + Anton number + orange 2px underline. Same `ValueChanged<DateTime>` callback. |
+| `SlotHairlineRow` | `lib/features/schedule/ui/slot_hairline_row.dart` | Replaces SlotCard body. Hairline divider row, no Card. Anton 42px time, orange left strip for myBooking, 0.45 opacity for booked. |
+| `SportBtn` | `lib/core/widgets/sport_btn.dart` | Reusable button: Anton uppercase, `StadiumBorder`, no text wrap. Two variants: filled (orange) and outlined (ink). |
+| `HairlineBookingRow` | `lib/features/booking/ui/hairline_booking_row.dart` | Replaces BookingCard body. Anton date + mono eyebrow + status pill. Used in MyBookingsScreen. |
 
-  void _startStream(String period) {
-    _sub = _firestore
-        .collection('config')
-        .doc('dashboard')
-        .collection(period)
-        .doc('current')
-        .snapshots()
-        .listen(
-          (snap) {
-            final metrics = DashboardMetricsModel.fromFirestore(snap);
-            emit(DashboardLoaded(metrics));
-          },
-          onError: (e, s) => emit(DashboardError('Erro ao carregar dashboard.')),
-        );
-  }
+### Modified Components (Same Constructor Interface)
 
-  @override
-  Future<void> close() {
-    _sub?.cancel();
-    return super.close();
-  }
-}
-```
-
-#### 2. SportConfigCubit (New)
-Manages admin sport list configuration.
-
-```dart
-class SportConfigCubit extends Cubit<SportConfigState> {
-  final FirebaseFirestore _firestore;
-  StreamSubscription<DocumentSnapshot>? _sub;
-
-  SportConfigCubit({required FirebaseFirestore firestore})
-      : _firestore = firestore,
-        super(const SportConfigInitial()) {
-    _startStream();
-  }
-
-  void _startStream() {
-    _sub = _firestore
-        .collection('config')
-        .doc('sports')
-        .snapshots()
-        .listen(
-          (snap) {
-            if (!snap.exists) {
-              emit(const SportConfigLoaded([]));
-              return;
-            }
-            final sports = List<String>.from(snap.data()?['sports'] ?? []);
-            emit(SportConfigLoaded(sports));
-          },
-          onError: (e, s) => emit(const SportConfigError('Erro ao carregar esportes.')),
-        );
-  }
-
-  Future<void> saveSports(List<String> sports) async {
-    try {
-      await _firestore.collection('config').doc('sports').set({
-        'sports': sports,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e, s) {
-      Sentry.captureException(e, stackTrace: s);
-      rethrow;
-    }
-  }
-}
-```
-
-#### 3. Modified BookingCubit & AdminBookingCubit
-Add sport parameter to bookSlot() and display sport in booking cards.
+| Component | File | Change Scope |
+|-----------|------|-------------|
+| `DayChipRow` | schedule/ui/day_chip_row.dart | Internal `build()` full rewrite (or rename → `SportDayStrip` and delete old file) |
+| `SlotCard` | schedule/ui/slot_card.dart | Internal `build()` rewrite — Card removed, Anton time, opacity |
+| `BookingCard` | booking/ui/booking_card.dart | Card removed, hairline, status pills in mono |
+| `BookingConfirmationSheet` | booking/ui/booking_confirmation_sheet.dart | Banner → left-border; buttons → StadiumBorder; time → display(88) |
+| `MyBookingsScreen` | booking/ui/my_bookings_screen.dart | Headers → mono uppercase; hero "Próximo" section |
+| `AdminScreen` | admin/ui/admin_screen.dart | Action button color; notification banner |
+| `AdminBookingCard` | admin/ui/admin_booking_card.dart | Sport chip colors → AppTheme tokens; buttons → pills |
 
 ---
 
-### UI Layer
+## BLoC Safety Contract
 
-#### 1. DashboardScreen (New)
-Admin panel with metrics cards, heatmap, sport distribution chart.
+Files that are zero-change during v6.0:
 
-#### 2. BookingForm (Modified)
-Add sport dropdown to booking confirmation.
+- All `features/*/cubit/*.dart` — state logic unchanged
+- All `core/models/*.dart` — data models unchanged
+- `core/router/app_router.dart` — routing unchanged
+- `main.dart` — ThemeData already wired
+- `lib/firebase_options*.dart` — environment config
+- `functions/` — Cloud Functions unchanged
+- `AppSpacing` — token values unchanged
 
-#### 3. BookingCard (Modified)
-Display sport badge if present.
-
----
-
-### Cloud Functions Layer
-
-#### 1. onBookingStateChange (New/Modified)
-Triggered on `/bookings/{docId}` write. Updates counter atomically.
-
-```javascript
-export const onBookingStateChange = functions
-  .firestore
-  .document('bookings/{docId}')
-  .onWrite(async (change, context) => {
-    const oldBooking = change.before.data();
-    const newBooking = change.after.data();
-
-    if (!oldBooking || !newBooking) return;
-
-    const oldStatus = oldBooking.status;
-    const newStatus = newBooking.status;
-
-    const updates: { [key: string]: FieldValue } = {
-      lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    };
-
-    // Decrement old status count
-    if (oldStatus) {
-      updates[`${oldStatus}Count`] = 
-        admin.firestore.FieldValue.increment(-1);
-    }
-
-    // Increment new status count
-    updates[`${newStatus}Count`] = 
-      admin.firestore.FieldValue.increment(1);
-
-    // Adjust revenue
-    const oldPrice = oldStatus === 'confirmed' ? oldBooking.price : 0;
-    const newPrice = newStatus === 'confirmed' ? newBooking.price : 0;
-    if (newPrice !== oldPrice) {
-      updates['totalRevenue'] = admin.firestore.FieldValue.increment(
-        newPrice - oldPrice
-      );
-    }
-
-    // Handle sport breakdown
-    const oldSport = oldBooking.sport || 'null';
-    const newSport = newBooking.sport || 'null';
-    if (oldStatus !== 'confirmed' && newStatus === 'confirmed') {
-      updates[`sportBreakdown.${newSport}`] = 
-        admin.firestore.FieldValue.increment(1);
-    }
-
-    // Atomic update
-    await admin.firestore()
-      .collection('config')
-      .doc('dashboard')
-      .collection('realtime')
-      .doc('current')
-      .update(updates);
-  });
-```
-
-#### 2. scheduledDailyAggregation (New)
-Runs daily to compute non-real-time breakdowns (heatmap, sport, top clients).
-
-```javascript
-export const scheduledDailyAggregation = functions
-  .pubsub
-  .schedule('0 1 * * *')  // 01:00 UTC daily
-  .timeZone('UTC')
-  .onRun(async (context) => {
-    const db = admin.firestore();
-    
-    const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    
-    const snapshots = await db
-      .collection('bookings')
-      .where('status', '==', 'confirmed')
-      .where('createdAt', '>=', yesterday)
-      .where('createdAt', '<=', now)
-      .get();
-
-    let totalRevenue = 0;
-    const sportBreakdown: { [key: string]: number } = {};
-    const hourlyGrid: { [key: string]: { [day: string]: number } } = {};
-
-    snapshots.forEach((doc) => {
-      const booking = doc.data();
-      totalRevenue += booking.price || 0;
-
-      const sport = booking.sport || 'null';
-      sportBreakdown[sport] = (sportBreakdown[sport] || 0) + 1;
-
-      const hour = booking.startTime;
-      const dayName = getDayName(booking.date);
-      if (!hourlyGrid[hour]) hourlyGrid[hour] = {};
-      hourlyGrid[hour][dayName] = (hourlyGrid[hour][dayName] || 0) + 1;
-    });
-
-    await db
-      .collection('config')
-      .doc('dashboard')
-      .collection('day')
-      .doc('current')
-      .set({
-        totalRevenue,
-        sportBreakdown,
-        hourlyGrid,
-        lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-  });
-```
+If any PR for v6.0 modifies a cubit file, it is out of scope and must be rejected.
 
 ---
 
-## Data Flow
+## Anti-Patterns
 
-### Booking → Dashboard (Real-Time)
+### 1. Local Theme Override via `Theme(data: copyWith)`
+Creates invisible local overrides. Hard to debug. Breaks on global theme changes.
+**Instead:** reference `AppTheme.*` constants directly in the widget.
 
-```
-User books slot (sport: "Futevôlei")
-    ↓
-BookingCubit.bookSlot(sport: "Futevôlei")
-    ↓
-/bookings/{id} written (status: pending_payment)
-    ↓
-onBookingStateChange trigger
-    ↓
-/config/dashboard/realtime updated atomically:
-  - pendingPaymentCount +1
-  - sportBreakdown.Futevôlei +1 (if becomes confirmed)
-    ↓
-DashboardCubit listens to /config/dashboard/realtime
-    ↓
-UI rebuilds with new metrics
-```
+### 2. Hardcoded `Color(0xFF...)` in Widget Files
+Any hex literal that is not part of a legacy status-mapping function is tech debt.
+**Instead:** use `AppTheme.orange`, `AppTheme.ink`, `AppTheme.concrete`, etc.
 
-### Admin Configures Sports
+### 3. Overriding Theme `InputDecoration` Shape
+`BookingConfirmationSheet` currently overrides with `OutlineInputBorder(borderRadius: circular(12))`. This defeats the global `UnderlineInputBorder` in the theme.
+**Instead:** delete the override. The theme handles it.
 
-```
-Admin opens Settings → Sports tab
-    ↓
-SportConfigCubit.saveSports(["Futevôlei", "Vôlei"])
-    ↓
-/config/sports written
-    ↓
-SportConfigCubit stream emits new list
-    ↓
-BookingForm dropdown updates
-```
+### 4. Adding Style State to ViewModel or Model
+Visual variants (e.g., "is this the hero/next booking?") must be derived from existing model fields inside `build()`. Do not add `isHero: bool` to `BookingModel` or `SlotViewModel`.
+
+### 5. Breaking `ScheduleCubit.selectDay()` Contract
+`ScheduleScreen` calls `context.read<ScheduleCubit>().selectDay(day)` via the `onDaySelected` callback from `DayChipRow`. When rewriting `SportDayStrip`, preserve the exact same callback: `ValueChanged<DateTime> onDaySelected`. Do not lift selection state into the new widget.
+
+### 6. Semantic Green vs Accent Orange Confusion
+`AppTheme.court` (green `0xFF1B5E2A`) = success/confirmed. `AppTheme.orange` = accent/primary action.
+- Confirmed booking status badge → `court`
+- Active tab / selected day / primary button → `orange`
+Do not unify them.
 
 ---
 
-## Patterns to Follow
+## Confidence Assessment
 
-### 1. Write-Time Aggregation (Real-Time Metrics)
-**What:** Update counter documents as bookings change, rather than computing on read.
-**When:** You need real-time updates, low latency, <1K updates/hour per metric.
-**Implementation:** Firestore trigger on `/bookings/{id}` changes, atomic increment on `/config/dashboard/realtime` counters.
-
-### 2. Scheduled Batch Aggregation (Period Views)
-**What:** Run Cloud Functions on schedule (hourly/daily) to compute summaries.
-**When:** Complex aggregations (heatmaps), or if real-time not critical for that metric.
-**Implementation:** Cloud Functions `pubsub.schedule()`, query last N hours/days, write to `/config/dashboard/{period}`.
-
-### 3. Optional Field Backward Compatibility
-**What:** Add nullable field (`sport?: String`) without migrating existing documents.
-**When:** Schema evolution without downtime.
-**Implementation:** toFirestore() only writes if non-null, fromFirestore() treats missing as null.
-
-### 4. Admin-Configurable Lists in /config
-**What:** Store enumeration in Firestore under `/config/{type}`.
-**When:** Admin controls allowed values, values change infrequently.
-**Implementation:** `/config/sports` with array, stream with Cubit, validate in Cloud Functions.
-
----
-
-## Anti-Patterns to Avoid
-
-### ❌ Real-Time Listeners on Aggregation Queries
-Firestore aggregation queries do NOT support real-time listeners. Use write-time aggregation instead.
-
-### ❌ Computing Dashboard on Every Read
-Querying 10K bookings and filtering locally is slow and expensive. Pre-compute in Cloud Functions, store in `/config/dashboard`, read single document.
-
-### ❌ Denormalizing All Metrics to Bookings
-This creates duplicate writes, consistency issues. Keep BookingModel as single source of truth, aggregate separately.
-
-### ❌ Overwriting Counter Documents
-Use `FieldValue.increment()` instead of fetch + update to avoid contention and lost updates.
-
----
-
-## Scalability
-
-| Concern | 100 bookings/month | 1K bookings/month | 10K+ bookings/month |
-|---------|-----|-----|-----|
-| Dashboard reads | 1 read/load | 1 read/load | 1 read/load |
-| Aggregation triggers | ~0.15/hr | ~1.5/hr | ~15/hr |
-| Metric contention | None | None | Add shards if >1 write/sec |
-| Batch job frequency | Daily OK | Daily OK | Hourly or sharded |
-
----
-
-## Integration Points
-
-### 1. BookingModel Modification
-**File:** `lib/core/models/booking_model.dart`
-- Add: `final String? sport;`
-- Update serialization
-
-### 2. New Cubits
-**Files:** 
-- `lib/features/admin/cubit/dashboard_cubit.dart` + state
-- `lib/features/admin/cubit/sport_config_cubit.dart` + state
-
-### 3. Cloud Functions
-**File:** `functions/src/aggregations.ts` (new)
-- `onBookingStateChange`
-- `scheduledDailyAggregation`
-
-### 4. UI Integration
-- `lib/features/admin/ui/admin_screen.dart` — DashboardTab
-- `lib/features/booking/ui/booking_confirmation_sheet.dart` — sport dropdown
-- `lib/features/booking/cubit/booking_cubit.dart` — sport param
-
-### 5. Firestore Rules
-```
-match /config/dashboard/{period} {
-  allow read: if request.auth != null && isAdmin();
-  allow write: if request.auth != null && isAdmin();
-}
-
-match /config/sports {
-  allow read: if request.auth != null;
-  allow write: if request.auth != null && isAdmin();
-}
-```
-
----
-
-## Suggested Build Order
-
-### Phase 1: Backend (Week 1)
-1. Add `sport: String?` to BookingModel
-2. Create DashboardMetricsModel
-3. Create SportConfigModel
-4. Write Cloud Functions: `onBookingStateChange`, `scheduledDailyAggregation`
-5. Deploy + test counter increments
-
-### Phase 2: Dashboard UI (Week 2)
-1. Create DashboardCubit + states
-2. Build DashboardScreen with tabs
-3. Implement metric cards, heatmap, sport chart
-4. Test real-time updates
-
-### Phase 3: Sport Config (Week 3)
-1. Create SportConfigCubit + states
-2. Add sport dropdown to BookingForm
-3. Modify BookingCubit.bookSlot(sport)
-4. Display sport badge on cards
-5. Test end-to-end
-
-### Phase 4: Polish (Week 4)
-1. Add period date range display
-2. Implement refresh button
-3. Performance testing
-4. Sentry integration
-5. Final test
-
----
-
-## Firestore Schema Changes
-
-### New Collections
-```firestore
-/config/dashboard/realtime/current
-  ├─ totalRevenue: 5000.00
-  ├─ confirmedCount: 42
-  ├─ ... (metrics)
-
-/config/sports
-  ├─ sports: ["Futevôlei", "Vôlei"]
-  ├─ updatedAt: Timestamp
-```
-
-### Modified Collections
-```firestore
-/bookings/{id}
-  ├─ ... (existing)
-  ├─ sport: "Futevôlei" (NEW, optional)
-```
-
-No breaking changes. Backward compatible.
-
----
-
-## Known Constraints
-
-### Constraint 1: No Real-Time Aggregation Queries
-Firestore aggregation queries don't support real-time listeners.
-**Workaround:** Write-time aggregation.
-
-### Constraint 2: Document Write Rate Limit
-Can't update single document >1/sec.
-**Workaround:** Distributed counters (sharded) for high-traffic. Not needed for Vida Ativa.
-
-### Constraint 3: Heatmap Complex Aggregation
-Grouping by hour + day requires multi-level reduction.
-**Workaround:** Pre-compute in Cloud Functions, store as nested object.
-
----
-
-## Sources
-
-- [Firestore Aggregation Queries](https://firebase.google.com/docs/firestore/query-data/aggregation-queries)
-- [Write-Time Aggregations](https://firebase.google.com/docs/firestore/solutions/aggregation)
-- [Distributed Counters](https://firebase.google.com/docs/firestore/solutions/counters)
-- [Cloud Functions Scheduling](https://firebase.google.com/docs/functions/schedule-functions)
-- [Schema Evolution & Backward Compatibility](https://medium.com/firebase-developers/cloud-firestore-on-data-constraints-and-evolvability-a8f44b34fde8)
-- [Real-Time Stats Monitor in Flutter](https://medium.com/flutter-community/real-time-stats-monitor-with-flutter-and-firebase-576cd554b9ca)
-- [BLoC Pattern in Flutter](https://blog.logrocket.com/state-management-flutter-bloc-pattern/)
+| Area | Confidence | Basis |
+|------|------------|-------|
+| ThemeData structure | HIGH | Direct read of `app_theme.dart` |
+| Widget file inventory | HIGH | Full file enumeration + read of all key files |
+| BLoC boundaries | HIGH | All cubit files enumerated; no style code in any cubit |
+| Visual impact ordering | HIGH | Requirements file + screen traffic analysis |
+| Migration risk | HIGH | Widgets are pure `build()` functions; state in cubits is untouched |
