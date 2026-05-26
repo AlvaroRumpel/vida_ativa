@@ -4,7 +4,7 @@ import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_state.dart';
 import 'package:vida_ativa/features/schedule/ui/day_chip_row.dart';
-import 'package:vida_ativa/features/schedule/ui/slot_day_view.dart';
+import 'package:vida_ativa/features/schedule/ui/slot_list.dart';
 import 'package:vida_ativa/features/schedule/ui/week_header.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -80,16 +80,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppTheme.orange,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'VIDA ATIVA',
-                      style: AppTheme.display(size: 18, color: AppTheme.paper),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('VIDA', style: AppTheme.display(size: 18, color: AppTheme.ink)),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.orange,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text('ATIVA', style: AppTheme.display(size: 18, color: AppTheme.paper)),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   Text(
@@ -113,10 +117,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: BlocBuilder<ScheduleCubit, ScheduleState>(
-              builder: (context, state) => SlotDayView(
-                    state: state,
-                    selectedDay: _selectedDay,
-                  ),
+              builder: (context, state) => SlotList(state: state),
             ),
           ),
         ],

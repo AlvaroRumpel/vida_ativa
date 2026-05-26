@@ -19,8 +19,7 @@ class SportDayStrip extends StatelessWidget {
       a.year == b.year && a.month == b.month && a.day == b.day;
 
   Color _numberColor(bool isSelected, bool isToday) {
-    if (isSelected) return AppTheme.orange;
-    if (isToday) return AppTheme.orange;
+    if (!isSelected && isToday) return AppTheme.sun;
     return AppTheme.ink;
   }
 
@@ -36,6 +35,7 @@ class SportDayStrip extends StatelessWidget {
           final isSelected = _isSameDay(day, selectedDay);
           final isToday = _isSameDay(day, today);
           return GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => onDaySelected(day),
             child: SizedBox(
               width: 40,
