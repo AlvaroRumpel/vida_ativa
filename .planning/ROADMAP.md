@@ -162,7 +162,9 @@ Plans:
   1. TabBar do painel admin exibe labels em JetBrains Mono uppercase com indicador underline laranja 2px e fundo sand (sem fundo colorido ou Tab sólido)
   2. Header do painel admin exibe wordmark Arena + eyebrow "Painel admin" + link "cliente →" em mono laranja
   3. Notification banner de nova reserva exibe faixa lateral laranja 2px à esquerda sem container colorido de fundo
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 25-01-PLAN.md — Arena frame rewrite: inline header + TabBar body Column + orange-stripe notification banners
 **UI hint**: yes
 
 ### Phase 26: Fluxo de Reserva (Cliente)
