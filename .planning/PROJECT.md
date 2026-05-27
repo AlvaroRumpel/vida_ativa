@@ -89,6 +89,18 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ DASH-11: Cloud Functions onBookingStateChange e scheduledDailyAggregation deployed e funcionais — Phase 21
 - ✓ DASH-12: Admin vê chip de esporte em AdminBookingCard e info-row em AdminBookingDetailSheet — Phase 20
 
+### Validated (v6.0 in progress)
+
+- ✓ DS-01 a DS-04: AppTheme Arena verificado — paleta sand/ink/orange/court/sun + helpers display()/ui()/mono() — Phase 23
+- ✓ NAV-01: Bottom navigation exibe ícone laranja e label mono uppercase para aba selecionada — Phase 23
+- ✓ NAV-02: Bottom navigation tem fundo sand, borda superior hairline, sem elevação — Phase 23
+- ✓ SCHED-04: Day selector underline laranja 2px, abreviação mono, número Anton — Phase 24
+- ✓ SCHED-05: Slot rows hairline sem Card, Anton 42px, faixa laranja 3px em myBooking — Phase 24
+- ✓ SCHED-06: Header inline wordmark "VIDA ATIVA" sem AppBar — Phase 24
+- ✓ ADMN-13: TabBar admin com labels JBM UPPERCASE, underline laranja 2px, fundo sand — Phase 25
+- ✓ ADMN-14: Header admin inline wordmark Arena + eyebrow "PAINEL ADMIN" + link "cliente →" — Phase 25
+- ✓ ADMN-15: Notification banners com faixa laranja 2px à esquerda, sem container colorido — Phase 25
+
 ### Current Milestone: v6.0 Arena Esportivo — Redesign Visual
 
 **Goal:** Implementar a nova identidade visual esportiva em todas as telas do app, eliminando o "ar de IA" atual e aplicando o design system Arena Esportivo (sand/ink/laranja, Anton + Manrope + JetBrains Mono).
