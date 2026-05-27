@@ -79,7 +79,7 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
 
 - [x] **Phase 23: Design System + NavigationBar** - Font bundling em assets/google_fonts/, verificação do AppTheme já construído, e aplicação dos tokens Arena na bottom navigation bar (completed 2026-05-25)
 - [ ] **Phase 24: Agenda (Cliente)** - SportDayStrip (day selector underline), SlotHairlineRow (rows sem Card com faixa laranja), e wordmark "VIDA ATIVA" no cabeçalho
-- [ ] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin
+- [x] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin (completed 2026-05-27)
 - [ ] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas
 - [ ] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores
 - [ ] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP
@@ -164,7 +164,7 @@ Plans:
   3. Notification banner de nova reserva exibe faixa lateral laranja 2px à esquerda sem container colorido de fundo
 **Plans**: 1 plan
 Plans:
-- [ ] 25-01-PLAN.md — Arena frame rewrite: inline header + TabBar body Column + orange-stripe notification banners
+- [x] 25-01-PLAN.md — Arena frame rewrite: inline header + TabBar body Column + orange-stripe notification banners
 **UI hint**: yes
 
 ### Phase 26: Fluxo de Reserva (Cliente)
@@ -244,7 +244,7 @@ Plans:
 | 22. UI do Dashboard | v5.0 | 3/3 | Complete | 2026-05-23 |
 | 23. Design System + NavigationBar | v6.0 | 3/3 | Complete   | 2026-05-25 |
 | 24. Agenda (Cliente) | v6.0 | 0/? | Not started | - |
-| 25. Estrutura Admin | v6.0 | 0/? | Not started | - |
+| 25. Estrutura Admin | v6.0 | 1/1 | Complete    | 2026-05-27 |
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 0/? | Not started | - |
 | 27. Admin Slots + Reservas + Usuários | v6.0 | 0/? | Not started | - |
 | 28. Admin Preços + Ajustes | v6.0 | 0/? | Not started | - |
