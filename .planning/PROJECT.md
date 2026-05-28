@@ -100,6 +100,12 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ ADMN-13: TabBar admin com labels JBM UPPERCASE, underline laranja 2px, fundo sand — Phase 25
 - ✓ ADMN-14: Header admin inline wordmark Arena + eyebrow "PAINEL ADMIN" + link "cliente →" — Phase 25
 - ✓ ADMN-15: Notification banners com faixa laranja 2px à esquerda, sem container colorido — Phase 25
+- ✓ BOOK-07: Confirmação exibe horário em Anton 88px como elemento heroico principal — Phase 26
+- ✓ BOOK-08: Aviso de aprovação manual como faixa laranja 2px à esquerda, sem banner colorido — Phase 26
+- ✓ BOOK-09: Botões de pagamento (SportBtn) uppercase Anton sem quebra de linha em mobile — Phase 26
+- ✓ BOOK-10: "Próximo" em Minhas Reservas exibe horário em Anton 72px com eyebrow laranja — Phase 26
+- ✓ BOOK-11: Demais reservas em Minhas Reservas como rows hairline com Anton 30px e status pill — Phase 26
+- ✓ BOOK-12: Section headers "EM SEGUIDA" / "HISTÓRICO" em JBM mono uppercase — Phase 26
 
 ### Current Milestone: v6.0 Arena Esportivo — Redesign Visual
 
