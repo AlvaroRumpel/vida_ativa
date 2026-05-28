@@ -80,7 +80,7 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
 - [x] **Phase 23: Design System + NavigationBar** - Font bundling em assets/google_fonts/, verificação do AppTheme já construído, e aplicação dos tokens Arena na bottom navigation bar (completed 2026-05-25)
 - [ ] **Phase 24: Agenda (Cliente)** - SportDayStrip (day selector underline), SlotHairlineRow (rows sem Card com faixa laranja), e wordmark "VIDA ATIVA" no cabeçalho
 - [x] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin (completed 2026-05-27)
-- [ ] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas
+- [x] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas (completed 2026-05-28)
 - [ ] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores
 - [ ] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP
 - [ ] **Phase 29: Admin Dashboard** - KPI grid hairline, barras simples sem bordas, heatmap escala laranja, e receita por esporte com barra de progresso hairline
@@ -179,9 +179,9 @@ Plans:
   5. Demais reservas em Minhas Reservas exibem como rows hairline com data em Anton 30px e status como pill quiet
 **Plans**: 3 plans
 Plans:
-- [ ] 26-01-PLAN.md — SportBtn + HairlineBookingRow (novos widgets reutilizáveis)
-- [ ] 26-02-PLAN.md — BookingConfirmationSheet rewrite (hero 88px, stripe banner, SportBtn)
-- [ ] 26-03-PLAN.md — MyBookingsScreen rewrite (header inline, hero 72px, hairline rows)
+- [x] 26-01-PLAN.md — SportBtn + HairlineBookingRow (novos widgets reutilizáveis)
+- [x] 26-02-PLAN.md — BookingConfirmationSheet rewrite (hero 88px, stripe banner, SportBtn)
+- [x] 26-03-PLAN.md — MyBookingsScreen rewrite (header inline, hero 72px, hairline rows)
 **UI hint**: yes
 
 ### Phase 27: Admin Slots + Reservas + Usuários
@@ -249,7 +249,7 @@ Plans:
 | 23. Design System + NavigationBar | v6.0 | 3/3 | Complete   | 2026-05-25 |
 | 24. Agenda (Cliente) | v6.0 | 0/? | Not started | - |
 | 25. Estrutura Admin | v6.0 | 1/1 | Complete    | 2026-05-27 |
-| 26. Fluxo de Reserva (Cliente) | v6.0 | 0/3 | Not started | - |
+| 26. Fluxo de Reserva (Cliente) | v6.0 | 3/3 | Complete    | 2026-05-28 |
 | 27. Admin Slots + Reservas + Usuários | v6.0 | 0/? | Not started | - |
 | 28. Admin Preços + Ajustes | v6.0 | 0/? | Not started | - |
 | 29. Admin Dashboard | v6.0 | 0/? | Not started | - |
