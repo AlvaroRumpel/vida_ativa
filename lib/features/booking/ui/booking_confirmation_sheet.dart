@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
+import 'package:vida_ativa/core/widgets/sport_btn.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_state.dart';
 import 'package:vida_ativa/features/booking/cubit/booking_cubit.dart';
@@ -209,43 +210,44 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     super.dispose();
   }
 
-  Widget _infoRow(IconData icon, String text) {
-    return Row(
+  // ── Hero block: eyebrow mono date + Anton 88px hour + mono price ──────────
+  Widget _buildHeroBlock() {
+    final slotDate = DateTime.parse(widget.viewModel.dateString);
+    final eyebrow = DateFormat('E, d MMM', 'pt_BR')
+        .format(slotDate)
+        .toUpperCase(); // "QUA, 28 MAI"
+    final timeDisplay = widget.viewModel.slot.startTime; // "18:00"
+    final priceDisplay = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
+        .format(widget.viewModel.slot.price); // "R$ 50,00"
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, size: 16, color: AppTheme.primaryGreen),
-        ),
-        const SizedBox(width: 12),
-        Text(text),
+        Text(eyebrow, style: AppTheme.mono(size: 11, color: AppTheme.concrete)),
+        const SizedBox(height: 8),
+        Text(timeDisplay, style: AppTheme.display(size: 88, color: AppTheme.ink)),
+        const SizedBox(height: 8),
+        Text(priceDisplay, style: AppTheme.mono(size: 16, color: AppTheme.concrete)),
+        const SizedBox(height: 16),
+        const Divider(color: AppTheme.lineHair, height: 1, thickness: 0.5),
       ],
     );
   }
 
-  Widget _paymentWarningBanner() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppTheme.paper,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.sun, width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  // ── Approval banner: 2px orange left stripe, no colored background ────────
+  Widget _buildApprovalBanner() {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(Icons.info_outline, size: 18, color: AppTheme.orange),
-          SizedBox(width: 8),
+          Container(width: 2, color: AppTheme.orange),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              'Esta reserva será confirmada após aprovação do estabelecimento.',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppTheme.orange,
-                height: 1.4,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text(
+                'Esta reserva será confirmada após aprovação do estabelecimento.',
+                style: AppTheme.ui(size: 13, color: AppTheme.ink),
               ),
             ),
           ),
@@ -256,11 +258,6 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final formatted = DateFormat('EEEE, d \'de\' MMMM', 'pt_BR')
-        .format(DateTime.parse(widget.viewModel.dateString));
-    final dateDisplay =
-        '${formatted[0].toUpperCase()}${formatted.substring(1)}';
-
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -280,42 +277,31 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Confirmar Reserva',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-            ),
+
+            // Hero block — BOOK-07: Anton 88px hour as primary visual element
+            _buildHeroBlock(),
             const SizedBox(height: 16),
-            _infoRow(Icons.calendar_today, dateDisplay),
-            const SizedBox(height: 10),
-            _infoRow(Icons.access_time, widget.viewModel.slot.startTime),
-            const SizedBox(height: 10),
-            _infoRow(
-              Icons.attach_money,
-              NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$')
-                  .format(widget.viewModel.slot.price),
-            ),
-            const SizedBox(height: 16),
+
+            // Approval banner — BOOK-08: 2px orange left stripe, no colored background
             if (_requiresConfirmation && !widget.pixEnabled) ...[
-              _paymentWarningBanner(),
+              _buildApprovalBanner(),
               const SizedBox(height: 16),
             ],
-            // Recurrence toggle
+
+            // Recurrence toggle — D-11: Switch uses AppTheme.lightTheme.switchTheme (no activeThumbColor)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Reservar semanalmente',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                ),
+                Text('Reservar semanalmente', style: AppTheme.ui(size: 15)),
                 Switch(
                   value: _isRecurrent,
-                  activeThumbColor: AppTheme.primaryGreen,
                   onChanged: (v) => setState(() => _isRecurrent = v),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            // Animated recurrence section
+
+            // Animated recurrence section (unchanged)
             AnimatedSize(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
@@ -335,40 +321,28 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                   : const SizedBox.shrink(),
             ),
             const SizedBox(height: 16),
+
+            // Participants TextField — D-10: UnderlineInputBorder via theme (no explicit border overrides)
             TextField(
               controller: _participantsController,
               decoration: const InputDecoration(
-                labelText: 'Quem vai jogar? (opcional)',
-                hintText: 'Ex: Joao, Maria, Pedro',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
+                labelText: 'QUEM VAI JOGAR?',
+                hintText: 'Ex: João, Maria, Pedro',
+                // No border: — theme applies UnderlineInputBorder automatically
               ),
               maxLength: 200,
               maxLines: 2,
               textCapitalization: TextCapitalization.words,
             ),
+
+            // Sport dropdown — D-10: UnderlineInputBorder via theme (no explicit border overrides)
             if (widget.sports.isNotEmpty) ...[
               const SizedBox(height: 16),
               DropdownButtonFormField<String?>(
                 initialValue: _selectedSport,
                 decoration: const InputDecoration(
-                  labelText: 'Esporte (opcional)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
+                  labelText: 'ESPORTE',
+                  // No border: — theme applies UnderlineInputBorder automatically
                 ),
                 items: [
                   const DropdownMenuItem<String?>(
@@ -382,6 +356,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
                 onChanged: (v) => setState(() => _selectedSport = v),
               ),
             ],
+
+            // Error message (unchanged)
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
               Text(
@@ -390,79 +366,40 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               ),
             ],
             const SizedBox(height: 24),
+
+            // Action buttons — BOOK-09: SportBtn for all payment/confirm actions
             if (!_isRecurrent) ...[
               if (widget.pixEnabled) ...[
-                const Text(
-                  'Como voce prefere pagar?',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                ),
+                Text('Como você prefere pagar?', style: AppTheme.ui(size: 15)),
                 const SizedBox(height: 12),
-                FilledButton.icon(
+                SportBtn.filled(
+                  'PAGAR COM PIX',
                   onPressed: _isSubmitting ? null : _handlePayPix,
-                  icon: const Icon(Icons.qr_code, size: 20),
-                  label: const Text('Pagar com Pix'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 10),
-                OutlinedButton.icon(
+                SportBtn.outlined(
+                  'PAGAR NA HORA',
                   onPressed: _isSubmitting ? null : _handlePayOnArrival,
-                  icon: const Icon(Icons.handshake_outlined, size: 20),
-                  label: const Text('Pagar na hora'),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
                 ),
               ] else ...[
-                FilledButton(
-                  onPressed: _isSubmitting ? null : _handlePayOnArrival,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                if (_isSubmitting)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  SportBtn.filled(
+                    'CONFIRMAR RESERVA',
+                    onPressed: _handlePayOnArrival,
                   ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppTheme.paper,
-                          ),
-                        )
-                      : const Text('Confirmar reserva'),
-                ),
               ],
             ] else ...[
-              FilledButton(
-                onPressed: _isSubmitting ? null : _handleConfirmRecurring,
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              if (_isSubmitting)
+                const Center(child: CircularProgressIndicator())
+              else
+                SportBtn.filled(
+                  _availableRecurrenceEntries.isEmpty
+                      ? 'RESERVAR SEMANALMENTE'
+                      : 'RESERVAR ${_availableRecurrenceEntries.length} RESERVA${_availableRecurrenceEntries.length != 1 ? "S" : ""}',
+                  onPressed: _handleConfirmRecurring,
                 ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppTheme.paper,
-                        ),
-                      )
-                    : Text(_availableRecurrenceEntries.isEmpty
-                        ? 'Reservar semanalmente'
-                        : 'Reservar ${_availableRecurrenceEntries.length} reserva${_availableRecurrenceEntries.length != 1 ? "s" : ""}'),
-              ),
             ],
           ],
         ),
