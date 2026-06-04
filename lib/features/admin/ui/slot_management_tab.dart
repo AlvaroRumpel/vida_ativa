@@ -78,20 +78,20 @@ class _AdminDaySelectorState extends State<AdminDaySelector> {
       d.subtract(Duration(days: d.weekday - 1));
 
   void _previousWeek() {
-    setState(() {
-      _weekStart = _weekStart.subtract(const Duration(days: 7));
-    });
+    // Compute new week start first so the onDateChanged call is unambiguous
+    // and doesn't rely on setState having already mutated _weekStart.
+    final newWeekStart = _weekStart.subtract(const Duration(days: 7));
+    setState(() => _weekStart = newWeekStart);
     // Keep same day-of-week in new week
     final dayOffset = widget.selectedDate.weekday - 1;
-    widget.onDateChanged(_weekStart.add(Duration(days: dayOffset)));
+    widget.onDateChanged(newWeekStart.add(Duration(days: dayOffset)));
   }
 
   void _nextWeek() {
-    setState(() {
-      _weekStart = _weekStart.add(const Duration(days: 7));
-    });
+    final newWeekStart = _weekStart.add(const Duration(days: 7));
+    setState(() => _weekStart = newWeekStart);
     final dayOffset = widget.selectedDate.weekday - 1;
-    widget.onDateChanged(_weekStart.add(Duration(days: dayOffset)));
+    widget.onDateChanged(newWeekStart.add(Duration(days: dayOffset)));
   }
 
   @override
