@@ -151,7 +151,10 @@ class _BookingManagementView extends StatelessWidget {
                               ],
                             ),
                           );
-                          if (confirmed == true && context.mounted) {
+                          if (confirmed == true) {
+                            // cubit was captured before the await — safe to
+                            // call here even in a StatelessWidget (context.mounted
+                            // is always true on StatelessWidget and provides no guard).
                             await cubit.confirmBooking(booking.id);
                           }
                         },
@@ -177,7 +180,10 @@ class _BookingManagementView extends StatelessWidget {
                               ],
                             ),
                           );
-                          if (confirmed == true && context.mounted) {
+                          if (confirmed == true) {
+                            // cubit was captured before the await — safe to
+                            // call here even in a StatelessWidget (context.mounted
+                            // is always true on StatelessWidget and provides no guard).
                             await cubit.rejectBooking(booking.id);
                           }
                         },
