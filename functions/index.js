@@ -265,6 +265,16 @@ exports.createPixPayment = onCall(async (request) => {
     const qrCode = paymentResult?.payment_method?.qr_code;
     const qrCodeBase64 = paymentResult?.payment_method?.qr_code_base64;
 
+    // Validate QR fields before writing — a null/undefined value here would
+    // cause PaymentRecordModel.fromFirestore() to throw on the second open.
+    if (!qrCode || !qrCodeBase64) {
+      console.error('createPixPayment: MP response missing qr_code fields. paymentResult:', JSON.stringify(paymentResult));
+      throw new HttpsError(
+        'internal',
+        'Payment created but QR code data is missing from Mercado Pago response.',
+      );
+    }
+
     // 4. Save PaymentRecord subcollection
     await db
       .collection('bookings').doc(bookingId)
