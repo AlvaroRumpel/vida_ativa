@@ -74,7 +74,9 @@ class MyBookingsScreen extends StatelessWidget {
 
   String _heroEyebrow(String bookingDate) {
     final today = DateTime.now();
-    final date = DateTime.parse(bookingDate);
+    // WR-04: guard against malformed bookingDate before indexing day abbreviation array
+    final date = DateTime.tryParse(bookingDate);
+    if (date == null) return 'PRÓXIMO';
     final todayNorm = DateTime(today.year, today.month, today.day);
     final dateNorm = DateTime(date.year, date.month, date.day);
     final diff = dateNorm.difference(todayNorm).inDays;

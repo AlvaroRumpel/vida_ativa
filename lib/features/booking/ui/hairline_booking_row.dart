@@ -76,7 +76,9 @@ class HairlineBookingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final date = DateTime.parse(booking.date);
+    // WR-04: guard against malformed booking.date before indexing day abbreviation array
+    final date = DateTime.tryParse(booking.date);
+    if (date == null) return const SizedBox.shrink();
     final dayNum = date.day;
     final dayAbbr = _dayAbbrevs[date.weekday - 1];
     final timeDisplay = booking.startTime ?? '';
