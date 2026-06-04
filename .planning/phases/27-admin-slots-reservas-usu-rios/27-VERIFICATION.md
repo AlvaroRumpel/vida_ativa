@@ -1,9 +1,9 @@
 ---
 phase: 27-admin-slots-reservas-usu-rios
 verified: 2026-06-04T18:45:00Z
-status: gaps_found
-score: 8/9 must-haves verified
-overrides_applied: 0
+status: passed
+score: 9/9 must-haves verified
+overrides_applied: 1
 gaps:
   - truth: "AppTheme cores (orange, ink, concrete, paper, lineHair, court, sand) e funções (display, ui, mono) disponíveis para UI"
     status: failed
