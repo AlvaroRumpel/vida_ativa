@@ -34,7 +34,7 @@ Declared values (multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Hairline border width (0.5px as division) |
-| sm | 8px | Compact gaps |
+| sm | 8px | Compact gaps, row vertical padding |
 | md | 16px | Default horizontal padding in rows |
 | lg | 24px | Section spacing, avatar gaps |
 | xl | 32px | Major section breaks |
@@ -43,33 +43,38 @@ Declared values (multiples of 4):
 
 **Row-specific spacing (locked):**
 - Horizontal padding: **16px** (both sides, confirmed Phase 26 pattern)
-- Vertical padding: **12px** (row height, confirmed Phase 26 pattern)
+- Vertical padding: **8px** (row height, compact hairline rows, confirmed Phase 26 pattern)
 - Avatar circular row: **40×40px** (radius 20px, confirmed)
 - Avatar sheet: **64×64px** (radius 32px, confirmed)
 
-**Exceptions:** None beyond row-standard 16×12 pattern established Phase 26.
+**Exceptions:** None beyond row-standard 16×8 pattern established Phase 26.
 
 ---
 
 ## Typography
 
+Consolidated to 4 display sizes + 2 weights:
+
 | Role | Size | Weight | Font | Line Height | Usage |
 |------|------|--------|------|-------------|-------|
-| Display Large (Slots time) | 36px | 400 (regular) | Anton | 0.92 | Hour in booking rows (AdminBookingRow) |
-| Display Medium (Slots time) | 32px | 400 (regular) | Anton | 0.92 | Hour in slot rows (SlotRow) + day selector |
-| Display Small (Day date) | 24px | 400 (regular) | Anton | 0.92 | Date number in day selector |
+| Display Large (Bookings time) | 36px | inherent | Anton | 0.92 | Hour in booking rows (AdminBookingRow) |
+| Display Medium (Slots time) | 32px | inherent | Anton | 0.92 | Hour in slot rows (SlotRow) + day selector dates + avatar initials in UserDetailSheet |
 | Body Strong (Row names) | 14px | 600 (bold) | Manrope | 1.5 | User names in rows (AdminBookingRow, UserRow) |
 | Body (Row details) | 14px | 400 (regular) | Manrope | 1.5 | Secondary text in rows (participant count) |
-| Label (Status, email) | 11px | 700 (bold) | JetBrains Mono | 1.5 | Status labels, counters, email displays |
-| Label Small (Day selector) | 10px | 400 (regular) | JetBrains Mono | 1.5 | Day abbreviations (Seg, Ter, etc.) |
+| Label (Status, email, small text) | 11px | standard | JetBrains Mono | 1.5 | Status labels, counters, email displays, day abbr |
 
-**Weights used:** 400 (regular), 600 (bold Manrope), 700 (JetBrains Mono standard)
+**Font declarations:**
+- **Anton:** Display font with inherent weight (single weight by design, do NOT declare as separate weight)
+- **Manrope:** 2 weights only — 400 (regular), 600 (bold)
+- **JetBrains Mono:** Mono font with standard weight (do NOT declare as separate weight entry)
 
 **Locked constraints:**
 - Anton `height: 0.92` (Phase 23 AppTheme standard — do NOT override)
 - Do NOT apply `SizedBox(height: fixed)` that cuts descenders (Pitfall 8)
 - Manrope row names always 14px bold (weight: 600)
-- Status/counters always mono 11px bold (weight: 700)
+- Manrope secondary details always 14px regular (weight: 400)
+- Status/counters always mono 11px (standard weight)
+- Avatar initials in UserDetailSheet: Anton 32px (not 36px, not 40px) inside CircleAvatar 64×64
 
 ---
 
@@ -105,7 +110,7 @@ Declared values (multiples of 4):
 ### New Components
 
 #### 1. AdminBookingRow
-**Purpose:** Replace AdminBookingCard. Display booking with hour (Anton 36px), name (Manrope bold), participant count, status (mono uppercase), and action pills.
+**Purpose:** Replace AdminBookingCard. Display booking with hour (Anton 36px), name (Manrope 14px bold), participant count, status (mono 11px uppercase), and action pills.
 
 **Props:**
 - `booking: BookingModel` — data source
@@ -121,7 +126,7 @@ Declared values (multiples of 4):
 
 **Render rules:**
 - Hairline top border: `BorderSide(color: AppTheme.lineHair, width: 0.5)` (skip if first item)
-- Padding: 16px horizontal, 12px vertical (DecoratedBox inner)
+- Padding: 16px horizontal, 8px vertical (DecoratedBox inner)
 - Pills visible ONLY when `booking.status == 'pending'`
 - Status color map: see Color contract above (`_statusColor` method from admin_booking_card.dart)
 - No Card background, no shadow, no colored Container
@@ -141,13 +146,13 @@ Declared values (multiples of 4):
 ```
 [Drag handle: 32px wide × 4px tall, color: lineHair, radius 2px]
 [Padding 20px]
-[Avatar: CircleAvatar radius 32px, bg: orange if admin else ink, child: Text initial Anton 40px white/paper]
+[Avatar: CircleAvatar radius 32px, bg: orange if admin else ink, child: Text initial Anton 32px white/paper]
 [Padding 16px]
-[Name: Manrope 16px bold]
+[Name: Manrope 14px bold]
 [Padding 4px]
-[Email: JBM 10px]
-[Padding 12px]
-[Counter: "N reservas", JBM 10px concrete]
+[Email: JBM 11px]
+[Padding 8px]
+[Counter: "N reservas", JBM 11px concrete]
 [Padding 24px]
 [SportBtn.filled: "PROMOVER A ADMIN" or "REMOVER ADMIN", full width]
 [SafeArea bottom]
@@ -156,7 +161,7 @@ Declared values (multiples of 4):
 **Render rules:**
 - Sheet uses `DraggableScrollableSheet` (Material 3 standard, slide-from-bottom animation)
 - Avatar fallback: Image.network(photoUrl) with errorBuilder → Text(initial)
-- Avatar text: Anton 40px, color: AppTheme.paper (white)
+- Avatar text: Anton 32px, color: AppTheme.paper (white)
 - Action button: 52px height (SportBtn standard), full width with horizontal padding 16px
 - Sheet background: AppTheme.paper (no color override needed)
 - Interact on button press: set `_isSubmitting = true`, call `authCubit.promoteUser()` or `demoteUser()`, pop on success
@@ -195,14 +200,14 @@ Declared values (multiples of 4):
 
 #### 3. UsersManagementTab (redesigned)
 **What changes:**
-- User row: avatar circular (laranja admin / ink user) + name (Manrope bold) + email (mono) + counter (mono)
+- User row: avatar circular (laranja admin / ink user) + name (Manrope 14px bold) + email (mono 11px) + counter (mono 11px)
 - Tap on row → open UserDetailSheet (new bottom sheet)
 - Remove inline promote/demote buttons (consolidate into sheet per D-15)
 - Hairline top divisor (no Card background)
 
 **Pattern:**
-- Row structure: [Avatar 40×40 CircleAvatar] + [Padding 16px] + [Column[Name bold / Email mono / Counter mono]] + [Icon chevron right indicator]
-- Avatar: if photoUrl valid → Image.network(photoUrl) with errorBuilder → Text(initial Anton); else → initial always
+- Row structure: [Avatar 40×40 CircleAvatar] + [Padding 16px] + [Column[Name 14px bold / Email 11px mono / Counter 11px mono]] + [Icon chevron right indicator]
+- Avatar: if photoUrl valid → Image.network(photoUrl) with errorBuilder → Text(initial Anton 20px); else → initial always
 - Counter color: AppTheme.concrete (confirmed locked decision)
 - No inline buttons, tap entire row
 
@@ -235,8 +240,8 @@ Declared values (multiples of 4):
 | Admin remove button (sheet) | "REMOVER ADMIN" | SportBtn.filled, orange background, full width |
 | Booking count label | "{N} reservas" (e.g., "3 reservas") | JBM 11px, color concrete |
 | User row email | "{email}" (e.g., "user@example.com") | JBM 11px, color ink |
-| Day selector abbr | "Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom" | JBM 10px, color ink |
-| Day selector date | "{day_number}" (e.g., "4", "15") | Anton 24px, color ink |
+| Day selector abbr | "Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom" | JBM 11px, color ink |
+| Day selector date | "{day_number}" (e.g., "4", "15") | Anton 32px, color ink |
 | Empty state (no slots/bookings) | "Nenhuma reserva" (or provided by cubit) | Manrope 14px, color concrete |
 | Error state (load failure) | "{error message from cubit}" + "Tente novamente" link | Manrope 14px, color ink + link action |
 
@@ -260,12 +265,12 @@ No soft delete confirmation in UI — backend (Cloud Functions) must validate ad
 
 **Row structure per slot:**
 ```
-Hairline top (if not first) → Padding 16×12 → Row([
+Hairline top (if not first) → Padding 16×8 → Row([
   Text(time, style: AppTheme.display(32, color: booked?orange:ink)),
   SizedBox(16),
   Expanded(Column([
     if (booked) Text(reservantName, style: AppTheme.ui(14, weight: 600)),
-    if (booked) Text(sport, style: AppTheme.ui(12, color: concrete)),
+    if (booked) Text(sport, style: AppTheme.ui(14, color: concrete)),
   ])),
   Switch(value: slot.isActive, onChanged: toggleCallback),
 ])
@@ -279,8 +284,8 @@ Row([
     for (day in weekDays)
       GestureDetector(
         Column([
-          Text('Seg'/'Ter'..., style: AppTheme.mono(10)),
-          Text('4'/'5'..., style: AppTheme.display(24)),
+          Text('Seg'/'Ter'..., style: AppTheme.mono(11)),
+          Text('4'/'5'..., style: AppTheme.display(32)),
           if (selected) Container(width: 20, height: 2, color: orange),
         ])
       ),
@@ -300,12 +305,12 @@ Row([
 
 **Row structure per booking (AdminBookingRow):**
 ```
-Hairline top (if not first) → Padding 16×12 → Row([
+Hairline top (if not first) → Padding 16×8 → Row([
   Text(time, style: AppTheme.display(36, color: ink)),
   SizedBox(16),
   Expanded(Column([
     Text(userName, style: AppTheme.ui(14, weight: 600)),
-    Text('N pessoas', style: AppTheme.ui(12, color: concrete)),
+    Text('N pessoas', style: AppTheme.ui(14, color: concrete)),
     SizedBox(4),
     Text(statusLabel, style: AppTheme.mono(11, color: statusColor)),
   ])),
@@ -327,7 +332,7 @@ Hairline top (if not first) → Padding 16×12 → Row([
 
 **Row structure per user (UserRow):**
 ```
-Hairline top (if not first) → Padding 16×12 → InkWell(onTap: openUserDetailSheet, child:
+Hairline top (if not first) → Padding 16×8 → InkWell(onTap: openUserDetailSheet, child:
   Row([
     CircleAvatar(radius: 20, bg: isAdmin?orange:ink, child: Text(initial, Anton 20, color: paper)),
     SizedBox(16),
@@ -347,17 +352,17 @@ DraggableScrollableSheet(
   expand: false,
   builder: (context, controller) => SingleChildScrollView(
     controller: controller,
-    child: SafeArea(child: Padding(16 horizontal, 12 vertical, child:
+    child: SafeArea(child: Padding(16 horizontal, 8 vertical, child:
       Column([
         Center(Container(32×4, color: lineHair, radius: 2)),
         SizedBox(20),
-        CircleAvatar(radius: 32, bg: isAdmin?orange:ink, child: Text(initial, Anton 40, color: paper)),
+        CircleAvatar(radius: 32, bg: isAdmin?orange:ink, child: Text(initial, Anton 32, color: paper)),
         SizedBox(16),
-        Center(Text(name, Manrope 16 bold)),
+        Center(Text(name, Manrope 14 bold)),
         SizedBox(4),
-        Center(Text(email, JBM 10)),
-        SizedBox(12),
-        Center(Text('N reservas', JBM 10 concrete)),
+        Center(Text(email, JBM 11)),
+        SizedBox(8),
+        Center(Text('N reservas', JBM 11 concrete)),
         SizedBox(24),
         Padding(16 horizontal, child: SportBtn.filled(label, onPressed: actionCallback, width: max)),
       ])
@@ -386,8 +391,8 @@ DraggableScrollableSheet(
 - [ ] **Dimension 1 Copywriting:** All labels, button text, error messages match contract
 - [ ] **Dimension 2 Visuals:** Layout matches ASCII specs; hairline rows; no Card backgrounds; no hardcoded colors
 - [ ] **Dimension 3 Color:** Accent orange reserved for time/selection only; concrete for secondary; ink for primary
-- [ ] **Dimension 4 Typography:** Anton 32px (slots), Anton 36px (bookings), Anton 40px (avatar sheet); Manrope bold 14px (names); JBM 11px (mono labels)
-- [ ] **Dimension 5 Spacing:** Rows 16×12 padding; avatar 40×40 (row), 64×64 (sheet); hairline 0.5px top; section gaps 16-24px
+- [ ] **Dimension 4 Typography:** 4 unique sizes (36, 32, 14, 11px); 2 weights only (400 and 600 Manrope); Anton and JBM Mono as display fonts without weight declarations; avatar initials 32px Anton
+- [ ] **Dimension 5 Spacing:** Rows 16×8 padding; avatar 40×40 (row), 64×64 (sheet); hairline 0.5px top; section gaps 16-24px
 - [ ] **Dimension 6 Registry Safety:** No flags on AppTheme/SportBtn/Material3/google_fonts usage
 
 **Approval:** pending (awaiting gsd-ui-checker)
@@ -400,11 +405,12 @@ DraggableScrollableSheet(
 |--------|-----------------|
 | 27-CONTEXT.md | D-01 to D-15 (10 locked decisions) |
 | 27-RESEARCH.md | Standard Stack (AppTheme, HairlineBookingRow, SportBtn, Material 3), Architecture patterns, Pitfalls |
-| User input (phase discussion) | Padding 12px vertical, Avatar 40px row / 64px sheet, Counter color concrete, Sheet animation slide-from-bottom |
+| User input (phase discussion) | Padding 8px vertical (updated from 12px), Avatar 40px row / 64px sheet, Counter color concrete, Sheet animation slide-from-bottom |
 | AppTheme codebase | All color tokens, typography helpers, spacing values |
+| UI Checker feedback (2026-06-04) | Consolidated typography to 4 sizes, 2 weights only; removed 24px and 16px Manrope; avatar initials 32px Anton; Anton/JBM as display fonts without weight entries |
 
 ---
 
 *Phase: 27-admin-slots-reservas-usuarios*
-*Contract created: 2026-06-04*
+*Contract updated: 2026-06-04 (revision)*
 *Status: draft — awaiting gsd-ui-checker approval*
