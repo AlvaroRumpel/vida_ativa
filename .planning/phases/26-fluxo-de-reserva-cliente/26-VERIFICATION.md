@@ -164,5 +164,38 @@ Phase status: **READY FOR HUMAN VERIFICATION** (visual testing on device)
 
 ---
 
+## UAT Bug Fix — Pix QR Retry Error (2026-06-04)
+
+### Bug Found During UAT
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | First open of PixPaymentScreen works. Second open (from MyBookingsScreen tap on `pending_payment` row) shows "Erro ao carregar QR. Tente novamente." |
+| **Reproduction** | 1. BookingConfirmationSheet → PAGAR COM PIX → QR loads ✓  2. Back → MyBookingsScreen → tap pending_payment row → PixPaymentScreen shows error ✗ |
+| **Root cause** | `PaymentRecordModel.fromFirestore()` used hard casts: `data['qrCode'] as String` and `data['qrCodeBase64'] as String`. When the Cloud Function writes `qrCode`/`qrCodeBase64` via optional-chain (`paymentResult?.payment_method?.qr_code`), if the Mercado Pago Orders API response does not nest `qr_code` under `payment_method`, both values resolve to `undefined` — which Firestore stores as absent fields. The Dart `as String` cast on a null value throws a `TypeError`/`CastError` at runtime, caught by `_loadFromSubcollection()`'s catch block, which sets the error state. |
+| **Why first open worked** | First open calls `_generateQr()` → reads QR data directly from the Cloud Function HTTP response (`result.data`). No `PaymentRecordModel.fromFirestore()` call involved. |
+| **Why second open failed** | Second open (with `paymentId`) calls `_loadFromSubcollection()` → reads the Firestore subcollection doc → calls `PaymentRecordModel.fromFirestore()` → hard cast throws. |
+
+### Fix Applied
+
+**File 1: `lib/core/models/payment_record_model.dart`**
+- Replaced `data['qrCode'] as String` and `data['qrCodeBase64'] as String` with null-safe casts (`as String?`)
+- Added explicit `StateError` with diagnostic message if fields are null/empty
+- Commit: `fix(pix): null-safe cast in PaymentRecordModel.fromFirestore`
+
+**File 2: `functions/index.js`** (`createPixPayment` Cloud Function)
+- Added validation after extracting `qrCode`/`qrCodeBase64` from MP response
+- If either field is falsy, throws `HttpsError('internal', ...)` with error logging instead of writing a corrupted subcollection doc
+- Prevents the root cause at the source: no null record is ever written to Firestore
+- Commit: `fix(pix): validate qrCode fields in createPixPayment CF before writing`
+
+### Status
+
+**FIXED** — Both layers patched: defensive Dart deserialization + CF-level validation.
+
+---
+
 _Verified: 2026-05-28T00:15:00Z_
 _Verifier: Claude (gsd-verifier)_
+_UAT bug fix: 2026-06-04_
+_Bug fixer: Claude (gsd-debugger)_
