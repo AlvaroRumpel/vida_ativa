@@ -6,8 +6,8 @@ import 'package:vida_ativa/core/theme/app_spacing.dart';
 
 import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
-import 'package:vida_ativa/features/admin/ui/admin_booking_card.dart';
 import 'package:vida_ativa/features/admin/ui/admin_booking_detail_sheet.dart';
+import 'package:vida_ativa/features/admin/ui/admin_booking_row.dart';
 
 class BookingManagementTab extends StatelessWidget {
   const BookingManagementTab({super.key});
@@ -124,10 +124,63 @@ class _BookingManagementView extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final booking = state.bookings[index];
                     return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => _showBookingDetailSheet(context, booking),
-                      child: AdminBookingCard(
+                      child: AdminBookingRow(
                         booking: booking,
-                        bookingCubit: cubit,
+                        index: index,
+                        onConfirm: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Confirmar reserva?'),
+                              content: const Text(
+                                'Deseja confirmar esta reserva? Ação não pode ser desfeita.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(ctx, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () =>
+                                      Navigator.pop(ctx, true),
+                                  child: const Text('Confirmar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true && context.mounted) {
+                            await cubit.confirmBooking(booking.id);
+                          }
+                        },
+                        onReject: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Recusar reserva?'),
+                              content: const Text(
+                                'Deseja recusar esta reserva? Ação não pode ser desfeita.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(ctx, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () =>
+                                      Navigator.pop(ctx, true),
+                                  child: const Text('Recusar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true && context.mounted) {
+                            await cubit.rejectBooking(booking.id);
+                          }
+                        },
                       ),
                     );
                   },
