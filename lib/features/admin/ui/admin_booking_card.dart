@@ -17,38 +17,38 @@ class AdminBookingCard extends StatelessWidget {
 
   Color _statusColor(String status, String? paymentMethod) {
     return switch ((status, paymentMethod)) {
-      ('pending', _) => AppTheme.orange,
-      ('pending_payment', _) => AppTheme.sun,
-      ('confirmed', 'pix') => AppTheme.court,
-      ('confirmed', 'on_arrival') => AppTheme.ink,
-      ('confirmed', _) => AppTheme.court,
-      ('expired', _) => AppTheme.concrete,
-      ('rejected', _) => AppTheme.orangeDk,
-      _ => AppTheme.concrete,
+      ('pending', _) => Colors.orange,
+      ('pending_payment', _) => const Color(0xFFFFC107),
+      ('confirmed', 'pix') => const Color(0xFF4CAF50),
+      ('confirmed', 'on_arrival') => const Color(0xFF2196F3),
+      ('confirmed', _) => AppTheme.primaryGreen,
+      ('expired', _) => Colors.grey,
+      ('rejected', _) => Colors.red,
+      _ => Colors.grey,
     };
   }
 
   // Paleta determinística para chip de esporte (UI-SPEC §Color)
   static const List<Color> _sportBgColors = [
-    AppTheme.paper, // slot 0
-    AppTheme.paper, // slot 1
-    AppTheme.paper, // slot 2
-    AppTheme.paper, // slot 3
-    AppTheme.paper, // slot 4
-    AppTheme.paper, // slot 5
-    AppTheme.paper, // slot 6
-    AppTheme.paper, // slot 7
+    Color(0xFFE3F2FD), // blue bg
+    Color(0xFFE8F5E9), // green bg
+    Color(0xFFFFF3E0), // orange bg
+    Color(0xFFF3E5F5), // purple bg
+    Color(0xFFFCE4EC), // pink bg
+    Color(0xFFE0F7FA), // teal bg
+    Color(0xFFF9FBE7), // lime bg
+    Color(0xFFFFF8E1), // amber bg
   ];
 
   static const List<Color> _sportFgColors = [
-    AppTheme.ink,      // was blue fg
-    AppTheme.court,    // was green fg
-    AppTheme.orange,   // was orange fg
-    AppTheme.ink,      // was purple fg
-    AppTheme.orangeDk, // was red fg
-    AppTheme.court,    // was teal fg
-    AppTheme.court,    // was lime fg
-    AppTheme.sun,      // was amber fg
+    Color(0xFF1565C0),
+    Color(0xFF2E7D32),
+    Color(0xFFE65100),
+    Color(0xFF6A1B9A),
+    Color(0xFFC62828),
+    Color(0xFF00695C),
+    Color(0xFF558B2F),
+    Color(0xFFF57F17),
   ];
 
   int _sportColorIndex(String sport) =>
@@ -201,13 +201,13 @@ class AdminBookingCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.group, size: 14, color: AppTheme.concrete),
+                          const Icon(Icons.group, size: 14, color: Colors.grey),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               booking.participants!,
                               style: const TextStyle(
-                                  color: AppTheme.concrete, fontSize: 13),
+                                  color: Colors.grey, fontSize: 13),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
@@ -224,20 +224,20 @@ class AdminBookingCard extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(Icons.access_time, size: 14,
-                              color: AppTheme.concrete),
+                              color: Colors.grey),
                           const SizedBox(width: 4),
                           Text(
                             booking.startTime!,
-                            style: const TextStyle(color: AppTheme.concrete),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                           if (priceText.isNotEmpty) ...[
                             const SizedBox(width: 12),
                             const Icon(Icons.attach_money, size: 14,
-                                color: AppTheme.concrete),
+                                color: Colors.grey),
                             const SizedBox(width: 2),
                             Text(
                               priceText,
-                              style: const TextStyle(color: AppTheme.concrete),
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ],
                         ],
@@ -261,7 +261,7 @@ class AdminBookingCard extends StatelessWidget {
                             child: OutlinedButton(
                               onPressed: () => _rejectAction(context),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppTheme.orangeDk,
+                                foregroundColor: Colors.red,
                               ),
                               child: const Text('Recusar'),
                             ),

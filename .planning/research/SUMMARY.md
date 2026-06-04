@@ -1,150 +1,156 @@
-# Research Summary - v6.0 Arena Esportivo - Redesign Visual
+# Project Research Summary
 
-**Project:** Vida Ativa - Flutter PWA
-**Domain:** Flutter Material 3 design system application (widget-level migration)
-**Researched:** 2026-05-23
-**Confidence:** HIGH
-
----
+**Project:** Vida Ativa — Flutter Web PWA Court Booking
+**Domain:** Single-venue sports court time-slot booking (beach volleyball / futevôlei)
+**Researched:** 2026-03-19
+**Confidence:** MEDIUM (training-data based; external research tools unavailable this session)
 
 ## Executive Summary
 
-v6.0 is a pure visual migration with no new packages, no BLoC changes, and no data model changes. The AppTheme.lightTheme foundation (DS-01 through DS-04) is already fully built and deployed in production: complete ColorScheme, all three fonts loaded via google_fonts 6.2.1 (Anton, Manrope, JetBrains Mono), static helpers display()/ui()/mono(), and all Material component themes (NavigationBar, TabBar, Card, Button, Input, Switch, Chip, FAB). All v6.0 work is applying existing tokens to widget build() methods that currently bypass the theme with hardcoded colors and TextStyles.
+Vida Ativa is a focused single-venue booking app whose competitive bar is "better than a WhatsApp message chain", not a multi-venue SaaS. That framing is decisive for scope: the feature set is small, the architecture is straightforward, and the real risk is correctness and trust — one double-booking or a data leak will drive users back to WhatsApp permanently. The recommended approach is Flutter Web with Firebase (Firestore + Auth), Riverpod for state management, and go_router for URL-based navigation, deployed as a PWA on Firebase Hosting. This stack matches what the project already has bootstrapped and is well-understood by the Flutter community.
 
-The recommended approach is a screen-by-screen migration in four visual impact groups: (A) navigation shell, (B) client schedule, (C) booking flow, (D) admin panel. Groups A and B ship a fully Arena-branded experience for all client users before a single admin widget is touched. Each group is independently deployable because BLoC/Cubit state is zero-change throughout.
+The recommended architecture is feature-first with clean layering inside each feature (auth, schedule, booking, admin), following the directory structure already sketched in PROJECT.md. Data flows unidirectionally through Firestore streams into Riverpod providers into widgets. The build order is strictly determined by dependencies: Auth → Schedule (read-only) → Booking (write) → Admin → PWA hardening. Skipping this order creates untestable states and forces rework.
 
-The primary risk is font delivery on web: google_fonts fetches Anton/Manrope/JetBrains Mono from fonts.gstatic.com at runtime. On first load the app shows a system font before fonts load (FOUT), and in offline mode all display typography degrades completely. Mitigate before first deploy by bundling exact font weights in assets/google_fonts/. The second risk is hardcoded Color(0xFF...) literals in BookingCard, AdminBookingCard, and BookingConfirmationSheet that silently bypass the theme.
+The two risks that could sink the project before launch are the Firestore double-booking race condition (solved with a transaction using a deterministic `slotId_date` document ID) and insecure Firestore rules (the only server-side enforcement layer; must be deployed before any real user data enters). Everything else — Phone Auth reCAPTCHA complexity, service worker caching, ghost bookings from offline queues — is real but recoverable. The double-booking and open rules problems are not.
 
 ---
 
 ## Key Findings
 
-### Stack - No New Packages
+### Recommended Stack
 
-google_fonts 6.2.1 is sufficient. Anton, Manrope, and JetBrains Mono are confirmed available in the running codebase. Stay on this version; upgrading to 8.x during a visual milestone adds risk with zero benefit. flutter_bloc 9.1.1, fl_chart 1.2.0, and flutter_heatmap_calendar 1.0.5 require no changes; chart and heatmap colors are set via direct params on data models, not inherited from ThemeData.
+The project already has the correct Firebase foundation (`firebase_core`, `firebase_auth`, `cloud_firestore`). The additions needed for v1 are: `flutter_riverpod` + `riverpod_annotation` for stream-based state management, `go_router` for browser-correct URL routing, `table_calendar` for the weekly slot picker, and `intl` for Brazilian Portuguese date formatting. No additional Firebase packages (Cloud Functions, Storage) are needed for v1.
 
-**All Flutter APIs already correct for 3.41.9:**
-- WidgetStateProperty (not deprecated MaterialStateProperty) - already used in app_theme.dart
-- CardThemeData, TabBarThemeData, NavigationBarThemeData (with Data suffix) - already correct
-- ThemeExtension - NOT needed; single light theme, dark mode deferred to v7+
-- ColorScheme explicit constructor (not fromSeed) - correct for fixed brand palette
+PWA configuration is largely handled by Flutter Web's build tooling but requires two manual steps: updating `web/manifest.json` with maskable icons and `display: standalone`, and adding a catch-all SPA rewrite and a `no-cache` header for `flutter_service_worker.js` to `firebase.json`. Security rules should be version-controlled in `firestore.rules` and deployed with `firebase deploy --only firestore:rules`.
 
-**Packages to NOT add:** flex_color_scheme, ThemeExtension packages, dynamic_color, widgetbook, any icon pack.
+**Core technologies:**
+- `flutter_riverpod ^2.5.x`: State management — `StreamProvider` + `AsyncValue` map cleanly onto Firestore streams; no BuildContext required for route guards
+- `go_router ^14.x`: Routing — official Flutter team package; handles browser URL bar, back button, and auth redirect guards correctly for PWA
+- `cloud_firestore ^6.1.3` (existing): Primary database — real-time streams are the correct read strategy for availability data where concurrent writes matter
+- `firebase_auth ^6.2.0` (existing): Auth — Google Sign-In as primary; Phone OTP deferred to v2 due to web-specific reCAPTCHA complexity
+- `table_calendar ^3.1.x`: Weekly schedule UI — avoids 2-3 days of custom calendar implementation
+- `intl ^0.19.x`: Date formatting — required for `pt_BR` locale
 
-### Features - Foundation DONE, Widget Work Remaining
+### Expected Features
 
-The entire DS-01..DS-04 surface is pre-built. What remains is 29 widget-level requirements across 7 screen groups.
+**Must have (table stakes):**
+- Google Sign-In auth — gates all write operations; without it the conflict-prevention model breaks
+- Weekly schedule view with slot state indicators (available / booked / blocked) — first screen users see; must work before anything else
+- Admin: create recurring slot definitions — nothing to book without this; must exist before client flow
+- Admin: block specific dates — holidays and maintenance; direct functional dependency
+- Reserve a slot (tap-to-book) with conflict prevention via Firestore transaction — core action; correctness is non-negotiable
+- View my bookings + cancel with configurable cancellation window — users need to self-manage
+- Admin: view all bookings + confirm/reject — closes the WhatsApp confirmation loop
+- Configurable approval mode (auto vs. manual) — lets admin start cautious and relax later
+- PWA install (manifest + service worker) — set up at project start, not as an afterthought
 
-**Table stakes - DONE (theme foundation):**
-- Single ThemeData source wired in main.dart
-- Google Fonts runtime fetch with correct API calls
-- display()/ui()/mono() static helpers
-- NavigationBar: no pill, sand bg, orange selected state, mono labels
-- TabBar: UnderlineTabIndicator 2px orange, JetBrains Mono labels
-- Card: zero elevation, hairline border
-- All other Material component themes (Button, Input, Switch, Chip, FAB, SnackBar, Checkbox)
+**Should have (differentiators):**
+- Booking status timeline (Pending → Confirmed → Cancelled) — eliminates "did they see my message?" anxiety
+- Cancellation policy enforcement (configurable cutoff hours in Firestore config doc)
+- Slot price display — eliminates "how much?" WhatsApp messages
+- "My next booking" home card — reduces navigation friction for repeat users
 
-**Table stakes - NOT YET DONE (widget application):**
-- All per-screen widgets using AppTheme.* tokens (NAV, SCHED, BOOK, ADMN groups)
-- New components: SportDayStrip, SlotHairlineRow, SportBtn, HairlineBookingRow
+**Defer to v2+:**
+- Phone OTP auth — significant web-specific complexity (reCAPTCHA, domain whitelisting); Google covers most Brazilian Android users
+- Push notifications — requires FCM token management; out of scope for v1
+- Booking history per user in admin — useful but not blocking
+- Share slot deep link — nice-to-have once core routing is solid
 
-**Key differentiators to build:**
-- Anton 88px slot time hero (BOOK-07) and 72px Proximo hero (BOOK-10)
-- Hairline slot rows with 3px orange left stripe and 0.45 opacity for booked-by-other (SCHED-05)
-- Day selector underline column replacing ChoiceChip (SCHED-04)
-- Admin Dashboard: KPI hairline grid, orange-intensity heatmap, simplified bar chart (ADMN-26..29)
+### Architecture Approach
 
-**Defer to v7+:** dark mode, login/profile screen redesign, theme animations.
-**Explicitly out of scope:** PixPaymentScreen redesign, any BLoC/model/routing changes.
+The correct pattern is feature-first with clean layering: `lib/core/` holds models and Firebase service wrappers; `lib/features/{auth,schedule,booking,admin}/` each contain their own `data/`, `providers/`, and `ui/` subdirectories. The admin feature boundary is enforced at the router level — non-admin users are redirected before reaching admin routes. All writes go through Riverpod notifiers into repositories, never directly from widgets to Firestore.
 
-### Architecture - Pure Widget Migration
-
-AppTheme.lightTheme is already wired as the single global theme in main.dart. The migration is pure build() rewrites in */ui/*.dart files. BLoC/Cubit files, model classes, router, Cloud Functions, and AppSpacing are zero-change. Any PR that modifies a cubit file is out of scope.
-
-**New components to create:**
-
-| Component | Path | Replaces |
-|-----------|------|---------|
-| SportDayStrip | lib/features/schedule/ui/sport_day_strip.dart | DayChipRow |
-| SlotHairlineRow | lib/features/schedule/ui/slot_hairline_row.dart | SlotCard |
-| SportBtn | lib/core/widgets/sport_btn.dart | ad-hoc styled buttons |
-| HairlineBookingRow | lib/features/booking/ui/hairline_booking_row.dart | BookingCard |
-
-**Key patterns:**
-- Never use Theme(data: Theme.of(context).copyWith(...)) inside widget subtrees
-- Replace IntrinsicHeight in list rows with Stack + Positioned for status stripes
-- AppTheme.court (green) = confirmed/success; AppTheme.orange = accent/primary - do NOT unify
-- When rewriting SportDayStrip, preserve exact ValueChanged<DateTime> onDaySelected callback
+**Major components:**
+1. `core/models/` — Immutable data classes with `fromFirestore`/`toFirestore`; no Flutter dependency; unit-testable
+2. `core/services/` + `feature/*/data/` repositories — Firebase SDK calls wrapped and translated into domain objects; providers never import Firebase packages directly
+3. `core/router/` — GoRouter with `redirect` guards reading auth state; single entry point for all navigation and the security gate for admin routes
+4. `feature/*/providers/` — Riverpod providers exposing Firestore streams via `AsyncValue`; orchestrate repositories; handle loading/error/data states
+5. Firestore security rules (`firestore.rules`) — the authoritative server-side enforcement layer for all role and ownership checks
 
 ### Critical Pitfalls
 
-1. **Font FOUT / offline degradation** - google_fonts fetches from CDN at runtime. On cold start: system font flashes before Anton/Manrope loads. Offline: all display typography falls back to browser sans-serif, breaking 88px Anton layouts completely. Fix before first deploy: bundle Anton 400, Manrope 400/600/700, JetBrains Mono 700 in assets/google_fonts/ and declare in pubspec.yaml.
+1. **Firestore double-booking race condition** — Use a Firestore transaction with `slotId_dateString` as the deterministic document ID; this is the uniqueness key. Do not ship booking writes without this. A client-side availability check is not atomic.
 
-2. **Hardcoded colors bypass theme** - booking_card.dart has 6+ Color(0xFF...) literals; admin_booking_card.dart has _sportBgColors/_sportFgColors arrays of 8 Material colors; booking_confirmation_sheet.dart has amber container override. Widget tests will not catch these. Audit with grep and map each hex to the nearest AppTheme.* constant before redesigning.
+2. **Insecure Firestore security rules** — `flutterfire configure` exposes the API key in the compiled bundle; rules are the only server-side guard. Deploy restrictive rules (role-gated writes, ownership-scoped reads) before any real user data is written. Version-control `firestore.rules` from day one.
 
-3. **NavigationBar indicator ripple persists** - indicatorColor: Colors.transparent removes the pill fill but not the ink/splash overlay (open Flutter issue 138850). Already correctly set in theme. If ripple becomes visible, wrap NavigationBar in a Theme with splashColor: transparent and highlightColor: transparent. Flutter 3.32 regression: nav bar turns black - test immediately after any SDK upgrade.
+3. **PWA service worker caching stale app shell** — Set `Cache-Control: no-cache` on `flutter_service_worker.js` in `firebase.json`. Add a `controllerchange` listener in `index.html` to force reload on new worker activation. Test the full deploy → update → user-sees-new-version flow explicitly.
 
-4. **Anton height: 0.92 clips at large sizes** - At 88px, logical height is approximately 81px. Any SizedBox with explicit height smaller than fontSize * 0.92 * 1.1 will clip the cap. Do NOT wrap large Anton text in fixed-height SizedBox. Let Text measure its own height.
+4. **Ghost bookings from Firestore offline queue** — Disable offline persistence on web (`persistenceEnabled: false`) for the booking flow, or show a "confirming..." state and listen to the booking document's `status` field post-write before showing success. Never transition to "confirmed" before server acknowledgment.
+
+5. **Phone Auth reCAPTCHA and domain whitelist failures** — Add all deployment domains to Firebase Console → Authorized Domains before testing Phone Auth. It works on localhost but silently fails on production domains. Given the complexity, recommend deferring Phone OTP to v2 and using Google Sign-In only for v1.
 
 ---
 
 ## Implications for Roadmap
 
-The 7-phase sequence from FEATURES.md maps onto 7 roadmap phases. AppTheme foundation is complete and is a pre-condition, not a phase.
+Based on the dependency graph identified in ARCHITECTURE.md and the MVP ordering from FEATURES.md, six phases are recommended.
 
-### Phase 1: NavigationBar Verification (NAV-01, NAV-02)
-**Rationale:** Lowest risk, fastest win. Theme already configured. Font bundling in assets/google_fonts/ happens here as setup step before any screen ships fonts via CDN.
-**Delivers:** Correct nav bar on all screens - orange icon, mono label, sand bg, no pill.
-**Avoids:** Pitfall 3 (ripple through transparent indicator); Flutter 3.32 background regression.
+### Phase 1: Foundation — Core Models, Firebase Wiring, PWA Setup
 
-### Phase 2: Schedule Screen (SCHED-04, SCHED-05, SCHED-06)
-**Rationale:** Highest user-facing surface area - every client on every visit. Contains the two most complex new widgets. Establishes the hairline row pattern used in all subsequent phases.
-**Delivers:** Full Arena-branded client agenda experience.
-**New components:** SportDayStrip, SlotHairlineRow.
-**Avoids:** Day selector cubit desync (preserve ValueChanged<DateTime> callback; update both setState and cubit.selectDay() on week navigation); Anton 42px height clipping.
+**Rationale:** All subsequent features depend on the data model. PWA manifest and Firebase Hosting config are cheap to set up now and expensive to retrofit. Firestore rules should be started here, not at the end.
+**Delivers:** Dart model classes (`Slot`, `Booking`, `AppUser`, `BlockedDate`) with Firestore serialization; `firebase.json` with SPA rewrite and correct cache headers; `web/manifest.json` with maskable icons; initial `firestore.rules` file committed to repo; composite Firestore index for `(date, status)` created.
+**Addresses:** PWA install (table stakes), data model correctness
+**Avoids:** Pitfall 2 (open rules), Pitfall 4 (stale service worker), Pitfall 14 (SPA 404 on hard reload)
+**Research flag:** Standard patterns — no additional research needed
 
-### Phase 3: Admin Structure (ADMN-13, ADMN-14, ADMN-15)
-**Rationale:** AppBar + TabBar + notification banner are shared across all 6 admin tabs. Must ship before any tab refactors.
-**Delivers:** Arena-branded admin frame; unblocks Phases 5, 6, 7.
-**Avoids:** TabBarThemeData type confusion (keep Data suffix); test underline indicator on 5+ tabs.
+### Phase 2: Auth — Google Sign-In, Route Scaffold, Role Guard
 
-### Phase 4: Booking Flow (BOOK-07, BOOK-08, BOOK-09, BOOK-10, BOOK-11, BOOK-12)
-**Rationale:** Second most-used client surface. Anton 88px and 72px heroes are the signature visual moments of v6.0. HairlineBookingRow created here is reused in Phase 5.
-**Delivers:** Complete client booking experience in Arena identity.
-**New components:** SportBtn, HairlineBookingRow.
-**Avoids:** 6+ hardcoded hex in booking_card.dart; IntrinsicHeight in list rows (use Stack + Positioned); Anton clipping at 88px and 72px.
+**Rationale:** Auth is the gate for all write operations. GoRouter's `redirect` guard is the security boundary for admin routes and must exist before any authenticated screen is built.
+**Delivers:** Google Sign-In flow; `AppUser` written to `/users/{uid}` on first login with `role: "client"`; GoRouter scaffold with auth-based redirect; admin route guard redirecting non-admins; Riverpod `currentUser` stream provider.
+**Addresses:** Login (table stakes), admin role enforcement
+**Avoids:** Pitfall 3 (Phone Auth reCAPTCHA — by deferring Phone OTP to v2), Pitfall 6 (client-only admin enforcement), Pitfall 8 (canvas renderer input issues — test on deployed URL)
+**Research flag:** Standard patterns for Google Sign-In; verify HTML renderer behavior on current Flutter Web release before auth UI is built
 
-### Phase 5: Admin Slots + Bookings + Users (ADMN-16..21)
-**Rationale:** Mechanical hairline row refactors using patterns from Phases 2 and 4. Reuses HairlineBookingRow from Phase 4.
-**Delivers:** Three admin tabs fully Arena-branded.
-**Avoids:** Admin day selector int index (migrate to DateTime); _sportBgColors/_sportFgColors hardcoded arrays in AdminBookingCard.
+### Phase 3: Schedule — Read-Only Slot Display
 
-### Phase 6: Admin Pricing + Settings (ADMN-22..25)
-**Rationale:** Lower complexity - Switch already themed, input fields already themed. Mostly layout hairline plus SportBtn.
-**Delivers:** Two admin tabs fully Arena-branded.
+**Rationale:** The schedule screen is what users see first and what booking is triggered from. It must work — with correct loading/error states — before the booking write flow is layered on top.
+**Delivers:** Weekly schedule screen with slot cards showing available/booked/blocked states; Firestore streams for slots + bookings for selected week; proper `AsyncValue` loading/error/data handling; `table_calendar` week navigation; blocked dates suppressing slots.
+**Addresses:** Weekly schedule view (table stakes), slot availability at a glance, offline-friendly loading states
+**Avoids:** Pitfall 7 (slot expansion — keep slots as recurring rules, not pre-expanded documents), Pitfall 10 (missing loading/error states)
+**Research flag:** Standard patterns — no additional research needed
 
-### Phase 7: Admin Dashboard (ADMN-26..29)
-**Rationale:** Most complex - fl_chart bar customization, flutter_heatmap_calendar orange colorsets, KPI grid from Card to hairline Container. Done last so all patterns are established.
-**Delivers:** Fully branded dashboard with orange-intensity heatmap and simplified charts.
-**Key:** Chart and heatmap colors via direct params; use AppTheme.orange.withValues(alpha: x) not deprecated withOpacity.
+### Phase 4: Booking — Reserve, My Bookings, Cancel
+
+**Rationale:** Booking is the core user action and the highest-risk implementation step. The double-booking transaction and ghost booking prevention must be built correctly here; retrofitting them is painful.
+**Delivers:** Booking confirmation sheet; `BookingNotifier` with Firestore transaction using `slotId_dateString` as document ID; cancellation with configurable cutoff enforcement; My Bookings screen with pending/confirmed/cancelled status; offline persistence disabled for web booking writes; post-write status listener before showing success.
+**Addresses:** Reserve a slot, conflict prevention, view my bookings, cancel, booking status timeline, cancellation policy enforcement
+**Avoids:** Pitfall 1 (double-booking race condition — transaction required), Pitfall 5 (ghost bookings from offline queue)
+**Research flag:** Standard patterns for Riverpod notifiers; the transaction pattern is well-documented. Test the race condition manually with two browser tabs before marking done.
+
+### Phase 5: Admin — Slot Management, Booking Approval, Blocked Dates
+
+**Rationale:** Admin manages the data that the client features consume. Its absence does not block client flows, so it comes last in the client feature set. However, admin writes must be server-side gated in Firestore rules before this phase ships.
+**Delivers:** Admin dashboard with booking list; slot CRUD (create recurring slot definitions); blocked date picker; confirm/reject booking actions; configurable approval mode toggle in `/config/booking`; admin router guard confirmed enforced.
+**Addresses:** Admin: create recurring slots, block dates, view all bookings, confirm/reject, configurable approval mode
+**Avoids:** Pitfall 2 (rules must be hardened before admin writes go live), Pitfall 6 (all admin writes gated by `isAdmin()` rule), Pitfall 7 (admin creates slot rules, not pre-expanded documents)
+**Research flag:** Standard patterns — no additional research needed
+
+### Phase 6: PWA Hardening, Security Rules, Deployment
+
+**Rationale:** This phase promotes the app from "works for development" to "safe for real users." Security rules reference all collections so they can only be finalized after all features are built. The service worker update flow and iOS install banner are polish that requires a real deployment to test.
+**Delivers:** Final Firestore security rules deployed; service worker update strategy (no-cache header + controllerchange reload); iOS "Add to Home Screen" in-app banner; end-to-end test of deploy → update → user-sees-new-version flow; Firestore composite indexes verified; `firebase deploy` CI step.
+**Addresses:** PWA install (fully), offline behavior
+**Avoids:** Pitfall 2 (rules finalized and deployed), Pitfall 4 (service worker update flow), Pitfall 12 (iOS Safari install limitation), Pitfall 13 (rules `get()` cost — acceptable at v1 scale)
+**Research flag:** Standard patterns for Firebase Hosting config; verify service worker update behavior against current Flutter Web release
 
 ### Phase Ordering Rationale
 
-- Font bundling in assets/google_fonts/ is a Phase 1 setup step, not a standalone phase.
-- Admin phases 5, 6, 7 are blocked until Phase 3 ships the admin frame.
-- HairlineBookingRow from Phase 4 is reused in Phase 5 - Phase 4 ships first to eliminate duplication.
-- AppTheme.primaryGreen alias cleanup is post-milestone, not in v6.0 scope.
+- Models before auth, auth before schedule, schedule before booking, booking before admin: this is a strict dependency chain — each layer is used by the layer above it
+- PWA setup in Phase 1 (not Phase 6) because manifest and hosting config are quick wins with long lead time to validate (must be deployed to test real install behavior)
+- Firestore rules started in Phase 1, hardened in Phase 6 — rules can be permissive-but-present during development, but must be restrictive before real data enters
+- Admin last among feature phases because it manages configuration that client features depend on; its presence is required before clients can book, but it can be seeded manually during development
 
 ### Research Flags
 
-Skip gsd-research-phase (patterns confirmed in source):
-- **Phase 1** - verification only; theme already wired and confirmed
-- **Phase 3** - admin AppBar/TabBar; APIs confirmed correct in live codebase
-- **Phase 6** - Switch/input theming confirmed correct in app_theme.dart
+Phases needing deeper research during planning:
+- **Phase 2 (Auth):** Verify current Flutter Web HTML renderer behavior and Phone Auth reCAPTCHA requirements against the Flutter Web release in use before building auth UI. Training data confidence is MEDIUM here.
+- **Phase 4 (Booking):** The Firestore transaction pattern for double-booking prevention is well-documented, but the interaction with offline persistence on Flutter Web should be tested in a real browser environment early.
 
-Consider gsd-research-phase if blockers arise:
-- **Phase 2** - if cubit desync during week navigation is non-trivial
-- **Phase 7** - verify exact flutter_heatmap_calendar colorsets param names against installed version
+Phases with well-documented standard patterns (skip research-phase):
+- **Phase 1 (Foundation):** Firestore data modeling and PWA manifest are W3C/Firebase standards; HIGH confidence
+- **Phase 3 (Schedule):** Riverpod `StreamProvider` + `table_calendar` is well-documented; MEDIUM-HIGH confidence
+- **Phase 5 (Admin):** CRUD with Firestore and Riverpod is standard; rules patterns are documented; HIGH confidence
+- **Phase 6 (Deployment):** Firebase Hosting config is documented; service worker headers are standard; HIGH confidence
 
 ---
 
@@ -152,34 +158,43 @@ Consider gsd-research-phase if blockers arise:
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Direct codebase read of app_theme.dart; all three fonts confirmed in running code |
-| Features | HIGH | Requirements cross-checked against live app_theme.dart; DS-01..04 status verified |
-| Architecture | HIGH | Full widget file inventory done; BLoC files confirmed zero-change |
-| Pitfalls | HIGH | Open Flutter issues cited with numbers; hardcoded color count verified in source |
+| Stack | MEDIUM | Versions approximate from training data (cutoff Aug 2025); all pub.dev versions must be verified before pinning. Core technology choices (Riverpod, go_router, Firebase) are HIGH confidence. |
+| Features | MEDIUM | Anti-features and core table stakes are HIGH (grounded in PROJECT.md scope decisions). Brazilian market preference for Google vs. Phone auth is LOW — validate with actual users before permanently deferring Phone OTP. |
+| Architecture | HIGH | Feature-first Flutter architecture and Riverpod/Firestore patterns are mature and well-documented. Data model and security rules patterns are stable. |
+| Pitfalls | HIGH | Firestore transaction behavior, security rules enforcement, Phone Auth domain requirements, and PWA service worker caching are stable, well-documented behaviors. Flutter renderer input behavior is MEDIUM (varies by Flutter version). |
 
-**Overall confidence:** HIGH
+**Overall confidence:** MEDIUM-HIGH
 
 ### Gaps to Address
 
-- **Font bundling exact filenames:** google_fonts requires exact .ttf filenames for asset detection. Wrong filenames cause silent HTTP fallback. Confirm filenames from package source before Phase 1 setup.
-- **flutter_heatmap_calendar colorsets:** API confirmed on pub.dev but not tested in the live app. Verify exact parameter types against installed version before Phase 7.
-- **NavigationBar ripple acceptability:** Needs visual validation in staging to determine whether splashColor: transparent workaround is necessary.
+- **Package versions:** All `^X.Y.Z` versions in STACK.md are approximate. Run `flutter pub add` and verify against pub.dev before committing `pubspec.yaml`.
+- **Phone OTP feasibility on Flutter Web:** Research confirmed multiple failure modes but did not verify against current FlutterFire version. Before v2 planning, check current `firebase_auth` web changelog for reCAPTCHA improvements.
+- **Brazilian market auth preferences:** Assumption that Google Sign-In covers >95% of target users is based on Android market share in Brazil, not gym-demographic data. Worth a quick user survey before deferring Phone OTP permanently.
+- **Firestore composite index creation:** The `(date ASC, status ASC)` index on `bookings` must be created in the Firebase Console or via `firestore.indexes.json` before the schedule screen query works. This is not handled by FlutterFire automatically.
+- **Flutter Web renderer choice:** HTML renderer vs. CanvasKit affects auth form usability (autofill, virtual keyboard). Decision should be made in Phase 2 and tested on a real deployed URL, not just localhost.
 
 ---
 
 ## Sources
 
-- lib/core/theme/app_theme.dart - direct read, 2026-05-23 (HIGH)
-- Flutter API - NavigationBarThemeData: https://api.flutter.dev/flutter/material/NavigationBarThemeData-class.html
-- Flutter API - TabBarTheme: https://api.flutter.dev/flutter/material/TabBarTheme-class.html
-- Flutter breaking changes - MaterialState to WidgetState: https://docs.flutter.dev/release/breaking-changes/material-state
-- Flutter 3.27 release notes (CardThemeData, TabBarThemeData): https://docs.flutter.dev/release/release-notes/release-notes-3.27.0
-- google_fonts pub.dev changelog: https://pub.dev/packages/google_fonts/changelog
-- GitHub - NavigationBar missing overlayColor issue 138850: https://github.com/flutter/flutter/issues/138850
-- GitHub - NavigationBar background regression Flutter 3.32 issue 169258: https://github.com/flutter/flutter/issues/169258
-- GitHub - google_fonts WASM asset loading issue 159375: https://github.com/flutter/flutter/issues/159375
-- Flutter docs - IntrinsicHeight cost: https://api.flutter.dev/flutter/widgets/IntrinsicHeight-class.html
+### Primary (HIGH confidence)
+- `f:/_geral/Projetos/vida_ativa/.planning/PROJECT.md` — project requirements, out-of-scope decisions, data model
+- Flutter feature-first architecture: codewithandrea.com/articles/flutter-project-structure/ (Andrea Bizzotto)
+- Riverpod official docs: riverpod.dev/docs/introduction/getting_started
+- GoRouter official package: pub.dev/packages/go_router
+- Firebase Hosting SPA config: firebase.google.com/docs/hosting/full-config
+- Firestore security rules: firebase.google.com/docs/firestore/security/rules-conditions
+- W3C PWA manifest spec: web.dev/progressive-web-apps/
+
+### Secondary (MEDIUM confidence)
+- Training knowledge of `flutter_riverpod ^2.5.x`, `go_router ^14.x`, `table_calendar ^3.1.x` — versions unverified against current pub.dev
+- Training knowledge of Firestore offline persistence behavior on Flutter Web — requires project-specific testing to confirm interaction with booking transactions
+- Feature landscape based on analysis of Playtomic, CourtReserve, Clubspark patterns from training data
+
+### Tertiary (LOW confidence)
+- Brazilian market Google Sign-In vs. Phone OTP preference — inferred from Android market share data, not user research
+- Flutter Web HTML renderer input behavior — changes between Flutter versions; verify against current release
 
 ---
-*Research completed: 2026-05-23*
+*Research completed: 2026-03-19*
 *Ready for roadmap: yes*

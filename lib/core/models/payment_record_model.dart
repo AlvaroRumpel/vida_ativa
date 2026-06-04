@@ -23,24 +23,10 @@ class PaymentRecordModel extends Equatable {
   factory PaymentRecordModel.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
-    final qrCode = data['qrCode'] as String?;
-    final qrCodeBase64 = data['qrCodeBase64'] as String?;
-    if (qrCode == null || qrCode.isEmpty) {
-      throw StateError(
-        'PaymentRecord ${doc.id}: qrCode is null/empty in Firestore. '
-        'The Cloud Function may have written an incomplete record.',
-      );
-    }
-    if (qrCodeBase64 == null || qrCodeBase64.isEmpty) {
-      throw StateError(
-        'PaymentRecord ${doc.id}: qrCodeBase64 is null/empty in Firestore. '
-        'The Cloud Function may have written an incomplete record.',
-      );
-    }
     return PaymentRecordModel(
       id: doc.id,
-      qrCode: qrCode,
-      qrCodeBase64: qrCodeBase64,
+      qrCode: data['qrCode'] as String,
+      qrCodeBase64: data['qrCodeBase64'] as String,
       expiresAt: (data['expiresAt'] as Timestamp).toDate(),
       status: data['status'] as String,
       createdAt: data['createdAt'] != null

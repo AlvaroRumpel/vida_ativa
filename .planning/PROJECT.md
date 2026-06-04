@@ -89,42 +89,9 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ DASH-11: Cloud Functions onBookingStateChange e scheduledDailyAggregation deployed e funcionais — Phase 21
 - ✓ DASH-12: Admin vê chip de esporte em AdminBookingCard e info-row em AdminBookingDetailSheet — Phase 20
 
-### Validated (v6.0 in progress)
+### Active
 
-- ✓ DS-01 a DS-04: AppTheme Arena verificado — paleta sand/ink/orange/court/sun + helpers display()/ui()/mono() — Phase 23
-- ✓ NAV-01: Bottom navigation exibe ícone laranja e label mono uppercase para aba selecionada — Phase 23
-- ✓ NAV-02: Bottom navigation tem fundo sand, borda superior hairline, sem elevação — Phase 23
-- ✓ SCHED-04: Day selector underline laranja 2px, abreviação mono, número Anton — Phase 24
-- ✓ SCHED-05: Slot rows hairline sem Card, Anton 42px, faixa laranja 3px em myBooking — Phase 24
-- ✓ SCHED-06: Header inline wordmark "VIDA ATIVA" sem AppBar — Phase 24
-- ✓ ADMN-13: TabBar admin com labels JBM UPPERCASE, underline laranja 2px, fundo sand — Phase 25
-- ✓ ADMN-14: Header admin inline wordmark Arena + eyebrow "PAINEL ADMIN" + link "cliente →" — Phase 25
-- ✓ ADMN-15: Notification banners com faixa laranja 2px à esquerda, sem container colorido — Phase 25
-- ✓ BOOK-07: Confirmação exibe horário em Anton 88px como elemento heroico principal — Phase 26
-- ✓ BOOK-08: Aviso de aprovação manual como faixa laranja 2px à esquerda, sem banner colorido — Phase 26
-- ✓ BOOK-09: Botões de pagamento (SportBtn) uppercase Anton sem quebra de linha em mobile — Phase 26
-- ✓ BOOK-10: "Próximo" em Minhas Reservas exibe horário em Anton 72px com eyebrow laranja — Phase 26
-- ✓ BOOK-11: Demais reservas em Minhas Reservas como rows hairline com Anton 30px e status pill — Phase 26
-- ✓ BOOK-12: Section headers "EM SEGUIDA" / "HISTÓRICO" em JBM mono uppercase — Phase 26
-
-### Current Milestone: v6.0 Arena Esportivo — Redesign Visual
-
-**Goal:** Implementar a nova identidade visual esportiva em todas as telas do app, eliminando o "ar de IA" atual e aplicando o design system Arena Esportivo (sand/ink/laranja, Anton + Manrope + JetBrains Mono).
-
-**Target features:**
-- Sistema de design: AppTheme com paleta sport + 3 fontes (Anton/Manrope/JetBrains Mono)
-- Bottom navigation: estilo SportNav com tabs e labels mono
-- Agenda: day selector underline, slot rows hairline com Anton para horários
-- Confirmação de reserva: hora gigante Anton, linha lateral laranja, layout limpo
-- Minhas reservas: hero "Próximo" sem bloco preto, seções hairline
-- Admin tabs: underline laranja 2px substituindo fundo colorido
-- Admin slots/reservas/usuários: rows hairline, Scoreboard para horários
-- Admin dashboard: KPI grid hairline, barras simples, heatmap laranja
-- Admin preços/ajustes: layout hairline consistente
-
-## Active
-
-- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(resolvido parcialmente pelo v6.0 redesign — paleta Arena Esportivo aplicada)*
+- [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
 
 ### Out of Scope
 
@@ -194,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-23 — Milestone v6.0 Arena Esportivo started*
+*Last updated: 2026-05-23 after v5.0 milestone complete*
