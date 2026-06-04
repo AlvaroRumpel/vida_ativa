@@ -80,7 +80,8 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
 - [x] **Phase 23: Design System + NavigationBar** - Font bundling em assets/google_fonts/, verificação do AppTheme já construído, e aplicação dos tokens Arena na bottom navigation bar (completed 2026-05-25)
 - [ ] **Phase 24: Agenda (Cliente)** - SportDayStrip (day selector underline), SlotHairlineRow (rows sem Card com faixa laranja), e wordmark "VIDA ATIVA" no cabeçalho
 - [x] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin (completed 2026-05-27)
-- [x] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas (completed 2026-05-28)
+- [x] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas
+ (completed 2026-05-28)
 - [ ] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores
 - [ ] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP
 - [ ] **Phase 29: Admin Dashboard** - KPI grid hairline, barras simples sem bordas, heatmap escala laranja, e receita por esporte com barra de progresso hairline
@@ -193,7 +194,11 @@ Plans:
   2. Day selector da aba Slots usa o mesmo padrão underline laranja com botões de navegação ← →
   3. Aba Reservas exibe horário em Anton 36px, nome e participantes em Manrope, status em mono uppercase colorido, e ações "Confirmar/Recusar" como pills sem fundo colorido
   4. Aba Usuários exibe avatar circular laranja para admin e ink para usuário comum, com nome em Manrope bold, email em mono, e contador de reservas em mono — sem gradiente
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 27-01-PLAN.md — Redesenho slot_management_tab.dart (ADMN-16, ADMN-17): hairline rows + AdminDaySelector underline laranja
+- [ ] 27-02-PLAN.md — AdminBookingRow + booking_management_tab.dart (ADMN-18, ADMN-19): novo widget, deletar AdminBookingCard
+- [ ] 27-03-PLAN.md — UserDetailSheet + users_management_tab.dart (ADMN-20, ADMN-21): hairline rows + bottom sheet Arena
 **UI hint**: yes
 
 ### Phase 28: Admin Preços + Ajustes
@@ -250,6 +255,6 @@ Plans:
 | 24. Agenda (Cliente) | v6.0 | 0/? | Not started | - |
 | 25. Estrutura Admin | v6.0 | 1/1 | Complete    | 2026-05-27 |
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 3/3 | Complete    | 2026-05-28 |
-| 27. Admin Slots + Reservas + Usuários | v6.0 | 0/? | Not started | - |
+| 27. Admin Slots + Reservas + Usuários | v6.0 | 0/3 | Not started | - |
 | 28. Admin Preços + Ajustes | v6.0 | 0/? | Not started | - |
 | 29. Admin Dashboard | v6.0 | 0/? | Not started | - |
