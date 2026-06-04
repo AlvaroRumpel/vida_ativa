@@ -34,16 +34,22 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
 
   Future<void> _loadUsers() async {
     setState(() => _isLoading = true);
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .orderBy('displayName')
-        .get();
-    final users = snapshot.docs.map((d) => UserModel.fromFirestore(d)).toList();
-    setState(() {
-      _users = users;
-      _onSearchChanged(_searchController.text);
-      _isLoading = false;
-    });
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('displayName')
+          .get();
+      final users = snapshot.docs.map((d) => UserModel.fromFirestore(d)).toList();
+      if (!mounted) return;
+      setState(() {
+        _users = users;
+        _onSearchChanged(_searchController.text);
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+    }
   }
 
   void _onSearchChanged(String query) {
