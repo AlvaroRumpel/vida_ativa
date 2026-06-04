@@ -31,9 +31,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   late final TabController _tabController;
   StreamSubscription<dynamic>? _foregroundSub;
 
-  String? _pendingMessage;
-  Timer? _bannerTimer;
-
   static const int _reservasTabIndex = 3;
 
   @override
@@ -43,16 +40,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     _fcmCubit = AdminFcmCubit();
     _fcmCubit.init();
 
-    // Listen for foreground messages and show an inline banner
+    // Listen for foreground messages and show a SnackBar
     _foregroundSub = _fcmCubit.onForegroundMessage.listen((message) {
       if (!mounted) return;
       final title = message.notification?.title ?? 'Nova Reserva';
       final body = message.notification?.body ?? '';
-      setState(() => _pendingMessage = '$title\n$body');
-      _bannerTimer?.cancel();
-      _bannerTimer = Timer(const Duration(seconds: 5), () {
-        if (mounted) setState(() => _pendingMessage = null);
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$title\n$body'),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'Ver',
+            onPressed: _goToReservas,
+          ),
+        ),
+      );
     });
 
     // Navigate to Reservas if notification was tapped before this screen mounted
@@ -74,38 +76,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     }
   }
 
-  Widget _buildInlineBanner(String message) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(width: 2, color: AppTheme.orange),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(message, style: AppTheme.ui(size: 13)),
-                  ),
-                  TextButton(
-                    onPressed: _goToReservas,
-                    child: Text('Ver', style: AppTheme.mono(size: 11, color: AppTheme.ink)),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _foregroundSub?.cancel();
-    _bannerTimer?.cancel();
     navigateToReservasNotifier.removeListener(_onFcmNavigation);
     _tabController.dispose();
     _fcmCubit.close();
@@ -119,74 +92,40 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       child: BlocProvider.value(
         value: _fcmCubit,
         child: Scaffold(
-          body: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                // --- HEADER ---
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Line 1: wordmark + "cliente →"
-                      Row(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('VIDA', style: AppTheme.display(size: 18, color: AppTheme.ink)),
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.orange,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text('ATIVA', style: AppTheme.display(size: 18, color: AppTheme.paper)),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () => context.go('/home'),
-                            child: Text('cliente →', style: AppTheme.mono(size: 11, color: AppTheme.orange)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      // Line 2: eyebrow
-                      Text('PAINEL ADMIN', style: AppTheme.mono(size: 10, color: AppTheme.concrete)),
-                    ],
+            appBar: AppBar(
+              title: const Text('Painel Admin'),
+              actions: [
+                TextButton.icon(
+                  onPressed: () => context.go('/home'),
+                  icon: const Icon(Icons.person_outline, size: 18),
+                  label: const Text('Área do Cliente'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.primaryGreen,
                   ),
                 ),
-
-                // --- TABBAR ---
-                TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  dividerColor: AppTheme.lineHair,
-                  tabs: const [
-                    Tab(text: 'DASHBOARD'),
-                    Tab(text: 'SLOTS'),
-                    Tab(text: 'BLOQUEIOS'),
-                    Tab(text: 'RESERVAS'),
-                    Tab(text: 'USUÁRIOS'),
-                    Tab(text: 'PREÇOS'),
-                    Tab(text: 'AJUSTES'),
-                  ],
-                ),
-
-                // --- INLINE NEW BOOKING BANNER ---
-                if (_pendingMessage != null) _buildInlineBanner(_pendingMessage!),
-
-                // --- FCM PERMISSION / ERROR BANNERS ---
+              ],
+              bottom: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabs: const [
+                  Tab(text: 'Dashboard'),
+                  Tab(text: 'Slots'),
+                  Tab(text: 'Bloqueios'),
+                  Tab(text: 'Reservas'),
+                  Tab(text: 'Usuarios'),
+                  Tab(text: 'Preços'),
+                  Tab(text: 'Ajustes'),
+                ],
+              ),
+            ),
+            body: Column(
+              children: [
                 BlocBuilder<AdminFcmCubit, AdminFcmState>(
                   builder: (context, state) {
                     if (state is AdminFcmPermissionRequired) {
                       return _NotificationBanner(
-                        onEnable: () => context.read<AdminFcmCubit>().requestPermission(),
+                        onEnable: () =>
+                            context.read<AdminFcmCubit>().requestPermission(),
                       );
                     }
                     if (state is AdminFcmError) {
@@ -203,8 +142,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     return const SizedBox.shrink();
                   },
                 ),
-
-                // --- TAB CONTENT ---
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -217,8 +154,16 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       const PricingTab(),
                       MultiBlocProvider(
                         providers: [
-                          BlocProvider(create: (_) => SettingsCubit(firestore: FirebaseFirestore.instance)),
-                          BlocProvider(create: (_) => SportConfigCubit(firestore: FirebaseFirestore.instance)),
+                          BlocProvider(
+                            create: (_) => SettingsCubit(
+                              firestore: FirebaseFirestore.instance,
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (_) => SportConfigCubit(
+                              firestore: FirebaseFirestore.instance,
+                            ),
+                          ),
                         ],
                         child: const SettingsTab(),
                       ),
@@ -228,7 +173,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -236,36 +180,28 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
 class _NotificationBanner extends StatelessWidget {
   final VoidCallback onEnable;
+
   const _NotificationBanner({required this.onEnable});
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
+    return Container(
+      width: double.infinity,
+      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(width: 2, color: AppTheme.orange),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  const Icon(Icons.notifications_outlined, size: 18, color: AppTheme.ink),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      'Ative as notificações para receber alertas de novas reservas.',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: onEnable,
-                    child: const Text('Ativar'),
-                  ),
-                ],
-              ),
+          const Icon(Icons.notifications_outlined, size: 18),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'Ative as notificações para receber alertas de novas reservas.',
+              style: TextStyle(fontSize: 13),
             ),
+          ),
+          TextButton(
+            onPressed: onEnable,
+            child: const Text('Ativar'),
           ),
         ],
       ),

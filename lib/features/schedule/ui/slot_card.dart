@@ -3,126 +3,112 @@ import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/schedule/models/slot_view_model.dart';
 
-class SlotHairlineRow extends StatelessWidget {
+class SlotCard extends StatelessWidget {
   final SlotViewModel viewModel;
-  final int index;
   final VoidCallback? onTap;
-  final VoidCallback? onDetailTap;
 
-  const SlotHairlineRow({
-    super.key,
-    required this.viewModel,
-    required this.index,
-    this.onTap,
-    this.onDetailTap,
-  });
+  const SlotCard({super.key, required this.viewModel, this.onTap});
 
-  BoxDecoration _borderDecoration() => BoxDecoration(
-        border: index == 0
-            ? null
-            : const Border(
-                top: BorderSide(color: AppTheme.lineHair, width: 0.5),
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 4,
+              color: _statusColor(viewModel.status),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Text(
+                      viewModel.slot.startTime,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      _formatPrice(viewModel.slot.price),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    _StatusLabel(status: viewModel.status, bookerName: viewModel.bookerName),
+                  ],
+                ),
               ),
-      );
+            ),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
 
-  double _opacity(SlotStatus status) => switch (status) {
-        SlotStatus.available => 1.0,
-        SlotStatus.myBooking => 1.0,
-        SlotStatus.booked => 0.45,
-        SlotStatus.blocked => 0.45,
-      };
-
-  String _statusLabel(SlotViewModel vm) => switch (vm.status) {
-        SlotStatus.available => 'DISPONÍVEL',
-        SlotStatus.myBooking => 'MINHA RESERVA',
-        SlotStatus.booked => (vm.bookerName ?? 'OCUPADO').toUpperCase(),
-        SlotStatus.blocked => 'BLOQUEADO',
-      };
-
-  Color _statusLabelColor(SlotStatus status) => switch (status) {
-        SlotStatus.available => AppTheme.court,
-        SlotStatus.myBooking => AppTheme.concrete,
-        SlotStatus.booked => AppTheme.concrete,
-        SlotStatus.blocked => AppTheme.concrete,
+  Color _statusColor(SlotStatus status) => switch (status) {
+        SlotStatus.available => AppTheme.primaryGreen,
+        SlotStatus.booked => Colors.grey,
+        SlotStatus.myBooking => Colors.grey,
+        SlotStatus.blocked => const Color(0xFFE53935),
       };
 
   String _formatPrice(double price) =>
       NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(price);
+}
 
-  Widget _contentRow() => Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            viewModel.slot.startTime,
-            style: AppTheme.display(size: 42),
-          ),
-          const Spacer(),
-          Text(
-            _formatPrice(viewModel.slot.price),
-            style: AppTheme.mono(size: 11),
-          ),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: 96,
-            child: Text(
-              _statusLabel(viewModel),
-              style: AppTheme.mono(
-                size: 11,
-                color: _statusLabelColor(viewModel.status),
-              ),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ],
-      );
+class _StatusLabel extends StatelessWidget {
+  final SlotStatus status;
+  final String? bookerName;
 
-  // Plain row — available, booked, blocked.
-  // IntrinsicHeight is NOT used here (performance: these appear many times in list).
-  Widget _buildPlainRow() => DecoratedBox(
-        decoration: _borderDecoration(),
-        child: Opacity(
-          opacity: _opacity(viewModel.status),
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: _contentRow(),
-            ),
-          ),
-        ),
-      );
-
-  // Stripe row — myBooking only.
-  // IntrinsicHeight is acceptable here: a user has at most one myBooking per day.
-  Widget _buildStripeRow() => DecoratedBox(
-        decoration: _borderDecoration(),
-        child: InkWell(
-          onTap: onDetailTap,
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(width: 3, color: AppTheme.orange),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    child: _contentRow(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+  const _StatusLabel({required this.status, this.bookerName});
 
   @override
   Widget build(BuildContext context) {
-    if (viewModel.status == SlotStatus.myBooking) {
-      return _buildStripeRow();
-    }
-    return _buildPlainRow();
+    return switch (status) {
+      SlotStatus.available => const Text(
+          'Dispon\u00edvel',
+          style: TextStyle(color: AppTheme.primaryGreen),
+        ),
+      SlotStatus.booked => Text(
+          bookerName ?? 'Ocupado',
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      SlotStatus.myBooking => Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: const Text(
+            'Minha reserva',
+            style: TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      SlotStatus.blocked => const Text(
+          'Bloqueado',
+          style: TextStyle(color: Color(0xFFE53935)),
+        ),
+    };
   }
 }

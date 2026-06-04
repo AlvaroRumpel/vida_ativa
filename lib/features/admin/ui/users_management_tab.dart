@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:vida_ativa/core/models/user_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
-import 'package:vida_ativa/core/utils/snack_helper.dart';
+import 'package:vida_ativa/features/admin/ui/user_detail_sheet.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 
 class UsersManagementTab extends StatefulWidget {
@@ -59,39 +59,6 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
     });
   }
 
-  Future<void> _confirmPromote(BuildContext context, UserModel user) async {
-    final authCubit = context.read<AuthCubit>();
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Promover a administrador'),
-        content: Text(
-          'Promover ${user.displayName} a administrador? Esta acao nao pode ser desfeita pelo app.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await authCubit.promoteUser(user.uid);
-              await _loadUsers();
-              if (context.mounted) {
-                SnackHelper.success(context, '${user.displayName} agora é administrador');
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primaryGreen,
-            ),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -103,7 +70,6 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
             decoration: const InputDecoration(
               labelText: 'Buscar por nome ou email',
               prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(),
             ),
             onChanged: _onSearchChanged,
           ),
@@ -123,35 +89,93 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
                       itemCount: _filtered.length,
                       itemBuilder: (context, index) {
                         final user = _filtered[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            child: Text(
-                              user.displayName.isNotEmpty
-                                  ? user.displayName[0].toUpperCase()
-                                  : '?',
+                        return UserRow(
+                          user: user,
+                          index: index,
+                          onTap: () => showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => BlocProvider.value(
+                              value: context.read<AuthCubit>(),
+                              child: UserDetailSheet(user: user),
                             ),
-                          ),
-                          title: Text(user.displayName),
-                          subtitle: Text(user.email),
-                          trailing: user.isAdmin
-                              ? Chip(
-                                  label: const Text('Admin'),
-                                  backgroundColor:
-                                      AppTheme.primaryGreen.withValues(alpha: 0.2),
-                                )
-                              : FilledButton(
-                                  onPressed: () =>
-                                      _confirmPromote(context, user),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: AppTheme.primaryGreen,
-                                  ),
-                                  child: const Text('Promover'),
-                                ),
+                          ).then((_) => _loadUsers()),
                         );
                       },
                     ),
         ),
       ],
+    );
+  }
+}
+
+/// Public widget exposed for widget testing (ADMN-21).
+class UserRow extends StatelessWidget {
+  final UserModel user;
+  final int index;
+  final VoidCallback onTap;
+
+  const UserRow({
+    super.key,
+    required this.user,
+    required this.index,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = user.displayName.isNotEmpty
+        ? user.displayName[0].toUpperCase()
+        : '?';
+    final avatarBg = user.isAdmin ? AppTheme.orange : AppTheme.ink;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: index == 0
+            ? null
+            : const Border(
+                top: BorderSide(color: AppTheme.lineHair, width: 0.5),
+              ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: avatarBg,
+                child: Text(
+                  initial,
+                  style: AppTheme.display(size: 20, color: AppTheme.paper),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.displayName,
+                      style:
+                          AppTheme.ui(size: 14, weight: FontWeight.w600),
+                    ),
+                    Text(user.email, style: AppTheme.mono(size: 11)),
+                    if (user.isAdmin)
+                      Text(
+                        'Admin',
+                        style: AppTheme.mono(size: 11, color: AppTheme.orange),
+                      ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppTheme.concrete, size: 20),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
