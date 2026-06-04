@@ -57,9 +57,28 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
           .get();
       final mode = snap.data()?['confirmationMode'] ?? 'manual';
       if (mounted) setState(() => _requiresConfirmation = mode != 'automatic');
-    } catch (_) {
-      // keep default true
+    } catch (e) {
+      debugPrint('Failed to fetch confirmation mode: $e');
+      // keep default true (_requiresConfirmation stays true)
     }
+  }
+
+  /// WR-02: Centralises string-based error classification in one place.
+  /// If the backend changes error message format, only this method needs updating.
+  String _classifyBookingError(String errorStr) {
+    if (errorStr.contains('slot_already_booked')) {
+      return 'Este horario acabou de ser reservado.';
+    }
+    if (errorStr.contains('slot_already_passed')) {
+      return 'Este horario ja passou.';
+    }
+    return 'Falha na conexao. Tente novamente.';
+  }
+
+  /// Returns true for known/expected booking errors that should not be sent to Sentry.
+  bool _isExpectedBookingError(String errorStr) {
+    return errorStr.contains('slot_already_booked') ||
+        errorStr.contains('slot_already_passed');
   }
 
   Future<void> _handleConfirmRecurring() async {
@@ -68,8 +87,13 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       _isSubmitting = true;
       _errorMessage = null;
     });
+    final rawAuthState = context.read<AuthCubit>().state;
+    if (rawAuthState is! AuthAuthenticated) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
     try {
-      final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+      final authState = rawAuthState;
       final outcomes = await widget.bookingCubit.bookRecurring(
         entries: _availableRecurrenceEntries,
         startTime: widget.viewModel.slot.startTime,
@@ -115,11 +139,12 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       _errorMessage = null;
     });
 
-    final authState = context.read<AuthCubit>().state as AuthAuthenticated;
-    final bookingId = BookingModel.generateId(
-      widget.viewModel.slot.id,
-      widget.viewModel.dateString,
-    );
+    final rawAuthState = context.read<AuthCubit>().state;
+    if (rawAuthState is! AuthAuthenticated) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+    final authState = rawAuthState;
 
     try {
       await widget.bookingCubit.bookSlot(
@@ -138,25 +163,26 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       );
     } on Exception catch (e, s) {
       final str = e.toString();
-      final isExpected =
-          str.contains('slot_already_booked') || str.contains('slot_already_passed');
-      if (!isExpected) await Sentry.captureException(e, stackTrace: s);
-      final msg = str.contains('slot_already_booked')
-          ? 'Este horario acabou de ser reservado.'
-          : str.contains('slot_already_passed')
-              ? 'Este horario ja passou.'
-              : 'Falha na conexao. Tente novamente.';
+      if (!_isExpectedBookingError(str)) await Sentry.captureException(e, stackTrace: s);
+      final msg = _classifyBookingError(str);
       if (mounted) setState(() { _isSubmitting = false; _errorMessage = msg; });
       return;
     }
 
     if (!mounted) return;
+    // WR-05: generate bookingId after successful bookSlot to avoid computing it on failure
+    final bookingId = BookingModel.generateId(
+      widget.viewModel.slot.id,
+      widget.viewModel.dateString,
+    );
     final rootNav = Navigator.of(context, rootNavigator: true);
     Navigator.pop(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      rootNav.push(MaterialPageRoute(
-        builder: (_) => PixPaymentScreen(bookingId: bookingId),
-      ));
+      if (mounted) {  // WR-03: double-check mounted before push
+        rootNav.push(MaterialPageRoute(
+          builder: (_) => PixPaymentScreen(bookingId: bookingId),
+        ));
+      }
     });
   }
 
@@ -166,8 +192,13 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       _isSubmitting = true;
       _errorMessage = null;
     });
+    final rawAuthState = context.read<AuthCubit>().state;
+    if (rawAuthState is! AuthAuthenticated) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+    final authState = rawAuthState;
     try {
-      final authState = context.read<AuthCubit>().state as AuthAuthenticated;
       await widget.bookingCubit.bookSlot(
         slotId: widget.viewModel.slot.id,
         dateString: widget.viewModel.dateString,
@@ -187,14 +218,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
       SnackHelper.success(context, 'Reserva confirmada!');
     } on Exception catch (e, s) {
       final str = e.toString();
-      final isExpected =
-          str.contains('slot_already_booked') || str.contains('slot_already_passed');
-      if (!isExpected) await Sentry.captureException(e, stackTrace: s);
-      final msg = str.contains('slot_already_booked')
-          ? 'Este horario acabou de ser reservado.'
-          : str.contains('slot_already_passed')
-              ? 'Este horario ja passou.'
-              : 'Falha na conexao. Tente novamente.';
+      if (!_isExpectedBookingError(str)) await Sentry.captureException(e, stackTrace: s);
+      final msg = _classifyBookingError(str);
       if (mounted) {
         setState(() {
           _isSubmitting = false;
@@ -336,6 +361,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             ),
 
             // Sport dropdown — D-10: UnderlineInputBorder via theme (no explicit border overrides)
+            // WR-06: null sport is intentional — "Não informado" is a valid selection
+            // passed as-is to bookSlot; downstream accepts null sport.
             if (widget.sports.isNotEmpty) ...[
               const SizedBox(height: 16),
               DropdownButtonFormField<String?>(
