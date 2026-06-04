@@ -340,7 +340,10 @@ class _SlotDayViewState extends State<_SlotDayView> {
 
   Future<void> _openSheet(SlotModel? existing) async {
     if (existing != null) {
-      final docId = BookingModel.generateId(existing.id, existing.date);
+      // Use _selectedDate (the date visible in the UI), not existing.date
+      // (the template date stored on the slot), to avoid missing active bookings
+      // when slot.date diverges from the admin-selected date.
+      final docId = BookingModel.generateId(existing.id, _toDateString(_selectedDate));
       final snap = await FirebaseFirestore.instance
           .collection('bookings')
           .doc(docId)
