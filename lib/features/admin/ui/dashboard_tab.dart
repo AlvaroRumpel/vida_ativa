@@ -66,15 +66,8 @@ class _DashboardTabState extends State<DashboardTab> {
                 const SizedBox(height: 24),
                 _buildHeatmap(data),
                 const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: _buildStatusPie(data),
-                ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: _buildSportDonut(data),
-                ),
+                _buildStatusPie(data),
+                _buildSportRows(data),
                 const SizedBox(height: 40),
               ],
             ),
@@ -447,190 +440,261 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  // ── Status Pie / Donut ───────────────────────────────────────────────────────
+  // ── Status Pie / Donut (D-21 through D-25, ADMN-28) ────────────────────────
 
   Widget _buildStatusPie(DashboardData data) {
     final rawExpired = data.totalBookings -
         data.confirmedBookings -
         data.cancelledBookings -
         data.pendingBookings;
-
     final expired = rawExpired.clamp(0, data.totalBookings);
+    final total = data.totalBookings;
 
-    final sections = <_PieSection>[
-      _PieSection('CONFIRMADAS', data.confirmedBookings.toDouble(), AppTheme.court),
-      _PieSection('PENDENTES',   data.pendingBookings.toDouble(),   AppTheme.sun),
-      _PieSection('CANCELADAS',  data.cancelledBookings.toDouble(), AppTheme.orangeDk),
-      _PieSection('EXPIRADAS',   expired.toDouble(),                AppTheme.concrete),
-    ].where((s) => s.value > 0).toList();
+    final categories = [
+      (label: 'Confirmadas', count: data.confirmedBookings, color: AppTheme.court),
+      (label: 'Pendentes',   count: data.pendingBookings,   color: AppTheme.sun),
+      (label: 'Canceladas',  count: data.cancelledBookings, color: AppTheme.orangeDk),
+      (label: 'Expiradas',   count: expired,                color: AppTheme.concrete),
+    ].where((c) => c.count > 0).toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('DISTRIBUIÇÃO DE RESERVAS', style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
-        const SizedBox(height: 12),
-        if (sections.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text('Sem reservas no período', style: AppTheme.mono(size: 11, color: AppTheme.concrete)),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('RESERVAS', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text('DISTRIBUIÇÃO', style: AppTheme.display(size: 26)),
+                    ],
+                  ),
+                ),
+                Text(
+                  '${total.toString().padLeft(2, '0')} TOTAL',
+                  style: AppTheme.mono(size: 11),
+                ),
+              ],
             ),
-          )
-        else
-          Row(
-            children: [
-              SizedBox(
-                width: 160,
-                height: 160,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    PieChart(
-                      PieChartData(
-                        sections: sections
-                            .map((s) => PieChartSectionData(
-                                  value: s.value,
-                                  color: s.color,
-                                  title: '',
-                                  radius: 52,
-                                ))
-                            .toList(),
-                        centerSpaceRadius: 52,
-                        sectionsSpace: 2,
-                        pieTouchData: PieTouchData(enabled: false),
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          data.totalBookings.toString(),
-                          style: AppTheme.display(size: 28),
-                        ),
-                        Text('RESERVAS', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: sections.map((s) {
-                    final total = sections.fold(0.0, (sum, sec) => sum + sec.value);
-                    final pct = total > 0 ? (s.value / total * 100).toStringAsFixed(0) : '0';
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: [
-                          Container(width: 8, height: 8, color: s.color),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(s.label, style: AppTheme.ui(size: 12)),
-                          ),
-                          Text('$pct%', style: AppTheme.mono(size: 10, color: AppTheme.concrete)),
-                          const SizedBox(width: 6),
-                          Text(s.value.toInt().toString(), style: AppTheme.display(size: 18)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
           ),
-      ],
+          // Body
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+            child: categories.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Text(
+                        'Sem reservas no período',
+                        style: AppTheme.ui(size: 13, color: AppTheme.concrete),
+                      ),
+                    ),
+                  )
+                : Row(
+                    children: [
+                      // Donut
+                      SizedBox(
+                        width: 132,
+                        height: 132,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            PieChart(
+                              PieChartData(
+                                sections: categories
+                                    .map((c) => PieChartSectionData(
+                                          value: c.count.toDouble(),
+                                          color: c.color,
+                                          radius: 40,
+                                          title: '',
+                                        ))
+                                    .toList(),
+                                centerSpaceRadius: 52,
+                                sectionsSpace: 2,
+                                pieTouchData: PieTouchData(enabled: false),
+                              ),
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('$total', style: AppTheme.display(size: 28)),
+                                Text('RESERVAS', style: AppTheme.mono(size: 9)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 22),
+                      // Legend
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: categories.map((c) {
+                            final pct = total > 0 ? (c.count / total * 100).round() : 0;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: c.color,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      c.label,
+                                      style: AppTheme.ui(size: 12.5, weight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  Text('$pct%', style: AppTheme.mono(size: 10)),
+                                  const SizedBox(width: 8),
+                                  Text('${c.count}', style: AppTheme.display(size: 18)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
-  // ── Revenue by Sport ─────────────────────────────────────────────────────────
+  // ── Revenue by Sport — hairline rows (D-26 through D-31, ADMN-29) ───────────
 
-  Widget _buildSportDonut(DashboardData data) {
-    final hasSportData = data.revenueBySport != null && data.revenueBySport!.isNotEmpty;
-    final currencyFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
+  Widget _buildSportRows(DashboardData data) {
+    final sports = data.revenueBySport;
+    final currFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('RECEITA POR ESPORTE', style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
-        const SizedBox(height: 4),
-        if (!hasSportData)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text('Nenhum dado de esporte ainda', style: AppTheme.mono(size: 11, color: AppTheme.concrete)),
-            ),
-          )
-        else
-          ...data.revenueBySport!.asMap().entries.map((entry) {
-            final idx = entry.key;
-            final sport = entry.value;
-            final share = data.totalRevenue > 0 ? sport.revenue / data.totalRevenue : 0.0;
-            final pct = (share * 100).toStringAsFixed(0);
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: idx == 0 ? AppTheme.line : AppTheme.lineHair,
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            sport.sport ?? 'Não informado',
-                            style: AppTheme.ui(size: 14, weight: FontWeight.w700),
-                          ),
-                        ),
-                        Text(currencyFmt.format(sport.revenue), style: AppTheme.mono(size: 11, color: AppTheme.ink)),
-                      ],
-                    ),
+                    Text('RECEITA', style: AppTheme.mono(size: 9.5)),
                     const SizedBox(height: 6),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Stack(
-                          children: [
-                            Container(height: 3, color: AppTheme.lineHair),
-                            Container(
-                              height: 3,
-                              width: constraints.maxWidth * share,
-                              color: AppTheme.orange,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text('$pct%', style: AppTheme.mono(size: 10, color: AppTheme.concrete)),
-                    ),
+                    Text('POR ESPORTE', style: AppTheme.display(size: 26)),
                   ],
                 ),
               ),
-            );
-          }),
-      ],
+              if (sports != null && sports.isNotEmpty)
+                Text('${sports.length} MODALIDADES', style: AppTheme.mono(size: 11)),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Empty state
+          if (sports == null || sports.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                'Nenhum dado de esporte ainda',
+                style: AppTheme.ui(size: 13, color: AppTheme.concrete),
+              ),
+            )
+          else
+            Column(
+              children: sports.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final sp = entry.value;
+                final share = data.totalRevenue > 0
+                    ? (sp.revenue / data.totalRevenue).clamp(0.0, 1.0)
+                    : 0.0;
+                final pct = (share * 100).round();
+
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: idx == 0 ? AppTheme.line : AppTheme.lineHair,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Line 1: sport name + revenue
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                sp.sport ?? 'Não informado',
+                                style: AppTheme.ui(size: 14, weight: FontWeight.w700),
+                              ),
+                            ),
+                            Text(
+                              currFmt.format(sp.revenue),
+                              style: AppTheme.display(size: 18),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Line 2: progress bar + percentage
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) => SizedBox(
+                                  height: 3,
+                                  child: Stack(
+                                    children: [
+                                      Container(color: AppTheme.lineHair),
+                                      Container(
+                                        width: constraints.maxWidth * share,
+                                        color: AppTheme.orange,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text('$pct%', style: AppTheme.mono(size: 10)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
     );
   }
 }
 
 // ── Data classes ──────────────────────────────────────────────────────────────
-
-class _PieSection {
-  final String label;
-  final double value;
-  final Color color;
-  const _PieSection(this.label, this.value, this.color);
-}
 
 class _KpiItem {
   final String kicker;
