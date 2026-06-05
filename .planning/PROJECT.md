@@ -89,6 +89,13 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ DASH-11: Cloud Functions onBookingStateChange e scheduledDailyAggregation deployed e funcionais — Phase 21
 - ✓ DASH-12: Admin vê chip de esporte em AdminBookingCard e info-row em AdminBookingDetailSheet — Phase 20
 
+### Validated (v6.0)
+
+- ✓ ADMN-26: KPI cards em grid 2×N hairlines, Anton 32px, delta mono colorido, sem Card/sombra — Phase 29
+- ✓ ADMN-27: Gráfico de receita com barras Container simples sem bordas arredondadas, labels mono — Phase 29
+- ✓ ADMN-28: Heatmap 7×7 custom GridView com escala laranja rgba + status donut Arena 4 categorias — Phase 29
+- ✓ ADMN-29: Receita por esporte em hairline rows com progress bar 3px laranja, share calculado client-side — Phase 29
+
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
@@ -161,4 +168,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-05 after Phase 28 complete — Admin PricingTab + SettingsTab Arena identity (ADMN-22/23/24/25 validated)*
+*Last updated: 2026-06-05 after Phase 29 complete — Admin Dashboard Arena identity (ADMN-26/27/28/29 validated)*
