@@ -279,7 +279,7 @@ class _DashboardTabState extends State<DashboardTab> {
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
             child: SizedBox(
-              height: 130 + 20 + 16,
+              height: 130 + 20 + 16 + 14, // 180: bar(130) + spacers(16) + labels(14) + top pad(20)
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: _buildRevenueBars(data),
@@ -302,17 +302,18 @@ class _DashboardTabState extends State<DashboardTab> {
     final currFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
 
     return bars.map((b) {
-      final barHeight = ((b.value / safeMax) * 130.0).clamp(4.0, 130.0);
+      final barHeight = ((b.value / safeMax) * 130.0).clamp(0.0, 130.0);
       return Expanded(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(currFmt.format(b.value), style: AppTheme.mono(size: 10, color: AppTheme.ink)),
             const SizedBox(height: 8),
-            Container(
-              height: barHeight,
-              color: b.color,
-            ),
+            if (barHeight > 0)
+              Container(
+                height: barHeight,
+                color: b.color,
+              ),
             const SizedBox(height: 8),
             Text(b.label, style: AppTheme.mono(size: 9.5)),
           ],
