@@ -183,6 +183,7 @@ class _SettingsFormState extends State<_SettingsForm> {
                     children: [
                       Expanded(
                         child: TextField(
+                          key: ValueKey(_showAccessToken),
                           controller: _accessTokenController,
                           obscureText: !_showAccessToken,
                           style: AppTheme.mono(size: 14, color: AppTheme.ink),
@@ -235,6 +236,7 @@ class _SettingsFormState extends State<_SettingsForm> {
                     children: [
                       Expanded(
                         child: TextField(
+                          key: ValueKey(_showWebhookSecret),
                           controller: _webhookSecretController,
                           obscureText: !_showWebhookSecret,
                           style: AppTheme.mono(size: 14, color: AppTheme.ink),

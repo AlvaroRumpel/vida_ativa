@@ -328,8 +328,7 @@ class _TierDisplayRow extends StatelessWidget {
                   ),
                   // Right: price
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'R\$',
