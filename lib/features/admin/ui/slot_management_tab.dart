@@ -120,34 +120,34 @@ class _AdminDaySelectorState extends State<AdminDaySelector> {
 
                 return GestureDetector(
                   onTap: () => widget.onDateChanged(day),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _dayAbbrevs[i],
-                        style: AppTheme.mono(
-                          size: 11,
-                          color: isSelected ? AppTheme.orange : AppTheme.concrete,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _dayAbbrevs[i].toUpperCase(),
+                          style: AppTheme.mono(
+                            size: 8,
+                            color: isSelected ? AppTheme.ink : AppTheme.concrete,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${day.day}',
-                        style: AppTheme.display(
-                          size: 32,
-                          color: isSelected ? AppTheme.orange : AppTheme.ink,
+                        const SizedBox(height: 2),
+                        Text(
+                          '${day.day}',
+                          style: AppTheme.display(
+                            size: 18,
+                            color: isSelected ? AppTheme.ink : AppTheme.concrete,
+                          ),
                         ),
-                      ),
-                      if (isSelected)
+                        const SizedBox(height: 4),
                         Container(
                           width: 20,
                           height: 2,
-                          decoration: const BoxDecoration(
-                            color: AppTheme.orange,
-                          ),
-                        )
-                      else
-                        const SizedBox(height: 2),
-                    ],
+                          color: isSelected ? AppTheme.orange : Colors.transparent,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -227,15 +227,15 @@ class SlotRow extends StatelessWidget {
                     if (isBooked && bookedByName != null)
                       Text(
                         bookedByName!,
-                        style: AppTheme.ui(
-                          size: 14,
-                          weight: FontWeight.w600,
-                        ),
+                        style: AppTheme.ui(size: 13, weight: FontWeight.w700),
                       ),
-                    if (isBooked && sport != null)
+                    if (isBooked)
                       Text(
-                        sport!,
-                        style: AppTheme.ui(size: 14, color: AppTheme.concrete),
+                        'RESERVADO',
+                        style: AppTheme.mono(
+                          size: 10,
+                          color: AppTheme.orange,
+                        ),
                       ),
                     if (!isBooked)
                       Text(
@@ -246,11 +246,14 @@ class SlotRow extends StatelessWidget {
                   ],
                 ),
               ),
-              // Switch — disabled when booked
-              Switch(
-                value: slot.isActive,
-                onChanged: isBooked ? null : onSwitchToggle,
-              ),
+              // Right: chevron if booked, switch if not
+              if (isBooked)
+                const Icon(Icons.chevron_right, color: AppTheme.concrete, size: 18)
+              else
+                Switch(
+                  value: slot.isActive,
+                  onChanged: onSwitchToggle,
+                ),
             ],
           ),
         ),

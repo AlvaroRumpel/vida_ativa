@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/booking_model.dart';
-import 'package:vida_ativa/core/theme/app_spacing.dart';
+import 'package:vida_ativa/core/theme/app_theme.dart';
 
 import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
@@ -46,10 +46,11 @@ class _BookingManagementView extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final formatted = DateFormat("EEEE, d 'de' MMMM", 'pt_BR').format(date);
-    return '${formatted[0].toUpperCase()}${formatted.substring(1)}';
-  }
+  String _dayOfWeek(DateTime date) =>
+      DateFormat('EEEE', 'pt_BR').format(date).toUpperCase();
+
+  String _dateLabel(DateTime date) =>
+      DateFormat("d 'de' MMMM", 'pt_BR').format(date);
 
   Future<void> _pickDate(BuildContext context) async {
     final cubit = context.read<AdminBookingCubit>();
@@ -72,7 +73,7 @@ class _BookingManagementView extends StatelessWidget {
       children: [
         // Date selector row
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -82,13 +83,20 @@ class _BookingManagementView extends StatelessWidget {
                   state.selectedDate.subtract(const Duration(days: 1)),
                 ),
               ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => _pickDate(context),
-                  child: Text(
-                    _formatDate(state.selectedDate),
-                    textAlign: TextAlign.center,
-                  ),
+              GestureDetector(
+                onTap: () => _pickDate(context),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _dayOfWeek(state.selectedDate),
+                      style: AppTheme.mono(size: 9, color: AppTheme.concrete),
+                    ),
+                    Text(
+                      _dateLabel(state.selectedDate),
+                      style: AppTheme.display(size: 24),
+                    ),
+                  ],
                 ),
               ),
               IconButton(
@@ -119,7 +127,7 @@ class _BookingManagementView extends StatelessWidget {
           child: state.bookings.isEmpty
               ? const Center(child: Text('Nenhuma reserva para esta data.'))
               : ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  padding: const EdgeInsets.all(8),
                   itemCount: state.bookings.length,
                   itemBuilder: (context, index) {
                     final booking = state.bookings[index];

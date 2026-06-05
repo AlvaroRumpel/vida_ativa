@@ -76,92 +76,95 @@ class AdminBookingRow extends StatelessWidget {
               ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left: time in Anton 36px
-            Text(
-              timeDisplay,
-              style: AppTheme.display(size: 36),
-            ),
-            const SizedBox(width: 16),
-            // Middle: client info + status
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
+            // Row 1: time + name + participants | price
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(timeDisplay, style: AppTheme.display(size: 36)),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        clientName,
+                        style: AppTheme.ui(size: 15, weight: FontWeight.w700),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (booking.participants != null &&
+                          booking.participants!.isNotEmpty)
+                        Text(
+                          booking.participants!,
+                          style: AppTheme.ui(size: 12, color: AppTheme.concrete),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                    ],
+                  ),
+                ),
+                if (booking.price != null)
                   Text(
-                    clientName,
-                    style: AppTheme.ui(
-                      size: 14,
-                      weight: FontWeight.w600,
-                    ),
+                    'R\$ ${booking.price!.toStringAsFixed(0)}',
+                    style: AppTheme.ui(size: 14, color: AppTheme.concrete),
                   ),
-                  if (booking.participants != null &&
-                      booking.participants!.isNotEmpty)
-                    Text(
-                      booking.participants!,
-                      style: AppTheme.ui(
-                        size: 14,
-                        color: AppTheme.concrete,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    statusLabel,
-                    style: AppTheme.mono(size: 11, color: statusColor),
-                  ),
-                ],
-              ),
+              ],
             ),
-            // Right: CONFIRMAR / RECUSAR pills (pending only)
-            if (isPending) ...[
-              const SizedBox(width: 8),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 36,
-                    child: OutlinedButton(
-                      onPressed: onConfirm,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.court,
-                        side: const BorderSide(
-                            color: AppTheme.court, width: 1.5),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        shape: const StadiumBorder(),
-                        textStyle: AppTheme.mono(size: 10),
-                        minimumSize: Size.zero,
+            const SizedBox(height: 12),
+            // Row 2: status | actions (pending only)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  statusLabel,
+                  style: AppTheme.mono(size: 10, color: statusColor),
+                ),
+                if (isPending)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // CONFIRMAR — ink filled with check icon
+                      SizedBox(
+                        height: 32,
+                        child: FilledButton.icon(
+                          onPressed: onConfirm,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppTheme.ink,
+                            foregroundColor: AppTheme.paper,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            shape: const StadiumBorder(),
+                            textStyle: AppTheme.mono(size: 10),
+                            minimumSize: Size.zero,
+                          ),
+                          icon: const Icon(Icons.check, size: 11),
+                          label: const Text('CONFIRMAR'),
+                        ),
                       ),
-                      child: const Text('CONFIRMAR'),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    height: 36,
-                    child: OutlinedButton(
-                      onPressed: onReject,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.orangeDk,
-                        side: const BorderSide(
-                            color: AppTheme.orangeDk, width: 1.5),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        shape: const StadiumBorder(),
-                        textStyle: AppTheme.mono(size: 10),
-                        minimumSize: Size.zero,
+                      const SizedBox(width: 8),
+                      // RECUSAR — quiet outlined
+                      SizedBox(
+                        height: 32,
+                        child: OutlinedButton(
+                          onPressed: onReject,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.ink,
+                            side: const BorderSide(color: AppTheme.ink, width: 1),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            shape: const StadiumBorder(),
+                            textStyle: AppTheme.mono(size: 10),
+                            minimumSize: Size.zero,
+                          ),
+                          child: const Text('RECUSAR'),
+                        ),
                       ),
-                      child: const Text('RECUSAR'),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ],
         ),
       ),

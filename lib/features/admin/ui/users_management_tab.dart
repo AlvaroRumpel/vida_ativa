@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:vida_ativa/core/models/user_model.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
-import 'package:vida_ativa/features/admin/ui/user_detail_sheet.dart';
 import 'package:vida_ativa/features/auth/cubit/auth_cubit.dart';
 
 class UsersManagementTab extends StatefulWidget {
@@ -95,17 +94,64 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
                       itemCount: _filtered.length,
                       itemBuilder: (context, index) {
                         final user = _filtered[index];
+                        final cubit = context.read<AuthCubit>();
                         return UserRow(
                           user: user,
                           index: index,
-                          onTap: () => showModalBottomSheet<void>(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) => BlocProvider.value(
-                              value: context.read<AuthCubit>(),
-                              child: UserDetailSheet(user: user),
-                            ),
-                          ).then((_) => _loadUsers()),
+                          onPromote: user.isAdmin
+                              ? () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('Remover admin?'),
+                                      content: const Text(
+                                        'Deseja remover privilégios de admin? Ação não pode ser desfeita.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(ctx, false),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () => Navigator.pop(ctx, true),
+                                          child: const Text('Remover'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirmed == true) {
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(user.uid)
+                                        .update({'role': 'client'});
+                                    _loadUsers();
+                                  }
+                                }
+                              : () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('Promover a admin?'),
+                                      content: const Text(
+                                        'Deseja promover este usuário a admin?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(ctx, false),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () => Navigator.pop(ctx, true),
+                                          child: const Text('Promover'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirmed == true) {
+                                    await cubit.promoteUser(user.uid);
+                                    _loadUsers();
+                                  }
+                                },
                         );
                       },
                     ),
@@ -119,13 +165,13 @@ class _UsersManagementTabState extends State<UsersManagementTab> {
 class UserRow extends StatelessWidget {
   final UserModel user;
   final int index;
-  final VoidCallback onTap;
+  final VoidCallback onPromote;
 
   const UserRow({
     super.key,
     required this.user,
     required this.index,
-    required this.onTap,
+    required this.onPromote,
   });
 
   @override
@@ -143,43 +189,60 @@ class UserRow extends StatelessWidget {
                 top: BorderSide(color: AppTheme.lineHair, width: 0.5),
               ),
       ),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: avatarBg,
-                child: Text(
-                  initial,
-                  style: AppTheme.display(size: 20, color: AppTheme.paper),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: avatarBg,
+              child: Text(
+                initial,
+                style: AppTheme.display(size: 20, color: AppTheme.paper),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.displayName,
+                    style: AppTheme.ui(size: 14, weight: FontWeight.w700),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    user.email,
+                    style: AppTheme.mono(size: 10, color: AppTheme.concrete),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            if (user.isAdmin)
+              Text(
+                'ADMIN',
+                style: AppTheme.mono(size: 10, color: AppTheme.orange),
+              )
+            else
+              SizedBox(
+                height: 30,
+                child: OutlinedButton(
+                  onPressed: onPromote,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.ink,
+                    side: const BorderSide(color: AppTheme.ink, width: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    shape: const StadiumBorder(),
+                    textStyle: AppTheme.mono(size: 10),
+                    minimumSize: Size.zero,
+                  ),
+                  child: const Text('PROMOVER'),
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.displayName,
-                      style:
-                          AppTheme.ui(size: 14, weight: FontWeight.w600),
-                    ),
-                    Text(user.email, style: AppTheme.mono(size: 11)),
-                    if (user.isAdmin)
-                      Text(
-                        'Admin',
-                        style: AppTheme.mono(size: 11, color: AppTheme.orange),
-                      ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: AppTheme.concrete, size: 20),
-            ],
-          ),
+          ],
         ),
       ),
     );
