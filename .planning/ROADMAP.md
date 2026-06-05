@@ -82,7 +82,8 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
 - [x] **Phase 25: Estrutura Admin** - AppBar wordmark, TabBar underline laranja, e notification banner com faixa lateral laranja no painel admin (completed 2026-05-27)
 - [x] **Phase 26: Fluxo de Reserva (Cliente)** - Hora Anton 88px na confirmação, SportBtn para ações Pix, e HairlineBookingRow com hero Anton 72px em Minhas Reservas
  (completed 2026-05-28)
-- [x] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores (completed 2026-06-05)
+- [x] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores
+ (completed 2026-06-05)
 - [ ] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP
 - [ ] **Phase 29: Admin Dashboard** - KPI grid hairline, barras simples sem bordas, heatmap escala laranja, e receita por esporte com barra de progresso hairline
 
@@ -210,7 +211,11 @@ Plans:
   2. Botão "Salvar tabela" é um SportBtn ink fixado no rodapé da aba Preços
   3. Toggle Pix na aba Ajustes usa Switch sport (laranja quando ativo, cinza quando inativo) com labels em mono uppercase
   4. Campos de credencial Mercado Pago são underline fields em mono com ícone de olho para revelar valor
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 28-01-PLAN.md — SportBtn.filledInk variant (dependência para footer PricingTab)
+- [ ] 28-02-PLAN.md — PricingTab redesign: hairline rows, timeline laranja, SportBtn.filledInk footer (ADMN-22, ADMN-23)
+- [ ] 28-03-PLAN.md — SettingsTab redesign: Pix Anton 26px, underline fields MP, hairline sport rows (ADMN-24, ADMN-25)
 **UI hint**: yes
 
 ### Phase 29: Admin Dashboard
