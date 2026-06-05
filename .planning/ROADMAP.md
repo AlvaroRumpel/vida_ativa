@@ -227,7 +227,11 @@ Plans:
   2. Gráfico de barras de receita exibe barras sem bordas arredondadas com labels em mono
   3. Heatmap de ocupação exibe células com escala de intensidade laranja (de transparente a laranja sólido) em vez de cores do calendário padrão
   4. Seção de receita por esporte exibe barra de progresso hairline 3px laranja com valor em Anton e label em mono
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 29-01-PLAN.md — Period selector underline tabs + KPI grid 2×N hairline (ADMN-26)
+- [ ] 29-02-PLAN.md — Revenue Container bars + Heatmap custom GridView (ADMN-27, ADMN-28)
+- [ ] 29-03-PLAN.md — Status donut Arena + sport hairline rows + dead code removal (ADMN-28, ADMN-29)
 **UI hint**: yes
 
 ## Progress
@@ -262,4 +266,4 @@ Plans:
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 3/3 | Complete    | 2026-05-28 |
 | 27. Admin Slots + Reservas + Usuários | v6.0 | 3/0 | Complete    | 2026-06-05 |
 | 28. Admin Preços + Ajustes | v6.0 | 3/3 | Complete    | 2026-06-05 |
-| 29. Admin Dashboard | v6.0 | 0/? | Not started | - |
+| 29. Admin Dashboard | v6.0 | 0/3 | Not started | - |
