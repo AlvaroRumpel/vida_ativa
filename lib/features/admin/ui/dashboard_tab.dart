@@ -62,15 +62,9 @@ class _DashboardTabState extends State<DashboardTab> {
                   child: _buildKpiGrid(data),
                 ),
                 const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: _buildRevenueChart(data),
-                ),
+                _buildRevenueChart(data),
                 const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: _buildHeatmap(data),
-                ),
+                _buildHeatmap(data),
                 const SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -255,137 +249,201 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  // ── Revenue Chart ────────────────────────────────────────────────────────────
+  // ── Revenue Chart (D-15 through D-20, ADMN-27) ──────────────────────────────
 
   Widget _buildRevenueChart(DashboardData data) {
-    final currencyFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('RECEITA', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text(
+                        'R\$ ${NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 0).format(data.totalRevenue)}',
+                        style: AppTheme.display(size: 26),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Bar chart
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
+            child: SizedBox(
+              height: 130 + 20 + 16,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: _buildRevenueBars(data),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildRevenueBars(DashboardData data) {
     final bars = [
-      (label: 'TOTAL',      value: data.totalRevenue,      color: AppTheme.ink),
+      (label: 'TOTAL',      value: data.totalRevenue,     color: AppTheme.ink),
       (label: 'PIX',        value: data.pixRevenue,        color: AppTheme.orange),
       (label: 'PRESENCIAL', value: data.onArrivalRevenue,  color: AppTheme.concrete),
     ];
     final maxVal = bars.map((b) => b.value).reduce((a, b) => a > b ? a : b);
-    const chartHeight = 130.0;
+    final safeMax = maxVal > 0 ? maxVal : 1.0;
+    final currFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('RECEITA', style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
-        const SizedBox(height: 4),
-        Text(currencyFmt.format(data.totalRevenue), style: AppTheme.display(size: 32)),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: chartHeight + 40,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: bars.map((bar) {
-              final barH = maxVal > 0 ? (bar.value / maxVal) * chartHeight : 0.0;
-              return Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      currencyFmt.format(bar.value),
-                      style: AppTheme.mono(size: 9, color: AppTheme.ink),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      height: barH.clamp(2.0, chartHeight),
-                      color: bar.color,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(bar.label, style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+    return bars.map((b) {
+      final barHeight = ((b.value / safeMax) * 130.0).clamp(4.0, 130.0);
+      return Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(currFmt.format(b.value), style: AppTheme.mono(size: 10, color: AppTheme.ink)),
+            const SizedBox(height: 8),
+            Container(
+              height: barHeight,
+              color: b.color,
+            ),
+            const SizedBox(height: 8),
+            Text(b.label, style: AppTheme.mono(size: 9.5)),
+          ],
         ),
-      ],
-    );
+      );
+    }).toList();
   }
 
-  // ── Heatmap (placeholder structure) ─────────────────────────────────────────
+  // ── Heatmap custom GridView (D-01 through D-06, ADMN-28) ────────────────────
 
   Widget _buildHeatmap(DashboardData data) {
-    const hours = ['08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h'];
     const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    const slots = ['08h', '10h', '12h', '14h', '16h', '18h', '20h'];
+    // Placeholder: all zeros. Real data requires DashboardData extension (deferred).
+    final heat = List.generate(7, (_) => List.filled(7, 0.0)); // [dayIdx][slotIdx]
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('OCUPAÇÃO POR HORA', style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
-        const SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Y-axis labels
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
-                const SizedBox(height: 20), // header offset
-                ...hours.map((h) => SizedBox(
-                  height: 22,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(h, style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('OCUPAÇÃO', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text('HORA · DIA', style: AppTheme.display(size: 26)),
+                    ],
                   ),
-                )),
+                ),
+                // Legend: BAIXA · 5 squares · ALTA
+                Row(
+                  children: [
+                    Text('BAIXA', style: AppTheme.mono(size: 9)),
+                    const SizedBox(width: 6),
+                    ...[0.15, 0.35, 0.55, 0.75, 1.0].map((o) => Container(
+                      width: 10,
+                      height: 10,
+                      color: Color.fromRGBO(255, 77, 23, o),
+                      margin: const EdgeInsets.only(right: 1),
+                    )),
+                    const SizedBox(width: 6),
+                    Text('ALTA', style: AppTheme.mono(size: 9)),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(
-                children: [
-                  // X-axis labels
-                  Row(
+          ),
+          // Grid body
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Y-axis: slot labels
+                SizedBox(
+                  width: 32,
+                  child: Column(
+                    children: slots.map((s) => SizedBox(
+                      height: 22,
+                      child: Text(s, style: AppTheme.mono(size: 9)),
+                    )).toList(),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Grid: 7 slot rows × 7 day columns
+                Expanded(
+                  child: Column(
+                    children: List.generate(slots.length, (slotIdx) => Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Row(
+                        children: List.generate(days.length, (dayIdx) {
+                          final v = heat[dayIdx][slotIdx];
+                          return Expanded(
+                            child: Container(
+                              height: 22,
+                              margin: dayIdx < days.length - 1
+                                  ? const EdgeInsets.only(right: 3)
+                                  : EdgeInsets.zero,
+                              color: v == 0.0
+                                  ? AppTheme.lineHair
+                                  : Color.fromRGBO(255, 77, 23, (0.12 + v * 0.88).clamp(0.0, 1.0)),
+                            ),
+                          );
+                        }),
+                      ),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // X-axis labels
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 6, 22, 24),
+            child: Row(
+              children: [
+                const SizedBox(width: 32 + 6), // match Y-axis offset
+                Expanded(
+                  child: Row(
                     children: days.map((d) => Expanded(
                       child: Text(
                         d,
+                        style: AppTheme.mono(size: 8.5),
                         textAlign: TextAlign.center,
-                        style: AppTheme.mono(size: 8, color: AppTheme.concrete),
                       ),
                     )).toList(),
                   ),
-                  const SizedBox(height: 4),
-                  // Grid cells
-                  ...hours.map((h) => Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Row(
-                      children: days.map((d) => Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 1.5),
-                          child: Container(
-                            height: 18,
-                            color: AppTheme.lineHair,
-                          ),
-                        ),
-                      )).toList(),
-                    ),
-                  )),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        // Scale legend
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('BAIXA', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
-            const SizedBox(width: 6),
-            ...const [0.15, 0.35, 0.55, 0.75, 1.0].map((opacity) => Container(
-              width: 10,
-              height: 10,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              color: AppTheme.orange.withValues(alpha: opacity),
-            )),
-            const SizedBox(width: 6),
-            Text('ALTA', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
