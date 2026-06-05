@@ -161,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-23 after v5.0 milestone complete*
+*Last updated: 2026-06-05 after Phase 28 complete — Admin PricingTab + SettingsTab Arena identity (ADMN-22/23/24/25 validated)*
