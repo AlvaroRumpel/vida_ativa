@@ -274,9 +274,7 @@ class _TierDisplayRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final tierLabel =
         'FAIXA ${(index + 1).toString().padLeft(2, '0')} · ${_daysLabel(draft.daysOfWeek)}';
-    final currency =
-        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$ ');
-    final priceText = currency.format(draft.price);
+    final priceNumber = NumberFormat('#,##0.00', 'pt_BR').format(draft.price);
 
     return GestureDetector(
       onTap: onTap,
@@ -329,9 +327,20 @@ class _TierDisplayRow extends StatelessWidget {
                     ],
                   ),
                   // Right: price
-                  Text(
-                    priceText,
-                    style: AppTheme.display(size: 44, color: AppTheme.ink),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        'R\$',
+                        style: AppTheme.mono(size: 14, color: AppTheme.concrete),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        priceNumber,
+                        style: AppTheme.display(size: 44, color: AppTheme.ink),
+                      ),
+                    ],
                   ),
                 ],
               ),

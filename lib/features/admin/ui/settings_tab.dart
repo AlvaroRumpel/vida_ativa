@@ -202,14 +202,18 @@ class _SettingsFormState extends State<_SettingsForm> {
                         ),
                       const SizedBox(width: 12),
                       GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () =>
                             setState(() => _showAccessToken = !_showAccessToken),
-                        child: Icon(
-                          _showAccessToken
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          size: 14,
-                          color: AppTheme.concrete,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Icon(
+                            _showAccessToken
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            size: 14,
+                            color: AppTheme.concrete,
+                          ),
                         ),
                       ),
                     ],
@@ -250,14 +254,18 @@ class _SettingsFormState extends State<_SettingsForm> {
                         ),
                       const SizedBox(width: 12),
                       GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () => setState(
                             () => _showWebhookSecret = !_showWebhookSecret),
-                        child: Icon(
-                          _showWebhookSecret
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          size: 14,
-                          color: AppTheme.concrete,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Icon(
+                            _showWebhookSecret
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            size: 14,
+                            color: AppTheme.concrete,
+                          ),
                         ),
                       ),
                     ],
