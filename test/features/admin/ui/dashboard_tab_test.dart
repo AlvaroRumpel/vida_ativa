@@ -84,9 +84,9 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Semana'), findsOneWidget);
-        expect(find.text('Mês'), findsOneWidget);
-        expect(find.text('Ano'), findsOneWidget);
+        expect(find.text('SEMANA'), findsOneWidget);
+        expect(find.text('MÊS'), findsOneWidget);
+        expect(find.text('ANO'), findsOneWidget);
       });
     });
 
@@ -98,11 +98,11 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Taxa de Ocupação'), findsOneWidget);
-        expect(find.text('Receita Total'), findsOneWidget);
-        expect(find.text('Ticket Médio'), findsOneWidget);
-        expect(find.text('Taxa de Conversão'), findsOneWidget);
-        expect(find.text('Taxa de No-Show'), findsOneWidget);
+        expect(find.text('TAXA DE OCUPAÇÃO'), findsOneWidget);
+        expect(find.text('RECEITA TOTAL'), findsOneWidget);
+        expect(find.text('TICKET MÉDIO'), findsOneWidget);
+        expect(find.text('CONVERSÃO'), findsOneWidget);
+        expect(find.text('NO-SHOW'), findsOneWidget);
       });
 
       testWidgets('mostra -- quando metricas nullable sao null',
@@ -129,7 +129,7 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Receita'), findsOneWidget);
+        expect(find.text('RECEITA'), findsAtLeastNWidgets(1));
       });
     });
 
@@ -141,7 +141,8 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Ocupação por Hora e Dia'), findsOneWidget);
+        expect(find.text('OCUPAÇÃO'), findsOneWidget);
+        expect(find.text('HORA · DIA'), findsOneWidget);
       });
     });
 
@@ -153,7 +154,8 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Distribuição de Reservas por Status'), findsOneWidget);
+        expect(find.text('RESERVAS'), findsOneWidget);
+        expect(find.text('DISTRIBUIÇÃO'), findsOneWidget);
       });
     });
 
@@ -179,7 +181,8 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('Receita por Esporte'), findsOneWidget);
+        expect(find.text('RECEITA'), findsAtLeastNWidgets(1));
+        expect(find.text('POR ESPORTE'), findsOneWidget);
       });
     });
   });
