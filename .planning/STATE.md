@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v6.0
+milestone_name: Arena Esportivo — Redesign Visual
 status: executing
-last_updated: "2026-06-04T21:43:46.185Z"
-last_activity: 2026-06-04
+last_updated: "2026-06-05T01:54:40.070Z"
+last_activity: 2026-06-05
 progress:
-  total_phases: 3
+  total_phases: 10
   completed_phases: 3
   total_plans: 9
-  completed_plans: 9
+  completed_plans: 12
   percent: 100
 ---
 
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 ## Current Position
 
-Phase: 27
+Phase: 28
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-06-04
+Last activity: 2026-06-05
 
 ```
 Progress: [█████████████░░░░░░░] 67% (2/3 phases)
