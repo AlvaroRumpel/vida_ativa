@@ -84,7 +84,7 @@ Full details: `.planning/milestones/v5.0-ROADMAP.md`
  (completed 2026-05-28)
 - [x] **Phase 27: Admin Slots + Reservas + Usuários** - Três abas admin com rows hairline usando padrões estabelecidos nas fases anteriores
  (completed 2026-06-05)
-- [ ] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP
+- [x] **Phase 28: Admin Preços + Ajustes** - Faixas de preço hairline com Anton 44px, Switch sport, e underline fields para credenciais MP (completed 2026-06-05)
 - [ ] **Phase 29: Admin Dashboard** - KPI grid hairline, barras simples sem bordas, heatmap escala laranja, e receita por esporte com barra de progresso hairline
 
 ## Phase Details
@@ -213,9 +213,9 @@ Plans:
   4. Campos de credencial Mercado Pago são underline fields em mono com ícone de olho para revelar valor
 **Plans**: 3 plans
 Plans:
-- [ ] 28-01-PLAN.md — SportBtn.filledInk variant (dependência para footer PricingTab)
-- [ ] 28-02-PLAN.md — PricingTab redesign: hairline rows, timeline laranja, SportBtn.filledInk footer (ADMN-22, ADMN-23)
-- [ ] 28-03-PLAN.md — SettingsTab redesign: Pix Anton 26px, underline fields MP, hairline sport rows (ADMN-24, ADMN-25)
+- [x] 28-01-PLAN.md — SportBtn.filledInk variant (dependência para footer PricingTab)
+- [x] 28-02-PLAN.md — PricingTab redesign: hairline rows, timeline laranja, SportBtn.filledInk footer (ADMN-22, ADMN-23)
+- [x] 28-03-PLAN.md — SettingsTab redesign: Pix Anton 26px, underline fields MP, hairline sport rows (ADMN-24, ADMN-25)
 **UI hint**: yes
 
 ### Phase 29: Admin Dashboard
@@ -261,5 +261,5 @@ Plans:
 | 25. Estrutura Admin | v6.0 | 1/1 | Complete    | 2026-05-27 |
 | 26. Fluxo de Reserva (Cliente) | v6.0 | 3/3 | Complete    | 2026-05-28 |
 | 27. Admin Slots + Reservas + Usuários | v6.0 | 3/0 | Complete    | 2026-06-05 |
-| 28. Admin Preços + Ajustes | v6.0 | 0/? | Not started | - |
+| 28. Admin Preços + Ajustes | v6.0 | 3/3 | Complete    | 2026-06-05 |
 | 29. Admin Dashboard | v6.0 | 0/? | Not started | - |
