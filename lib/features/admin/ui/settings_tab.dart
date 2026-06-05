@@ -407,17 +407,6 @@ class _SportsSectionState extends State<_SportsSection> {
     });
   }
 
-  void _reorder(int oldIndex, int newIndex) {
-    setState(() {
-      _isDirty = true;
-      if (newIndex > oldIndex) newIndex--;
-      final updated = List<String>.from(_localSports);
-      final item = updated.removeAt(oldIndex);
-      updated.insert(newIndex, item);
-      _localSports = updated;
-    });
-  }
-
   Future<void> _save() async {
     setState(() => _isSaving = true);
     try {
