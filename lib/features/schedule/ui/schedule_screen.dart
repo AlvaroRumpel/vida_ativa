@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_cubit.dart';
 import 'package:vida_ativa/features/schedule/cubit/schedule_state.dart';
 import 'package:vida_ativa/features/schedule/ui/day_chip_row.dart';
-import 'package:vida_ativa/features/schedule/ui/slot_day_view.dart';
+import 'package:vida_ativa/features/schedule/ui/slot_list.dart';
 import 'package:vida_ativa/features/schedule/ui/week_header.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -60,27 +61,55 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     context.read<ScheduleCubit>().selectDay(day);
   }
 
+  String _eyebrowDate(DateTime day) {
+    const abbrevDays = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    const abbrevMonths = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    final dayName = abbrevDays[day.weekday - 1];
+    final monthName = abbrevMonths[day.month - 1];
+    return '$dayName, ${day.day} $monthName';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.sports_volleyball, size: 20, color: Color(0xFFD4860A)),
-            SizedBox(width: 8),
-            Text('Agenda'),
-          ],
-        ),
-      ),
       body: Column(
         children: [
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('VIDA', style: AppTheme.display(size: 18, color: AppTheme.ink)),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.orange,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text('ATIVA', style: AppTheme.display(size: 18, color: AppTheme.paper)),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    _eyebrowDate(_selectedDay),
+                    style: AppTheme.mono(size: 11, color: AppTheme.ink),
+                  ),
+                ],
+              ),
+            ),
+          ),
           WeekHeader(
             weekStart: _weekStart,
             onPreviousWeek: _canGoPrevious ? _goToPreviousWeek : null,
             onNextWeek: _canGoNext ? _goToNextWeek : null,
           ),
-          DayChipRow(
+          SportDayStrip(
             weekStart: _weekStart,
             selectedDay: _selectedDay,
             onDaySelected: _onDaySelected,
@@ -88,10 +117,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: BlocBuilder<ScheduleCubit, ScheduleState>(
-              builder: (context, state) => SlotDayView(
-                    state: state,
-                    selectedDay: _selectedDay,
-                  ),
+              builder: (context, state) => SlotList(state: state),
             ),
           ),
         ],
