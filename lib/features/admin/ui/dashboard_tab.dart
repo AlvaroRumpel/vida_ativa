@@ -153,11 +153,16 @@ class _DashboardTabState extends State<DashboardTab> {
 
   Widget _buildKpiGrid(DashboardData data) {
     final kpis = [
-      _KpiItem(kicker: 'TAXA DE OCUPAÇÃO', rawValue: data.occupancyRate != null ? (data.occupancyRate! * 100) : null, unit: 'pct'),
-      _KpiItem(kicker: 'RECEITA TOTAL',    rawValue: data.totalRevenue, unit: 'currency'),
-      _KpiItem(kicker: 'TICKET MÉDIO',     rawValue: data.avgTicket, unit: 'currency'),
-      _KpiItem(kicker: 'CONVERSÃO',        rawValue: data.conversionRate != null ? (data.conversionRate! * 100) : null, unit: 'pct'),
-      _KpiItem(kicker: 'NO-SHOW',          rawValue: data.noShowRate != null ? (data.noShowRate! * 100) : null, unit: 'pct'),
+      _KpiItem(kicker: 'TAXA DE OCUPAÇÃO', rawValue: data.occupancyRate != null ? (data.occupancyRate! * 100) : null, unit: 'pct',
+        trend: data.occupancyTrend, tooltipText: 'Slots reservados ÷ slots disponíveis no período.'),
+      _KpiItem(kicker: 'RECEITA TOTAL',    rawValue: data.totalRevenue, unit: 'currency',
+        trend: data.revenueTrend, tooltipText: 'Soma de todas as reservas confirmadas no período.'),
+      _KpiItem(kicker: 'TICKET MÉDIO',     rawValue: data.avgTicket, unit: 'currency',
+        trend: data.avgTicketTrend, tooltipText: 'Receita total ÷ número de reservas confirmadas.'),
+      _KpiItem(kicker: 'CONVERSÃO',        rawValue: data.conversionRate != null ? (data.conversionRate! * 100) : null, unit: 'pct',
+        trend: data.conversionTrend, tooltipText: 'Reservas confirmadas ÷ total de reservas criadas.'),
+      _KpiItem(kicker: 'NO-SHOW',          rawValue: data.noShowRate != null ? (data.noShowRate! * 100) : null, unit: 'pct',
+        trend: data.noShowTrend, tooltipText: 'Reservas expiradas ou canceladas depois de confirmadas.'),
     ];
 
     final List<Widget> rows = [];
@@ -227,12 +232,33 @@ class _DashboardTabState extends State<DashboardTab> {
       );
     }
 
+    final hasTrend = kpi.trend != null && kpi.trend!.length >= 2;
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(kpi.kicker, style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(kpi.kicker, style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
+              const Spacer(),
+              if (hasTrend)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: CustomPaint(
+                    size: const Size(56, 22),
+                    painter: _SparklinePainter(kpi.trend!),
+                  ),
+                ),
+              if (kpi.tooltipText.isNotEmpty)
+                Tooltip(
+                  message: kpi.tooltipText,
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Text('?', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
+                ),
+            ],
+          ),
           const SizedBox(height: 4),
           valueWidget,
           const SizedBox(height: 4),
@@ -517,11 +543,11 @@ class _DashboardTabState extends State<DashboardTab> {
                                     .map((c) => PieChartSectionData(
                                           value: c.count.toDouble(),
                                           color: c.color,
-                                          radius: 40,
+                                          radius: 18,
                                           title: '',
                                         ))
                                     .toList(),
-                                centerSpaceRadius: 52,
+                                centerSpaceRadius: 48,
                                 sectionsSpace: 2,
                                 pieTouchData: PieTouchData(enabled: false),
                               ),
@@ -701,5 +727,44 @@ class _KpiItem {
   final String kicker;
   final double? rawValue;
   final String unit; // 'currency' | 'pct'
-  const _KpiItem({required this.kicker, required this.rawValue, required this.unit});
+  final List<double>? trend;
+  final String tooltipText;
+  const _KpiItem({
+    required this.kicker,
+    required this.rawValue,
+    required this.unit,
+    this.trend,
+    this.tooltipText = '',
+  });
+}
+
+class _SparklinePainter extends CustomPainter {
+  final List<double> points;
+  const _SparklinePainter(this.points);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+    final min = points.reduce((a, b) => a < b ? a : b);
+    final max = points.reduce((a, b) => a > b ? a : b);
+    final range = max - min;
+    final isUp = points.last >= points.first;
+    final paint = Paint()
+      ..color = isUp ? AppTheme.court : AppTheme.orangeDk
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+    final path = Path();
+    for (int i = 0; i < points.length; i++) {
+      final x = (i / (points.length - 1)) * size.width;
+      final normalized = range > 0 ? (points[i] - min) / range : 0.5;
+      final y = size.height - normalized * size.height;
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter old) => old.points != points;
 }

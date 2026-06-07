@@ -67,6 +67,13 @@ class DashboardData extends Equatable {
   final List<TopClientEntry>? topClients;
   final List<RevenueBySportEntry>? revenueBySport;
 
+  // Trend arrays para sparklines (7 pontos diários) — ADMN-30
+  final List<double>? occupancyTrend;
+  final List<double>? revenueTrend;
+  final List<double>? avgTicketTrend;
+  final List<double>? conversionTrend;
+  final List<double>? noShowTrend;
+
   const DashboardData({
     required this.period,
     required this.startDate,
@@ -90,6 +97,11 @@ class DashboardData extends Equatable {
     required this.returnRate,
     required this.topClients,
     required this.revenueBySport,
+    this.occupancyTrend,
+    this.revenueTrend,
+    this.avgTicketTrend,
+    this.conversionTrend,
+    this.noShowTrend,
   });
 
   factory DashboardData.empty(String period) => DashboardData(
@@ -149,6 +161,16 @@ class DashboardData extends Equatable {
       revenueBySport: revenueBySportRaw
           ?.map((e) => RevenueBySportEntry.fromMap(e as Map<String, dynamic>))
           .toList(),
+      occupancyTrend: (map['occupancyTrend'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble()).toList(),
+      revenueTrend: (map['revenueTrend'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble()).toList(),
+      avgTicketTrend: (map['avgTicketTrend'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble()).toList(),
+      conversionTrend: (map['conversionTrend'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble()).toList(),
+      noShowTrend: (map['noShowTrend'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble()).toList(),
     );
   }
 
@@ -176,5 +198,10 @@ class DashboardData extends Equatable {
         returnRate,
         topClients,
         revenueBySport,
+        occupancyTrend,
+        revenueTrend,
+        avgTicketTrend,
+        conversionTrend,
+        noShowTrend,
       ];
 }
