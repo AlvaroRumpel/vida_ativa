@@ -58,6 +58,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 ### Roadmap Evolution
 
+- Phase 30 added 2026-06-07: Validação Visual Arena — UAT automatizado + checklist manual
 - v5.0 roadmap criado 2026-05-19: 3 phases (20–22), 16 requirements mapeados
 - Phase 20: SPORT-01..04 (campo de esporte — infraestrutura completa)
 - Phase 21: DASH-01..04, DASH-09..12 (backend de agregação + métricas de clientes)
