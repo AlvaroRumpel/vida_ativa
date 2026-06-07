@@ -234,6 +234,19 @@ Plans:
 - [x] 29-03-PLAN.md — Status donut Arena + sport hairline rows + dead code removal (ADMN-28, ADMN-29)
 **UI hint**: yes
 
+### Phase 30: Validação Visual Arena — UAT automatizado + checklist manual
+
+**Goal:** Garantir que a identidade Arena Esportivo está corretamente implementada em todas as telas ativas do app — zero tokens hardcoded, conformidade visual ponto-a-ponto e checklist manual de screenshot comparison
+**Requirements**: VAL-01, VAL-02, VAL-03, VAL-04, VAL-05, VAL-06
+**Depends on:** Phase 29
+**Plans:** 4 plans
+
+Plans:
+- [ ] 30-01-PLAN.md — Token audit (grep hardcoded) + fix CRITICAL em pix_payment_screen + admin_screen + VALIDATION.md
+- [ ] 30-02-PLAN.md — flutter analyze + flutter build web --release + cobertura widget tests fases 26-29
+- [ ] 30-03-PLAN.md — Conformidade visual ponto-a-ponto por tela contra CONTEXT.md das fases originais
+- [ ] 30-04-PLAN.md — Geração do 30-CHECKLIST.md + checkpoint de UAT manual do usuário
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -267,3 +280,4 @@ Plans:
 | 27. Admin Slots + Reservas + Usuários | v6.0 | 3/0 | Complete    | 2026-06-05 |
 | 28. Admin Preços + Ajustes | v6.0 | 3/3 | Complete    | 2026-06-05 |
 | 29. Admin Dashboard | v6.0 | 3/3 | Complete    | 2026-06-05 |
+| 30. Validação Visual Arena | v6.0 | 0/4 | Ready      | - |
