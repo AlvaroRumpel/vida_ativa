@@ -99,6 +99,9 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
+- [ ] ADMN-30: KPI cards exibem sparkline de tendência (7 pontos diários) quando campo `*Trend` disponível em DashboardData — modelo pronto, dados via seed staging
+- [ ] ADMN-31: Admin pode tocar em "?" ao lado de cada KPI e ver tooltip com descrição do que o dado representa
+- [ ] DEV-01: Script `scripts/seed_dashboard_staging.js` popula Firestore staging com dados realistas incluindo trend arrays
 
 ### Out of Scope
 
@@ -168,4 +171,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-05 after Phase 29 complete — Admin Dashboard Arena identity (ADMN-26/27/28/29 validated)*
+*Last updated: 2026-06-07 post-Phase 29 adjustments — donut fix, KPI sparklines (ADMN-30), tooltips (ADMN-31), staging seed script (DEV-01)*
