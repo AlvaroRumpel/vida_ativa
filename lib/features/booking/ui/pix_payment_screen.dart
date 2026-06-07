@@ -234,13 +234,10 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     if (_qrExpired) {
       return Column(
         children: [
-          const Text(
+          Text(
             'QR expirado. Gere um novo acima.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFFC62828),
-              fontStyle: FontStyle.italic,
-            ),
+            style: AppTheme.ui(size: 14, color: AppTheme.orangeDk)
+                .copyWith(fontStyle: FontStyle.italic),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -251,11 +248,9 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
               icon: const Icon(Icons.refresh),
               label: const Text('Gerar novo QR'),
               style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.primaryGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                backgroundColor: AppTheme.orange,
+                foregroundColor: AppTheme.paper,
+                shape: const StadiumBorder(),
               ),
             ),
           ),
@@ -271,10 +266,9 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
 
     return Text(
       '$minutes:$seconds restantes',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: isUrgent ? const Color(0xFFC62828) : AppTheme.primaryGreen,
+      style: AppTheme.display(
+        size: 24,
+        color: isUrgent ? AppTheme.orangeDk : AppTheme.court,
       ),
     );
   }
@@ -299,15 +293,15 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
   }
 
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
           Text(
             'Gerando QR...',
-            style: TextStyle(fontSize: 16, color: Color(0xFF757575)),
+            style: AppTheme.ui(size: 16, color: AppTheme.concrete),
           ),
         ],
       ),
@@ -321,12 +315,12 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Color(0xFFC62828)),
+            const Icon(Icons.error_outline, size: 48, color: AppTheme.orangeDk),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: AppTheme.ui(size: 16),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -350,10 +344,10 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         children: [
           const SizedBox(height: 8),
           // Header instruction
-          const Text(
+          Text(
             'Escaneie o QR code com seu app de banco',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: AppTheme.ui(size: 16, weight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
           // QR image with expired overlay
@@ -363,7 +357,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.paper,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -384,7 +378,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.5),
+                      color: AppTheme.ink.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
@@ -403,10 +397,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   'ou use o codigo',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 13,
-                  ),
+                  style: AppTheme.ui(size: 13, color: AppTheme.concrete),
                 ),
               ),
               const Expanded(child: Divider()),
@@ -417,18 +408,14 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: AppTheme.paper,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               _qrCode!,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontFamily: 'monospace',
-                color: Color(0xFF424242),
-              ),
+              style: AppTheme.mono(size: 12, color: AppTheme.ink),
             ),
           ),
           const SizedBox(height: 12),
@@ -442,11 +429,11 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
               ),
               label: Text(_copied ? 'Copiado' : 'Copiar codigo'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.primaryGreen,
+                foregroundColor: AppTheme.orange,
                 side: BorderSide(
                   color: _copied
-                      ? AppTheme.primaryGreen
-                      : AppTheme.primaryGreen.withValues(alpha: 0.5),
+                      ? AppTheme.orange
+                      : AppTheme.orange.withValues(alpha: 0.5),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -460,19 +447,19 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF8E1),
+              color: AppTheme.sand,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFFFB300), width: 1),
+              border: Border.all(color: AppTheme.orange, width: 1),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, size: 16, color: Color(0xFFE65100)),
-                SizedBox(width: 8),
+                const Icon(Icons.info_outline, size: 16, color: AppTheme.orange),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Apos pagar, sua reserva sera confirmada automaticamente.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFFE65100)),
+                    style: AppTheme.ui(size: 12, color: AppTheme.orange),
                   ),
                 ),
               ],

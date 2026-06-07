@@ -192,11 +192,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     if (state is AdminFcmError) {
                       return Container(
                         width: double.infinity,
-                        color: Colors.red.withValues(alpha: 0.1),
+                        color: AppTheme.orangeDk.withValues(alpha: 0.1),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: Text(
                           'FCM Error: ${state.message}',
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
+                          style: AppTheme.ui(size: 12, color: AppTheme.orangeDk),
                         ),
                       );
                     }
@@ -253,10 +253,10 @@ class _NotificationBanner extends StatelessWidget {
                 children: [
                   const Icon(Icons.notifications_outlined, size: 18, color: AppTheme.ink),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Ative as notificações para receber alertas de novas reservas.',
-                      style: TextStyle(fontSize: 13),
+                      style: AppTheme.ui(size: 13),
                     ),
                   ),
                   TextButton(

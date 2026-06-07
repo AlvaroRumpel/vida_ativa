@@ -7,9 +7,9 @@
 
 | Severity | Total | Fixed | Pending |
 |----------|-------|-------|---------|
-| CRITICAL | 20    | 20    | 0       |
-| MINOR    | 7     | 7     | 0       |
-| **TOTAL**| **27**| **27**| **0**   |
+| CRITICAL | 21    | 21    | 0       |
+| MINOR    | 7     | 4     | 3       |
+| **TOTAL**| **28**| **25**| **3**   |
 
 ---
 
@@ -44,6 +44,7 @@
 | V-25  | Admin Booking  | MINOR    | `TextStyle(color:Colors.red)` no erro de booking management — deve ser AppTheme.ui(color:AppTheme.orangeDk) | booking_management_tab.dart | 23   | pendente manual |
 | V-26  | Admin Pricing  | MINOR    | `TextStyle(color:Colors.red)` no erro de pricing tab — deve ser AppTheme.ui(color:AppTheme.orangeDk) | pricing_tab.dart | 40   | pendente manual |
 | V-27  | Admin Settings | MINOR    | `TextStyle(color:Colors.red)` em 2 locais no settings_tab — deve ser AppTheme.ui(color:AppTheme.orangeDk) | settings_tab.dart | 22,447 | pendente manual |
+| V-28  | Pix Error      | MINOR    | `TextStyle(fontSize:16)` no corpo da mensagem de erro (_buildError) — deve ser AppTheme.ui(size:16) | pix_payment_screen.dart | 323  | fix aplicado |
 
 ---
 

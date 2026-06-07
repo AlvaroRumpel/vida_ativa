@@ -389,7 +389,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
               const SizedBox(height: 12),
               Text(
                 _errorMessage!,
-                style: const TextStyle(color: AppTheme.orangeDk),
+                style: AppTheme.ui(size: 13, color: AppTheme.orangeDk),
               ),
             ],
             const SizedBox(height: 24),
