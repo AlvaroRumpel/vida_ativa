@@ -54,6 +54,22 @@ const week = {
   avgTicketTrend: [110, 115, 118, 120, 124, 126, 128],
   conversionTrend: [0.72, 0.70, 0.71, 0.69, 0.68, 0.67, 0.68],
   noShowTrend: [0.09, 0.085, 0.08, 0.074, 0.07, 0.069, 0.068],
+  // Period-over-period deltas (ratio)
+  occupancyDelta:  0.082,
+  revenueDelta:    0.124,
+  avgTicketDelta:  0.041,
+  conversionDelta: -0.020,
+  noShowDelta:     -0.012,
+  // Heatmap flat[49]: dayIdx*7+slotIdx, days Mon-Sun, slots 08h-20h
+  heatmap: [
+    0.3, 0.5, 0.4, 0.7, 0.9, 0.8, 0.4, // Mon
+    0.2, 0.6, 0.5, 0.8, 1.0, 0.9, 0.5, // Tue
+    0.1, 0.4, 0.3, 0.6, 0.8, 0.7, 0.3, // Wed
+    0.3, 0.5, 0.6, 0.9, 1.0, 0.8, 0.6, // Thu
+    0.4, 0.7, 0.8, 1.0, 1.0, 0.9, 0.7, // Fri
+    0.6, 0.9, 1.0, 1.0, 0.9, 0.8, 0.9, // Sat
+    0.5, 0.8, 0.9, 0.7, 0.6, 0.5, 0.4, // Sun
+  ],
   // Sport breakdown
   topClients: [
     { userId: 'user-seed-01', displayName: 'Carlos Mendes', bookingCount: 6 },

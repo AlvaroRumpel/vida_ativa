@@ -154,15 +154,15 @@ class _DashboardTabState extends State<DashboardTab> {
   Widget _buildKpiGrid(DashboardData data) {
     final kpis = [
       _KpiItem(kicker: 'TAXA DE OCUPAÇÃO', rawValue: data.occupancyRate != null ? (data.occupancyRate! * 100) : null, unit: 'pct',
-        trend: data.occupancyTrend, tooltipText: 'Slots reservados ÷ slots disponíveis no período.'),
+        trend: data.occupancyTrend, delta: data.occupancyDelta, tooltipText: 'Slots reservados ÷ slots disponíveis no período.'),
       _KpiItem(kicker: 'RECEITA TOTAL',    rawValue: data.totalRevenue, unit: 'currency',
-        trend: data.revenueTrend, tooltipText: 'Soma de todas as reservas confirmadas no período.'),
+        trend: data.revenueTrend, delta: data.revenueDelta, tooltipText: 'Soma de todas as reservas confirmadas no período.'),
       _KpiItem(kicker: 'TICKET MÉDIO',     rawValue: data.avgTicket, unit: 'currency',
-        trend: data.avgTicketTrend, tooltipText: 'Receita total ÷ número de reservas confirmadas.'),
+        trend: data.avgTicketTrend, delta: data.avgTicketDelta, tooltipText: 'Receita total ÷ número de reservas confirmadas.'),
       _KpiItem(kicker: 'CONVERSÃO',        rawValue: data.conversionRate != null ? (data.conversionRate! * 100) : null, unit: 'pct',
-        trend: data.conversionTrend, tooltipText: 'Reservas confirmadas ÷ total de reservas criadas.'),
+        trend: data.conversionTrend, delta: data.conversionDelta, tooltipText: 'Reservas confirmadas ÷ total de reservas criadas.'),
       _KpiItem(kicker: 'NO-SHOW',          rawValue: data.noShowRate != null ? (data.noShowRate! * 100) : null, unit: 'pct',
-        trend: data.noShowTrend, tooltipText: 'Reservas expiradas ou canceladas depois de confirmadas.'),
+        trend: data.noShowTrend, delta: data.noShowDelta, tooltipText: 'Reservas expiradas ou canceladas depois de confirmadas.'),
     ];
 
     final List<Widget> rows = [];
@@ -233,36 +233,48 @@ class _DashboardTabState extends State<DashboardTab> {
     }
 
     final hasTrend = kpi.trend != null && kpi.trend!.length >= 2;
+    final delta = kpi.delta;
+    final deltaLabel = delta != null
+        ? '${delta >= 0 ? '↑' : '↓'} ${(delta.abs() * 100).toStringAsFixed(1)}%'
+        : '--';
+    final deltaColor = delta != null
+        ? (delta >= 0 ? AppTheme.court : AppTheme.orange)
+        : AppTheme.concrete;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(kpi.kicker, style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
-              const Spacer(),
-              if (hasTrend)
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: CustomPaint(
-                    size: const Size(56, 22),
-                    painter: _SparklinePainter(kpi.trend!),
-                  ),
-                ),
-              if (kpi.tooltipText.isNotEmpty)
+              if (kpi.tooltipText.isNotEmpty) ...[
+                const SizedBox(width: 4),
                 Tooltip(
                   message: kpi.tooltipText,
                   triggerMode: TooltipTriggerMode.tap,
                   child: Text('?', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
                 ),
+              ],
             ],
           ),
           const SizedBox(height: 4),
-          valueWidget,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              valueWidget,
+              if (hasTrend) ...[
+                const Spacer(),
+                CustomPaint(
+                  size: const Size(64, 36),
+                  painter: _SparklinePainter(kpi.trend!),
+                ),
+              ],
+            ],
+          ),
           const SizedBox(height: 4),
-          Text('--', style: AppTheme.mono(size: 10, color: AppTheme.concrete)),
+          Text(deltaLabel, style: AppTheme.mono(size: 10, color: deltaColor)),
         ],
       ),
     );
@@ -353,8 +365,7 @@ class _DashboardTabState extends State<DashboardTab> {
   Widget _buildHeatmap(DashboardData data) {
     const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
     const slots = ['08h', '10h', '12h', '14h', '16h', '18h', '20h'];
-    // Placeholder: all zeros. Real data requires DashboardData extension (deferred).
-    final heat = List.generate(7, (_) => List.filled(7, 0.0)); // [dayIdx][slotIdx]
+    final heat = data.heatmap ?? List.generate(7, (_) => List.filled(7, 0.0)); // [dayIdx][slotIdx]
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -728,12 +739,14 @@ class _KpiItem {
   final double? rawValue;
   final String unit; // 'currency' | 'pct'
   final List<double>? trend;
+  final double? delta; // period-over-period ratio, e.g. 0.082 = +8.2%
   final String tooltipText;
   const _KpiItem({
     required this.kicker,
     required this.rawValue,
     required this.unit,
     this.trend,
+    this.delta,
     this.tooltipText = '',
   });
 }

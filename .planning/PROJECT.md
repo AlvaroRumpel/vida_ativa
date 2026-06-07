@@ -99,9 +99,11 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
-- [ ] ADMN-30: KPI cards exibem sparkline de tendência (7 pontos diários) quando campo `*Trend` disponível em DashboardData — modelo pronto, dados via seed staging
-- [ ] ADMN-31: Admin pode tocar em "?" ao lado de cada KPI e ver tooltip com descrição do que o dado representa
-- [ ] DEV-01: Script `scripts/seed_dashboard_staging.js` popula Firestore staging com dados realistas incluindo trend arrays
+- [x] ADMN-30: KPI cards exibem sparkline de tendência (7 pontos diários) — `*Trend` fields em DashboardData, sparkline inline com value widget
+- [x] ADMN-31: Admin pode tocar em "?" ao lado de cada KPI e ver tooltip com descrição do que o dado representa
+- [x] DEV-01: Script `scripts/seed_dashboard_staging.js` popula Firestore staging com dados realistas incluindo trend arrays, deltas e heatmap flat[49]
+- [x] ADMN-32: Delta period-over-period (↑/↓ X.X%) exibido por KPI — campos `*Delta` em DashboardData + seed
+- [x] ADMN-33: Heatmap hora×dia desbloqueado — campo `heatmap` flat[49] em DashboardData, `_heatmapFromFlat` reconstrói 7×7
 
 ### Out of Scope
 
@@ -171,4 +173,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-07 post-Phase 29 adjustments — donut fix, KPI sparklines (ADMN-30), tooltips (ADMN-31), staging seed script (DEV-01)*
+*Last updated: 2026-06-07 — sparkline posição corrigida (value row), deltas ↑/↓ (ADMN-32), heatmap desbloqueado (ADMN-33), seed atualizado com flat heatmap + deltas*

@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+List<List<double>>? _heatmapFromFlat(List<dynamic>? flat) {
+  if (flat == null || flat.length != 49) return null;
+  return List.generate(7, (d) => List.generate(7, (s) => (flat[d * 7 + s] as num).toDouble()));
+}
+
 class TopClientEntry extends Equatable {
   final String userId;
   final String displayName;
@@ -74,6 +79,16 @@ class DashboardData extends Equatable {
   final List<double>? conversionTrend;
   final List<double>? noShowTrend;
 
+  // Period-over-period deltas (ratio, e.g. 0.082 = +8.2%)
+  final double? occupancyDelta;
+  final double? revenueDelta;
+  final double? avgTicketDelta;
+  final double? conversionDelta;
+  final double? noShowDelta;
+
+  // Heatmap: [dayIdx 0=Mon..6=Sun][slotIdx 0=08h..6=20h] occupancy 0.0–1.0
+  final List<List<double>>? heatmap;
+
   const DashboardData({
     required this.period,
     required this.startDate,
@@ -102,6 +117,12 @@ class DashboardData extends Equatable {
     this.avgTicketTrend,
     this.conversionTrend,
     this.noShowTrend,
+    this.occupancyDelta,
+    this.revenueDelta,
+    this.avgTicketDelta,
+    this.conversionDelta,
+    this.noShowDelta,
+    this.heatmap,
   });
 
   factory DashboardData.empty(String period) => DashboardData(
@@ -128,6 +149,7 @@ class DashboardData extends Equatable {
         topClients: null,
         revenueBySport: null,
       );
+
 
   factory DashboardData.fromMap(Map<String, dynamic>? map) {
     if (map == null) return DashboardData.empty('');
@@ -171,6 +193,12 @@ class DashboardData extends Equatable {
           ?.map((e) => (e as num).toDouble()).toList(),
       noShowTrend: (map['noShowTrend'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble()).toList(),
+      occupancyDelta: (map['occupancyDelta'] as num?)?.toDouble(),
+      revenueDelta: (map['revenueDelta'] as num?)?.toDouble(),
+      avgTicketDelta: (map['avgTicketDelta'] as num?)?.toDouble(),
+      conversionDelta: (map['conversionDelta'] as num?)?.toDouble(),
+      noShowDelta: (map['noShowDelta'] as num?)?.toDouble(),
+      heatmap: _heatmapFromFlat(map['heatmap'] as List<dynamic>?),
     );
   }
 
@@ -203,5 +231,11 @@ class DashboardData extends Equatable {
         avgTicketTrend,
         conversionTrend,
         noShowTrend,
+        occupancyDelta,
+        revenueDelta,
+        avgTicketDelta,
+        conversionDelta,
+        noShowDelta,
+        heatmap,
       ];
 }
