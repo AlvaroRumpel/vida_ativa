@@ -45,8 +45,8 @@ void main() {
       );
       final textWidget = tester.widgetList<Text>(find.text('João Silva')).first;
       expect(textWidget.style, isNotNull);
-      expect(textWidget.style!.fontSize, 14.0);
-      expect(textWidget.style!.fontWeight, FontWeight.w600);
+      expect(textWidget.style!.fontSize, 15.0);
+      expect(textWidget.style!.fontWeight, FontWeight.w700);
     });
 
     testWidgets('ADMN-18c: status pending renders AGUARDANDO in orange', (tester) async {

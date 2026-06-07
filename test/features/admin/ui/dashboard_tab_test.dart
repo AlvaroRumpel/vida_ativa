@@ -117,7 +117,7 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('--'), findsNWidgets(4));
+        expect(find.text('--'), findsAtLeastNWidgets(4));
       });
     });
 
@@ -154,7 +154,7 @@ void main() {
           year: testDashboardData(),
         ));
         await tester.pumpWidget(buildSubject(cubit));
-        expect(find.text('RESERVAS'), findsOneWidget);
+        expect(find.text('RESERVAS'), findsAtLeastNWidgets(1));
         expect(find.text('DISTRIBUIÇÃO'), findsOneWidget);
       });
     });

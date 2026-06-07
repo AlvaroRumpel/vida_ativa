@@ -37,7 +37,7 @@ Widget _buildRow({required UserModel user, required int index}) {
       body: UserRow(
         user: user,
         index: index,
-        onTap: () {},
+        onPromote: () {},
       ),
     ),
   );
@@ -69,17 +69,17 @@ void main() {
 
       // Find the displayName text
       final nameText = tester.widget<Text>(find.text('Bob Client'));
-      final expectedStyle = AppTheme.ui(size: 14, weight: FontWeight.w600);
+      final expectedStyle = AppTheme.ui(size: 14, weight: FontWeight.w700);
       expect(nameText.style?.fontSize, equals(expectedStyle.fontSize));
       expect(nameText.style?.fontWeight, equals(expectedStyle.fontWeight));
     });
 
-    testWidgets('ADMN-21d: renders email in JBM 11px (AppTheme.mono)',
+    testWidgets('ADMN-21d: renders email in JBM 10px (AppTheme.mono)',
         (tester) async {
       await tester.pumpWidget(_buildRow(user: _clientUser, index: 0));
 
       final emailText = tester.widget<Text>(find.text('client@test.com'));
-      final expectedStyle = AppTheme.mono(size: 11);
+      final expectedStyle = AppTheme.mono(size: 10);
       expect(emailText.style?.fontSize, equals(expectedStyle.fontSize));
     });
 
@@ -109,10 +109,10 @@ void main() {
       expect(find.byType(ListTile), findsNothing);
     });
 
-    testWidgets('ADMN-21g: renders chevron_right icon', (tester) async {
+    testWidgets('ADMN-21g: client row renders PROMOVER button', (tester) async {
       await tester.pumpWidget(_buildRow(user: _clientUser, index: 0));
 
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      expect(find.text('PROMOVER'), findsOneWidget);
     });
   });
 }

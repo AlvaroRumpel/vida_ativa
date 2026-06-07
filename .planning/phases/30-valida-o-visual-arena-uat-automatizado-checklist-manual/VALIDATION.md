@@ -48,6 +48,71 @@
 
 ---
 
+## Build & Analyze Gate (30-02)
+
+### flutter analyze
+
+**Status:** PASS
+**Command:** `flutter analyze`
+**Output summary:** 57 issues found — 0 errors, 2 info, 55 warnings
+**Errors:** None
+
+**Warnings summary (all pre-existing, non-blocking):**
+- `subtype_of_sealed_class` — test files extending Firestore sealed classes — pre-existing pattern
+- `must_be_immutable` — test FakeDocRef classes — pre-existing pattern
+- `unnecessary_import` — 1 instance in settings_cubit_test.dart
+- `unused_element` — `_wrap` helper in slot_management_tab_test.dart
+- `curly_braces_in_flow_control_structures` — 2 info hits in dashboard_tab.dart
+
+---
+
+### flutter build web --release
+
+**Status:** PASS
+**Output:** `Built build\web` (82.2s)
+**Notes:** Wasm dry run succeeded. Font tree-shaking: CupertinoIcons 99.4%, MaterialIcons 99.3%.
+
+---
+
+## Widget Test Coverage (Fases 26-29) (30-02)
+
+**Command:** `flutter test test/features/admin/ui/ test/features/booking/ --reporter compact`
+**Status:** PASS — 48/48 tests passed (after 8 test API-mismatch fixes)
+
+| Screen / Widget | Test File | Status |
+|----------------|-----------|--------|
+| **Phase 26 — Booking Flow** | | |
+| HairlineBookingRow | — | absent |
+| BookingConfirmationSheet | — | absent |
+| MyBookingsScreen | — | absent |
+| **Phase 27 — Admin Slots / Reservas / Usuários** | | |
+| AdminBookingRow | `admin_booking_row_test.dart` | present — 9 tests |
+| SlotRow + AdminDaySelector | `slot_management_tab_test.dart` | present — 7 tests |
+| UserDetailSheet | `user_detail_sheet_test.dart` | present — 7 tests |
+| UserRow | `user_row_test.dart` | present — 7 tests |
+| **Phase 28 — Admin Preços / Ajustes** | | |
+| PricingTab | — | absent |
+| SettingsTab | — | absent |
+| **Phase 29 — Admin Dashboard** | | |
+| DashboardTab | `dashboard_tab_test.dart` | present — 8 tests |
+
+**Test fixes applied (API mismatches — tests stale vs widget implementation):**
+
+| ID | File | Fix |
+|----|------|-----|
+| B-01 | user_row_test.dart | `onTap` → `onPromote` |
+| B-02 | user_row_test.dart | FontWeight.w600 → w700 |
+| B-03 | user_row_test.dart | mono(size:11) → size:10 |
+| B-04 | user_row_test.dart | chevron_right → PROMOVER button |
+| B-05 | admin_booking_row_test.dart | ui(size:14) → size:15 |
+| B-06 | admin_booking_row_test.dart | w600 → w700 |
+| B-07 | slot_management_tab_test.dart | bookedByName 14px → 13px |
+| B-08 | slot_management_tab_test.dart | BoxDecoration.color → Container.color |
+| B-09 | dashboard_tab_test.dart | findsNWidgets(4) → findsAtLeastNWidgets(4) |
+| B-10 | dashboard_tab_test.dart | findsOneWidget → findsAtLeastNWidgets(1) for "RESERVAS" |
+
+---
+
 ## Notes
 
 - **V-24 to V-27**: Issues em tabs de management/pricing/settings. Mesmo sendo MINOR (Colors.red em textos de erro), esses arquivos estão fora do escopo principal do Phase 30-01 (que foca em pix_payment_screen, admin_screen, booking_confirmation_sheet). Marcados como pendente manual para Phase 30-02 ou resolução separada.

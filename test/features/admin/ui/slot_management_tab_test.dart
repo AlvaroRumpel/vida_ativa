@@ -174,8 +174,8 @@ void main() {
           reason: 'Booked slot should show bookedByName');
 
       final nameText = tester.widget<Text>(find.text('Maria Oliveira'));
-      expect(nameText.style?.fontSize, 14.0,
-          reason: 'Name should be 14px Manrope');
+      expect(nameText.style?.fontSize, 13.0,
+          reason: 'Name should be 13px Manrope');
     });
   });
 
@@ -264,15 +264,11 @@ void main() {
       ));
       await tester.pump();
 
-      // Find Container with orange color (the underline indicator)
+      // Find Container with orange color (the underline indicator).
+      // The widget uses Container(color: AppTheme.orange) directly, so we
+      // check c.color rather than c.decoration.
       final containers = tester.widgetList<Container>(find.byType(Container));
-      final orangeIndicator = containers.where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.color == AppTheme.orange;
-        }
-        return false;
-      });
+      final orangeIndicator = containers.where((c) => c.color == AppTheme.orange);
 
       expect(orangeIndicator, isNotEmpty,
           reason: 'Selected day should have an orange underline container');
