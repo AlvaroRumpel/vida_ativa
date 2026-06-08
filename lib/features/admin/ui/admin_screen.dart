@@ -251,17 +251,22 @@ class _NotificationBanner extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 children: [
-                  const Icon(Icons.notifications_outlined, size: 18, color: AppTheme.ink),
-                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Ative as notificações para receber alertas de novas reservas.',
+                      'Ative notificações para alertas de novas reservas.',
                       style: AppTheme.ui(size: 13),
                     ),
                   ),
-                  TextButton(
-                    onPressed: onEnable,
-                    child: const Text('Ativar'),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: onEnable,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      child: Text(
+                        'ATIVAR',
+                        style: AppTheme.mono(size: 12, color: AppTheme.orange),
+                      ),
+                    ),
                   ),
                 ],
               ),
