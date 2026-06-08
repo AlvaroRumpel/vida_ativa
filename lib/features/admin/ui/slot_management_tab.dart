@@ -389,6 +389,45 @@ class _SlotDayViewState extends State<_SlotDayView> {
     );
   }
 
+  void _showAddOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.lineHair,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: Text('Slot único', style: AppTheme.ui(size: 15)),
+              onTap: () {
+                Navigator.pop(context);
+                _openSheet(null);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.playlist_add),
+              title: Text('Múltiplos slots', style: AppTheme.ui(size: 15)),
+              onTap: () {
+                Navigator.pop(context);
+                _openBatchSheet(context);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   List<SlotModel> get _slotsForSelectedDay {
     final dateStr = _toDateString(_selectedDate);
     return widget.slots
@@ -446,22 +485,9 @@ class _SlotDayViewState extends State<_SlotDayView> {
           ),
         ],
       ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton.small(
-            heroTag: 'batch',
-            onPressed: () => _openBatchSheet(context),
-            tooltip: 'Adicionar em lote',
-            child: const Icon(Icons.playlist_add),
-          ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            heroTag: 'single',
-            onPressed: () => _openSheet(null),
-            child: const Icon(Icons.add),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddOptions(context),
+        child: const Icon(Icons.add),
       ),
     );
   }

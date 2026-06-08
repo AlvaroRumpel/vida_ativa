@@ -43,10 +43,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
   String? _qrCodeBase64;
   DateTime? _expiresAt;
   bool _copied = false;
-
-  // Countdown timer state
-  Timer? _countdownTimer;
-  Duration _remaining = Duration.zero;
   bool _qrExpired = false;
 
   // Real-time booking listener
@@ -65,36 +61,8 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
     _bookingSubscription?.cancel();
     super.dispose();
-  }
-
-  void _startCountdown() {
-    _countdownTimer?.cancel();
-    if (_expiresAt == null) return;
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      final remaining = _expiresAt!.difference(DateTime.now());
-      if (remaining <= Duration.zero) {
-        _countdownTimer?.cancel();
-        setState(() {
-          _remaining = Duration.zero;
-          _qrExpired = true;
-        });
-      } else {
-        setState(() {
-          _remaining = remaining;
-          _qrExpired = false;
-        });
-      }
-    });
-    // Trigger first tick immediately so display appears without 1s delay
-    final remaining = _expiresAt!.difference(DateTime.now());
-    setState(() {
-      _remaining = remaining <= Duration.zero ? Duration.zero : remaining;
-      _qrExpired = remaining <= Duration.zero;
-    });
   }
 
   void _startBookingListener() {
@@ -109,7 +77,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
       if (data == null) return;
       final status = data['status'] as String?;
       if (status == 'confirmed') {
-        _countdownTimer?.cancel();
         _bookingSubscription?.cancel();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -117,17 +84,11 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        // Pop PixPaymentScreen (may be on root or branch navigator)
-        // then navigate GoRouter to bookings tab
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         context.go('/bookings');
       } else if (status == 'expired') {
-        _countdownTimer?.cancel();
         if (!_qrExpired) {
-          setState(() {
-            _qrExpired = true;
-            _remaining = Duration.zero;
-          });
+          setState(() => _qrExpired = true);
         }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -158,7 +119,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = DateTime.parse(data['expiresAt'] as String);
         _isLoading = false;
       });
-      _startCountdown();
     } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
       setState(() {
@@ -210,7 +170,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = record.expiresAt;
         _isLoading = false;
       });
-      _startCountdown();
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       if (!mounted) return;
@@ -228,49 +187,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     setState(() => _copied = true);
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) setState(() => _copied = false);
-  }
-
-  Widget _buildCountdown() {
-    if (_qrExpired) {
-      return Column(
-        children: [
-          Text(
-            'QR expirado. Gere um novo acima.',
-            style: AppTheme.ui(size: 14, color: AppTheme.orangeDk)
-                .copyWith(fontStyle: FontStyle.italic),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton.icon(
-              onPressed: _isLoading ? null : _generateQr,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Gerar novo QR'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.orange,
-                foregroundColor: AppTheme.paper,
-                shape: const StadiumBorder(),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    final minutes =
-        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds =
-        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
-    final isUrgent = _remaining.inSeconds < 120;
-
-    return Text(
-      '$minutes:$seconds restantes',
-      style: AppTheme.display(
-        size: 24,
-        color: isUrgent ? AppTheme.orangeDk : AppTheme.court,
-      ),
-    );
   }
 
   @override
@@ -343,14 +259,13 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 8),
-          // Header instruction
           Text(
             'Escaneie o QR code com seu app de banco',
             textAlign: TextAlign.center,
             style: AppTheme.ui(size: 16, weight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
-          // QR image with expired overlay
+          // QR image — never rebuilds on countdown ticks (countdown is isolated)
           Stack(
             alignment: Alignment.center,
             children: [
@@ -386,10 +301,18 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Countdown widget (replaces static expiry text)
-          _buildCountdown(),
+          // Countdown isolated in its own StatefulWidget — no parent rebuild on tick
+          _PixCountdown(
+            key: ValueKey(_expiresAt),
+            expiresAt: _expiresAt!,
+            onExpired: () {
+              if (!_qrExpired && mounted) {
+                setState(() => _qrExpired = true);
+              }
+            },
+            onRegenerate: _generateQr,
+          ),
           const SizedBox(height: 32),
-          // Divider with "ou"
           Row(
             children: [
               const Expanded(child: Divider()),
@@ -404,7 +327,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Copia-e-cola
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -443,7 +365,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          // Info note
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
@@ -466,6 +387,105 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Countdown widget isolated so only it rebuilds every second, not the QR image.
+class _PixCountdown extends StatefulWidget {
+  const _PixCountdown({
+    super.key,
+    required this.expiresAt,
+    required this.onExpired,
+    required this.onRegenerate,
+  });
+
+  final DateTime expiresAt;
+  final VoidCallback onExpired;
+  final VoidCallback onRegenerate;
+
+  @override
+  State<_PixCountdown> createState() => _PixCountdownState();
+}
+
+class _PixCountdownState extends State<_PixCountdown> {
+  late Duration _remaining;
+  bool _expired = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    final remaining = widget.expiresAt.difference(DateTime.now());
+    _remaining = remaining <= Duration.zero ? Duration.zero : remaining;
+    _expired = remaining <= Duration.zero;
+    if (!_expired) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+    }
+  }
+
+  void _tick() {
+    if (!mounted) return;
+    final remaining = widget.expiresAt.difference(DateTime.now());
+    final expired = remaining <= Duration.zero;
+    setState(() {
+      _remaining = expired ? Duration.zero : remaining;
+      _expired = expired;
+    });
+    if (expired) {
+      _timer?.cancel();
+      _timer = null;
+      widget.onExpired();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_expired) {
+      return Column(
+        children: [
+          Text(
+            'QR expirado. Gere um novo acima.',
+            style: AppTheme.ui(size: 14, color: AppTheme.orangeDk)
+                .copyWith(fontStyle: FontStyle.italic),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: widget.onRegenerate,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Gerar novo QR'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.orange,
+                foregroundColor: AppTheme.paper,
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final minutes =
+        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final isUrgent = _remaining.inSeconds < 120;
+
+    return Text(
+      '$minutes:$seconds restantes',
+      style: AppTheme.display(
+        size: 24,
+        color: isUrgent ? AppTheme.orangeDk : AppTheme.court,
       ),
     );
   }

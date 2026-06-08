@@ -108,6 +108,17 @@ class _BookingManagementView extends StatelessWidget {
             ],
           ),
         ),
+        // Booking count for selected day
+        Padding(
+          padding: const EdgeInsets.only(bottom: 2),
+          child: Text(
+            state.bookings.isEmpty
+                ? 'SEM RESERVAS'
+                : '${state.bookings.length} RESERVA${state.bookings.length == 1 ? '' : 'S'}',
+            style: AppTheme.mono(size: 10, color: AppTheme.concrete),
+            textAlign: TextAlign.center,
+          ),
+        ),
         // Confirmation mode toggle
         SwitchListTile(
           title: const Text('Confirmacao automatica'),

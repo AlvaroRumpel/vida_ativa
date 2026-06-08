@@ -182,7 +182,9 @@ class AppTheme {
         (s) => s.contains(WidgetState.selected) ? paper : paper,
       ),
       trackColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.selected) ? orange : line,
+        (s) => s.contains(WidgetState.selected)
+            ? orange
+            : concrete.withValues(alpha: 0.55),
       ),
       trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
     ),
