@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v5.0
-milestone_name: Dashboard & Esportes
-status: complete
-last_updated: "2026-05-24T01:12:32.115Z"
-last_activity: 2026-05-24
+milestone: v6.0
+milestone_name: Arena Esportivo — Redesign Visual
+status: archived
+last_updated: "2026-06-08"
+last_activity: 2026-06-08
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 8
+  completed_phases: 8
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -17,20 +17,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19)
+See: .planning/PROJECT.md (updated 2026-06-08)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** Phase 22 — ui-do-dashboard
+**Current focus:** v6.0 ARCHIVED — próximo milestone a definir
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-24
+Phase: — (v6.0 fechado e arquivado 2026-06-08)
+Status: v6.0 milestone archived. Tag v6.0 criada. Próximo milestone: TBD.
+Last activity: 2026-06-08
 
 ```
-Progress: [█████████████░░░░░░░] 67% (2/3 phases)
+Progress: [████████████████████] 100% (11/11 phases)
 ```
 
 ## Performance Metrics
@@ -58,6 +57,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 ### Roadmap Evolution
 
+- Phase 30 added 2026-06-07: Validação Visual Arena — UAT automatizado + checklist manual
 - v5.0 roadmap criado 2026-05-19: 3 phases (20–22), 16 requirements mapeados
 - Phase 20: SPORT-01..04 (campo de esporte — infraestrutura completa)
 - Phase 21: DASH-01..04, DASH-09..12 (backend de agregação + métricas de clientes)

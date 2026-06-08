@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vida_ativa/core/models/dashboard_data.dart';
-import 'package:vida_ativa/core/theme/app_spacing.dart';
 import 'package:vida_ativa/core/theme/app_theme.dart';
 import 'package:vida_ativa/features/admin/cubit/dashboard_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/dashboard_state.dart';
 
 /// Main dashboard tab for admin panel.
-/// Shows KPI cards and chart implementations (Plan 22-03).
+/// Redesigned with Arena Esportivo identity (Phase 29).
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
 
@@ -50,57 +49,91 @@ class _DashboardTabState extends State<DashboardTab> {
     final data = _selectData(state);
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'week', label: Text('Semana')),
-                  ButtonSegment(value: 'month', label: Text('Mês')),
-                  ButtonSegment(value: 'year', label: Text('Ano')),
-                ],
-                selected: {_selectedPeriod},
-                onSelectionChanged: (newSelection) {
-                  setState(() => _selectedPeriod = newSelection.first);
-                },
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Última atualização: ${_formatTime(data.updatedAt)}',
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
+        _buildPeriodSelector(data),
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md, vertical: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildKpiGrid(data),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: _buildKpiGrid(data),
+                ),
+                const SizedBox(height: 24),
                 _buildRevenueChart(data),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 24),
                 _buildHeatmap(data),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 24),
                 _buildStatusPie(data),
-                const SizedBox(height: AppSpacing.lg),
-                _buildSportDonut(data),
-                const SizedBox(height: AppSpacing.xl),
+                _buildSportRows(data),
+                const SizedBox(height: 40),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  // ── Period Selector (D-13, D-14) ────────────────────────────────────────────
+
+  Widget _buildPeriodSelector(DashboardData data) {
+    const tabs = [
+      ('SEMANA', 'week'),
+      ('MÊS', 'month'),
+      ('ANO', 'year'),
+    ];
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: AppTheme.line, width: 1),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ...tabs.map((tab) {
+              final label = tab.$1;
+              final value = tab.$2;
+              final isActive = _selectedPeriod == value;
+              return GestureDetector(
+                onTap: () => setState(() => _selectedPeriod = value),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 14, bottom: 12),
+                  margin: const EdgeInsets.only(right: 22),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: isActive ? AppTheme.orange : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    label,
+                    style: AppTheme.mono(
+                      size: 10,
+                      color: isActive ? AppTheme.ink : AppTheme.concrete,
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                'Atualizado: ${_formatTime(data.updatedAt)}',
+                style: AppTheme.mono(size: 9, color: AppTheme.concrete),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -116,415 +149,635 @@ class _DashboardTabState extends State<DashboardTab> {
     return DateFormat('HH:mm').format(dt);
   }
 
-  Widget _buildKpiGrid(DashboardData data) {
-    final currencyFmt =
-        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  // ── KPI Grid 2×N hairline (D-07 through D-12, ADMN-26) ──────────────────────
 
+  Widget _buildKpiGrid(DashboardData data) {
     final kpis = [
-      (
-        label: 'Taxa de Ocupação',
-        value: data.occupancyRate != null
-            ? '${(data.occupancyRate! * 100).toStringAsFixed(1)}%'
-            : '--',
-        unit: '',
-      ),
-      (
-        label: 'Receita Total',
-        value: currencyFmt.format(data.totalRevenue),
-        unit: '',
-      ),
-      (
-        label: 'Ticket Médio',
-        value: data.avgTicket != null
-            ? currencyFmt.format(data.avgTicket!)
-            : '--',
-        unit: '',
-      ),
-      (
-        label: 'Taxa de Conversão',
-        value: data.conversionRate != null
-            ? '${(data.conversionRate! * 100).toStringAsFixed(1)}%'
-            : '--',
-        unit: '',
-      ),
-      (
-        label: 'Taxa de No-Show',
-        value: data.noShowRate != null
-            ? '${(data.noShowRate! * 100).toStringAsFixed(1)}%'
-            : '--',
-        unit: '',
-      ),
+      _KpiItem(kicker: 'TAXA DE OCUPAÇÃO', rawValue: data.occupancyRate != null ? (data.occupancyRate! * 100) : null, unit: 'pct',
+        trend: data.occupancyTrend, delta: data.occupancyDelta, tooltipText: 'Slots reservados ÷ slots disponíveis no período.'),
+      _KpiItem(kicker: 'RECEITA TOTAL',    rawValue: data.totalRevenue, unit: 'currency',
+        trend: data.revenueTrend, delta: data.revenueDelta, tooltipText: 'Soma de todas as reservas confirmadas no período.'),
+      _KpiItem(kicker: 'TICKET MÉDIO',     rawValue: data.avgTicket, unit: 'currency',
+        trend: data.avgTicketTrend, delta: data.avgTicketDelta, tooltipText: 'Receita total ÷ número de reservas confirmadas.'),
+      _KpiItem(kicker: 'CONVERSÃO',        rawValue: data.conversionRate != null ? (data.conversionRate! * 100) : null, unit: 'pct',
+        trend: data.conversionTrend, delta: data.conversionDelta, tooltipText: 'Reservas confirmadas ÷ total de reservas criadas.'),
+      _KpiItem(kicker: 'NO-SHOW',          rawValue: data.noShowRate != null ? (data.noShowRate! * 100) : null, unit: 'pct',
+        trend: data.noShowTrend, delta: data.noShowDelta, tooltipText: 'Reservas expiradas ou canceladas depois de confirmadas.'),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: AppSpacing.sm,
-      mainAxisSpacing: AppSpacing.sm,
-      childAspectRatio: 1.3,
-      children: kpis
-          .map((kpi) => _buildKpiCard(kpi.label, kpi.value, kpi.unit))
-          .toList(),
+    final List<Widget> rows = [];
+    for (int i = 0; i < kpis.length; i += 2) {
+      final isLastOdd = i == kpis.length - 1 && kpis.length % 2 == 1;
+      if (isLastOdd) {
+        rows.add(_buildKpiCell(kpis[i], isFirst: i < 2, spanFull: true));
+      } else {
+        rows.add(IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: _buildKpiCell(kpis[i], isFirst: i < 2)),
+              Container(width: 0.5, color: AppTheme.lineHair),
+              Expanded(child: _buildKpiCell(kpis[i + 1], isFirst: i < 2, isRightCol: true)),
+            ],
+          ),
+        ));
+      }
+      if (i + 2 < kpis.length) {
+        rows.add(Container(height: 0.5, color: AppTheme.lineHair));
+      }
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppTheme.lineHair, width: 0.5),
+      ),
+      child: Column(children: rows),
     );
   }
 
-  Widget _buildKpiCard(String label, String value, String unit) {
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primaryGreen,
-              ),
-            ),
-            if (unit.isNotEmpty)
-              Text(unit,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-          ],
-        ),
+  Widget _buildKpiCell(
+    _KpiItem kpi, {
+    bool isFirst = false,
+    bool isRightCol = false,
+    bool spanFull = false,
+  }) {
+    final currencyFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
+    final rawValue = kpi.rawValue;
+    final isNull = rawValue == null;
+
+    Widget valueWidget;
+    if (isNull) {
+      valueWidget = Text('--', style: AppTheme.display(size: 32, color: AppTheme.concrete));
+    } else if (kpi.unit == 'currency') {
+      final formatted = currencyFmt.format(rawValue).replaceFirst('R\$', '').trim();
+      valueWidget = Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text('R\$', style: AppTheme.mono(size: 11, color: AppTheme.concrete)),
+          const SizedBox(width: 2),
+          Text(formatted, style: AppTheme.display(size: 32)),
+        ],
+      );
+    } else {
+      // pct
+      final formatted = rawValue.toStringAsFixed(1);
+      valueWidget = Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text(formatted, style: AppTheme.display(size: 32)),
+          Text('%', style: AppTheme.display(size: 18, color: AppTheme.concrete)),
+        ],
+      );
+    }
+
+    final hasTrend = kpi.trend != null && kpi.trend!.length >= 2;
+    final delta = kpi.delta;
+    final deltaLabel = delta != null
+        ? '${delta >= 0 ? '↑' : '↓'} ${(delta.abs() * 100).toStringAsFixed(1)}%'
+        : '--';
+    final deltaColor = delta != null
+        ? (delta >= 0 ? AppTheme.court : AppTheme.orange)
+        : AppTheme.concrete;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(kpi.kicker, style: AppTheme.mono(size: 9.5, color: AppTheme.concrete)),
+              if (kpi.tooltipText.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: kpi.tooltipText,
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Text('?', style: AppTheme.mono(size: 9, color: AppTheme.concrete)),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              valueWidget,
+              if (hasTrend) ...[
+                const Spacer(),
+                CustomPaint(
+                  size: const Size(64, 36),
+                  painter: _SparklinePainter(kpi.trend!),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(deltaLabel, style: AppTheme.mono(size: 10, color: deltaColor)),
+        ],
       ),
     );
   }
 
-  // --- Chart implementations (DASH-05 through DASH-08) ---
+  // ── Revenue Chart (D-15 through D-20, ADMN-27) ──────────────────────────────
 
   Widget _buildRevenueChart(DashboardData data) {
-    final barData = [
-      ('Total', data.totalRevenue, AppTheme.primaryGreen),
-      ('Pix', data.pixRevenue, AppTheme.brandAmber),
-      (
-        'Presencial',
-        data.onArrivalRevenue,
-        AppTheme.primaryGreen.withValues(alpha: 0.5)
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
       ),
-    ];
-
-    final maxY = [data.totalRevenue, data.pixRevenue, data.onArrivalRevenue]
-        .reduce((a, b) => a > b ? a : b);
-    final yInterval = maxY > 0 ? (maxY / 4).ceilToDouble() : 100.0;
-
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Receita',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.sm),
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: maxY > 0 ? maxY * 1.2 : 100,
-                  barGroups: List.generate(3, (i) {
-                    final item = barData[i];
-                    return BarChartGroupData(
-                      x: i,
-                      barRods: [
-                        BarChartRodData(
-                          toY: item.$2,
-                          color: item.$3,
-                          width: 36,
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(4)),
-                        ),
-                      ],
-                    );
-                  }),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 28,
-                        getTitlesWidget: (value, meta) {
-                          final labels = ['Total', 'Pix', 'Presencial'];
-                          final idx = value.toInt();
-                          if (idx < 0 || idx >= labels.length) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(labels[idx],
-                                style: const TextStyle(fontSize: 12)),
-                          );
-                        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('RECEITA', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text(
+                        'R\$ ${NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 0).format(data.totalRevenue)}',
+                        style: AppTheme.display(size: 26),
                       ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 64,
-                        interval: yInterval,
-                        getTitlesWidget: (value, meta) {
-                          if (value == 0) return const SizedBox.shrink();
-                          return Text(
-                            'R\$ ${value.toStringAsFixed(0)}',
-                            style: const TextStyle(fontSize: 10),
-                          );
-                        },
-                      ),
-                    ),
-                    topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                    ],
                   ),
-                  borderData: FlBorderData(show: false),
-                  gridData: const FlGridData(
-                      show: true, drawVerticalLine: false),
                 ),
+              ],
+            ),
+          ),
+          // Bar chart
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
+            child: SizedBox(
+              height: 130 + 20 + 16 + 14, // 180: bar(130) + spacers(16) + labels(14) + top pad(20)
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: _buildRevenueBars(data),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
+  List<Widget> _buildRevenueBars(DashboardData data) {
+    final bars = [
+      (label: 'TOTAL',      value: data.totalRevenue,     color: AppTheme.ink),
+      (label: 'PIX',        value: data.pixRevenue,        color: AppTheme.orange),
+      (label: 'PRESENCIAL', value: data.onArrivalRevenue,  color: AppTheme.concrete),
+    ];
+    final maxVal = bars.map((b) => b.value).reduce((a, b) => a > b ? a : b);
+    final safeMax = maxVal > 0 ? maxVal : 1.0;
+    final currFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
+
+    return bars.map((b) {
+      final barHeight = ((b.value / safeMax) * 130.0).clamp(0.0, 130.0);
+      return Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(currFmt.format(b.value), style: AppTheme.mono(size: 10, color: AppTheme.ink)),
+            const SizedBox(height: 8),
+            if (barHeight > 0)
+              Container(
+                height: barHeight,
+                color: b.color,
+              ),
+            const SizedBox(height: 8),
+            Text(b.label, style: AppTheme.mono(size: 9.5)),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  // ── Heatmap custom GridView (D-01 through D-06, ADMN-28) ────────────────────
 
   Widget _buildHeatmap(DashboardData data) {
-    // Per-day occupancy data is not yet available from the backend.
-    // Show a placeholder until DashboardData exposes bookingsPerDay.
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Ocupação por Hora e Dia',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.sm),
-            Center(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                child: Text('Dados em breve',
-                    style:
-                        TextStyle(color: Colors.grey[600], fontSize: 14)),
-              ),
+    const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    const slots = ['08h', '10h', '12h', '14h', '16h', '18h', '20h'];
+    final heat = data.heatmap ?? List.generate(7, (_) => List.filled(7, 0.0)); // [dayIdx][slotIdx]
+
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('OCUPAÇÃO', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text('HORA · DIA', style: AppTheme.display(size: 26)),
+                    ],
+                  ),
+                ),
+                // Legend: BAIXA · 5 squares · ALTA
+                Row(
+                  children: [
+                    Text('BAIXA', style: AppTheme.mono(size: 9)),
+                    const SizedBox(width: 6),
+                    ...[0.15, 0.35, 0.55, 0.75, 1.0].map((o) => Container(
+                      width: 10,
+                      height: 10,
+                      color: Color.fromRGBO(255, 77, 23, o),
+                      margin: const EdgeInsets.only(right: 1),
+                    )),
+                    const SizedBox(width: 6),
+                    Text('ALTA', style: AppTheme.mono(size: 9)),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // Grid body
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Y-axis: slot labels
+                SizedBox(
+                  width: 32,
+                  child: Column(
+                    children: slots.map((s) => SizedBox(
+                      height: 22,
+                      child: Text(s, style: AppTheme.mono(size: 9)),
+                    )).toList(),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Grid: 7 slot rows × 7 day columns
+                Expanded(
+                  child: Column(
+                    children: List.generate(slots.length, (slotIdx) => Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Row(
+                        children: List.generate(days.length, (dayIdx) {
+                          final v = heat[dayIdx][slotIdx];
+                          return Expanded(
+                            child: Container(
+                              height: 22,
+                              margin: dayIdx < days.length - 1
+                                  ? const EdgeInsets.only(right: 3)
+                                  : EdgeInsets.zero,
+                              color: v == 0.0
+                                  ? AppTheme.lineHair
+                                  : Color.fromRGBO(255, 77, 23, (0.12 + v * 0.88).clamp(0.0, 1.0)),
+                            ),
+                          );
+                        }),
+                      ),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // X-axis labels
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 6, 22, 24),
+            child: Row(
+              children: [
+                const SizedBox(width: 32 + 6), // match Y-axis offset
+                Expanded(
+                  child: Row(
+                    children: days.map((d) => Expanded(
+                      child: Text(
+                        d,
+                        style: AppTheme.mono(size: 8.5),
+                        textAlign: TextAlign.center,
+                      ),
+                    )).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  // ── Status Pie / Donut (D-21 through D-25, ADMN-28) ────────────────────────
 
   Widget _buildStatusPie(DashboardData data) {
     final rawExpired = data.totalBookings -
         data.confirmedBookings -
         data.cancelledBookings -
         data.pendingBookings;
-
-    assert(rawExpired >= 0,
-        'Dashboard data inconsistency: booking counts exceed totalBookings');
-
     final expired = rawExpired.clamp(0, data.totalBookings);
+    final total = data.totalBookings;
 
-    final sections = <_PieSection>[
-      _PieSection(
-          'Confirmadas', data.confirmedBookings.toDouble(), Colors.green.shade600),
-      _PieSection(
-          'Canceladas', data.cancelledBookings.toDouble(), Colors.red.shade400),
-      _PieSection(
-          'Pendentes', data.pendingBookings.toDouble(), Colors.orange.shade400),
-      _PieSection('Expiradas', expired.toDouble(), Colors.grey.shade500),
-    ].where((s) => s.value > 0).toList();
+    final categories = [
+      (label: 'Confirmadas', count: data.confirmedBookings, color: AppTheme.court),
+      (label: 'Pendentes',   count: data.pendingBookings,   color: AppTheme.sun),
+      (label: 'Canceladas',  count: data.cancelledBookings, color: AppTheme.orangeDk),
+      (label: 'Expiradas',   count: expired,                color: AppTheme.concrete),
+    ].where((c) => c.count > 0).toList();
 
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Distribuição de Reservas por Status',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.sm),
-            if (sections.isEmpty)
-              Center(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                  child: Text('Sem reservas no período',
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 14)),
-                ),
-              )
-            else ...[
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: PieChart(
-                  PieChartData(
-                    sections: sections
-                        .map((s) => PieChartSectionData(
-                              value: s.value,
-                              color: s.color,
-                              title: '${s.value.toInt()}',
-                              radius: 80,
-                              titleStyle: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ))
-                        .toList(),
-                    centerSpaceRadius: 0,
-                    sectionsSpace: 2,
-                    pieTouchData: PieTouchData(enabled: false),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.line, width: 1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('RESERVAS', style: AppTheme.mono(size: 9.5)),
+                      const SizedBox(height: 6),
+                      Text('DISTRIBUIÇÃO', style: AppTheme.display(size: 26)),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.md,
-                runSpacing: AppSpacing.xs,
-                children: sections
-                    .map((s) => Row(
-                          mainAxisSize: MainAxisSize.min,
+                Text(
+                  '${total.toString().padLeft(2, '0')} TOTAL',
+                  style: AppTheme.mono(size: 11),
+                ),
+              ],
+            ),
+          ),
+          // Body
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+            child: categories.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Text(
+                        'Sem reservas no período',
+                        style: AppTheme.ui(size: 13, color: AppTheme.concrete),
+                      ),
+                    ),
+                  )
+                : Row(
+                    children: [
+                      // Donut
+                      SizedBox(
+                        width: 132,
+                        height: 132,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                    color: s.color,
-                                    shape: BoxShape.circle)),
-                            const SizedBox(width: AppSpacing.xs),
-                            Text(s.label,
-                                style: const TextStyle(fontSize: 12)),
-                          ],
-                        ))
-                    .toList(),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSportDonut(DashboardData data) {
-    final hasSportData =
-        data.revenueBySport != null && data.revenueBySport!.isNotEmpty;
-
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Receita por Esporte',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.sm),
-            if (!hasSportData)
-              Center(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                  child: Text(
-                    'Nenhum dado de esporte ainda',
-                    style:
-                        TextStyle(color: Colors.grey[600], fontSize: 14),
-                  ),
-                ),
-              )
-            else ...[
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: PieChart(
-                  PieChartData(
-                    sections: data.revenueBySport!
-                        .asMap()
-                        .entries
-                        .map((entry) {
-                          final idx = entry.key;
-                          final sport = entry.value;
-                          return PieChartSectionData(
-                            value: sport.revenue,
-                            color: _sportColor(idx),
-                            title: sport.revenue > 0
-                                ? 'R\$ ${sport.revenue.toStringAsFixed(0)}'
-                                : '',
-                            radius: 60,
-                            titleStyle: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                            PieChart(
+                              PieChartData(
+                                sections: categories
+                                    .map((c) => PieChartSectionData(
+                                          value: c.count.toDouble(),
+                                          color: c.color,
+                                          radius: 18,
+                                          title: '',
+                                        ))
+                                    .toList(),
+                                centerSpaceRadius: 48,
+                                sectionsSpace: 2,
+                                pieTouchData: PieTouchData(enabled: false),
+                              ),
                             ),
-                          );
-                        })
-                        .toList(),
-                    centerSpaceRadius: 40, // donut mode per D-12
-                    sectionsSpace: 2,
-                    pieTouchData: PieTouchData(enabled: false),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('$total', style: AppTheme.display(size: 28)),
+                                Text('RESERVAS', style: AppTheme.mono(size: 9)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 22),
+                      // Legend
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: categories.map((c) {
+                            final pct = total > 0 ? (c.count / total * 100).round() : 0;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: c.color,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      c.label,
+                                      style: AppTheme.ui(size: 12.5, weight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  Text('$pct%', style: AppTheme.mono(size: 10)),
+                                  const SizedBox(width: 8),
+                                  Text('${c.count}', style: AppTheme.display(size: 18)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.md,
-                runSpacing: AppSpacing.xs,
-                children: data.revenueBySport!
-                    .asMap()
-                    .entries
-                    .map((entry) {
-                      final idx = entry.key;
-                      final sport = entry.value;
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                  color: _sportColor(idx),
-                                  shape: BoxShape.circle)),
-                          const SizedBox(width: AppSpacing.xs),
-                          Text(sport.sport ?? 'Não informado',
-                              style: const TextStyle(fontSize: 12)),
-                        ],
-                      );
-                    })
-                    .toList(),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  /// Paleta de cores determinística para esportes (index-based)
-  Color _sportColor(int index) {
-    const palette = [
-      AppTheme.primaryGreen,
-      AppTheme.brandAmber,
-      Color(0xFF2196F3), // blue
-      Color(0xFF9C27B0), // purple
-      Color(0xFFFF5722), // deep orange
-      Color(0xFF00BCD4), // cyan
-    ];
-    return palette[index % palette.length];
+  // ── Revenue by Sport — hairline rows (D-26 through D-31, ADMN-29) ───────────
+
+  Widget _buildSportRows(DashboardData data) {
+    final sports = data.revenueBySport;
+    final currFmt = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 0);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('RECEITA', style: AppTheme.mono(size: 9.5)),
+                    const SizedBox(height: 6),
+                    Text('POR ESPORTE', style: AppTheme.display(size: 26)),
+                  ],
+                ),
+              ),
+              if (sports != null && sports.isNotEmpty)
+                Text('${sports.length} MODALIDADES', style: AppTheme.mono(size: 11)),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Empty state
+          if (sports == null || sports.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                'Nenhum dado de esporte ainda',
+                style: AppTheme.ui(size: 13, color: AppTheme.concrete),
+              ),
+            )
+          else
+            Column(
+              children: sports.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final sp = entry.value;
+                final share = data.totalRevenue > 0
+                    ? (sp.revenue / data.totalRevenue).clamp(0.0, 1.0)
+                    : 0.0;
+                final pct = (share * 100).round();
+
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: idx == 0 ? AppTheme.line : AppTheme.lineHair,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Line 1: sport name + revenue
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                sp.sport ?? 'Não informado',
+                                style: AppTheme.ui(size: 14, weight: FontWeight.w700),
+                              ),
+                            ),
+                            Text(
+                              currFmt.format(sp.revenue),
+                              style: AppTheme.display(size: 18),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Line 2: progress bar + percentage
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) => SizedBox(
+                                  height: 3,
+                                  child: Stack(
+                                    children: [
+                                      Container(color: AppTheme.lineHair),
+                                      Container(
+                                        width: constraints.maxWidth * share,
+                                        color: AppTheme.orange,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text('$pct%', style: AppTheme.mono(size: 10)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
   }
 }
 
-class _PieSection {
-  final String label;
-  final double value;
-  final Color color;
-  const _PieSection(this.label, this.value, this.color);
+// ── Data classes ──────────────────────────────────────────────────────────────
+
+class _KpiItem {
+  final String kicker;
+  final double? rawValue;
+  final String unit; // 'currency' | 'pct'
+  final List<double>? trend;
+  final double? delta; // period-over-period ratio, e.g. 0.082 = +8.2%
+  final String tooltipText;
+  const _KpiItem({
+    required this.kicker,
+    required this.rawValue,
+    required this.unit,
+    this.trend,
+    this.delta,
+    this.tooltipText = '',
+  });
+}
+
+class _SparklinePainter extends CustomPainter {
+  final List<double> points;
+  const _SparklinePainter(this.points);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+    final min = points.reduce((a, b) => a < b ? a : b);
+    final max = points.reduce((a, b) => a > b ? a : b);
+    final range = max - min;
+    final isUp = points.last >= points.first;
+    final paint = Paint()
+      ..color = isUp ? AppTheme.court : AppTheme.orangeDk
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+    final path = Path();
+    for (int i = 0; i < points.length; i++) {
+      final x = (i / (points.length - 1)) * size.width;
+      final normalized = range > 0 ? (points[i] - min) / range : 0.5;
+      final y = size.height - normalized * size.height;
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter old) => old.points != points;
 }

@@ -43,10 +43,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
   String? _qrCodeBase64;
   DateTime? _expiresAt;
   bool _copied = false;
-
-  // Countdown timer state
-  Timer? _countdownTimer;
-  Duration _remaining = Duration.zero;
   bool _qrExpired = false;
 
   // Real-time booking listener
@@ -65,36 +61,8 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
     _bookingSubscription?.cancel();
     super.dispose();
-  }
-
-  void _startCountdown() {
-    _countdownTimer?.cancel();
-    if (_expiresAt == null) return;
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      final remaining = _expiresAt!.difference(DateTime.now());
-      if (remaining <= Duration.zero) {
-        _countdownTimer?.cancel();
-        setState(() {
-          _remaining = Duration.zero;
-          _qrExpired = true;
-        });
-      } else {
-        setState(() {
-          _remaining = remaining;
-          _qrExpired = false;
-        });
-      }
-    });
-    // Trigger first tick immediately so display appears without 1s delay
-    final remaining = _expiresAt!.difference(DateTime.now());
-    setState(() {
-      _remaining = remaining <= Duration.zero ? Duration.zero : remaining;
-      _qrExpired = remaining <= Duration.zero;
-    });
   }
 
   void _startBookingListener() {
@@ -109,7 +77,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
       if (data == null) return;
       final status = data['status'] as String?;
       if (status == 'confirmed') {
-        _countdownTimer?.cancel();
         _bookingSubscription?.cancel();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -117,17 +84,11 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        // Pop PixPaymentScreen (may be on root or branch navigator)
-        // then navigate GoRouter to bookings tab
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         context.go('/bookings');
       } else if (status == 'expired') {
-        _countdownTimer?.cancel();
         if (!_qrExpired) {
-          setState(() {
-            _qrExpired = true;
-            _remaining = Duration.zero;
-          });
+          setState(() => _qrExpired = true);
         }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -158,7 +119,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = DateTime.parse(data['expiresAt'] as String);
         _isLoading = false;
       });
-      _startCountdown();
     } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
       setState(() {
@@ -210,7 +170,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         _expiresAt = record.expiresAt;
         _isLoading = false;
       });
-      _startCountdown();
     } catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       if (!mounted) return;
@@ -228,55 +187,6 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
     setState(() => _copied = true);
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) setState(() => _copied = false);
-  }
-
-  Widget _buildCountdown() {
-    if (_qrExpired) {
-      return Column(
-        children: [
-          const Text(
-            'QR expirado. Gere um novo acima.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFFC62828),
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton.icon(
-              onPressed: _isLoading ? null : _generateQr,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Gerar novo QR'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.primaryGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    final minutes =
-        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds =
-        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
-    final isUrgent = _remaining.inSeconds < 120;
-
-    return Text(
-      '$minutes:$seconds restantes',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: isUrgent ? const Color(0xFFC62828) : AppTheme.primaryGreen,
-      ),
-    );
   }
 
   @override
@@ -299,15 +209,15 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
   }
 
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
           Text(
             'Gerando QR...',
-            style: TextStyle(fontSize: 16, color: Color(0xFF757575)),
+            style: AppTheme.ui(size: 16, color: AppTheme.concrete),
           ),
         ],
       ),
@@ -321,12 +231,12 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Color(0xFFC62828)),
+            const Icon(Icons.error_outline, size: 48, color: AppTheme.orangeDk),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: AppTheme.ui(size: 16),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -349,21 +259,20 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 8),
-          // Header instruction
-          const Text(
+          Text(
             'Escaneie o QR code com seu app de banco',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: AppTheme.ui(size: 16, weight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
-          // QR image with expired overlay
+          // QR image — never rebuilds on countdown ticks (countdown is isolated)
           Stack(
             alignment: Alignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.paper,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -384,7 +293,7 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.5),
+                      color: AppTheme.ink.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
@@ -392,10 +301,18 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Countdown widget (replaces static expiry text)
-          _buildCountdown(),
+          // Countdown isolated in its own StatefulWidget — no parent rebuild on tick
+          _PixCountdown(
+            key: ValueKey(_expiresAt),
+            expiresAt: _expiresAt!,
+            onExpired: () {
+              if (!_qrExpired && mounted) {
+                setState(() => _qrExpired = true);
+              }
+            },
+            onRegenerate: _generateQr,
+          ),
           const SizedBox(height: 32),
-          // Divider with "ou"
           Row(
             children: [
               const Expanded(child: Divider()),
@@ -403,32 +320,24 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   'ou use o codigo',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 13,
-                  ),
+                  style: AppTheme.ui(size: 13, color: AppTheme.concrete),
                 ),
               ),
               const Expanded(child: Divider()),
             ],
           ),
           const SizedBox(height: 16),
-          // Copia-e-cola
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: AppTheme.paper,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               _qrCode!,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontFamily: 'monospace',
-                color: Color(0xFF424242),
-              ),
+              style: AppTheme.mono(size: 12, color: AppTheme.ink),
             ),
           ),
           const SizedBox(height: 12),
@@ -442,11 +351,11 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
               ),
               label: Text(_copied ? 'Copiado' : 'Copiar codigo'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.primaryGreen,
+                foregroundColor: AppTheme.orange,
                 side: BorderSide(
                   color: _copied
-                      ? AppTheme.primaryGreen
-                      : AppTheme.primaryGreen.withValues(alpha: 0.5),
+                      ? AppTheme.orange
+                      : AppTheme.orange.withValues(alpha: 0.5),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -456,29 +365,127 @@ class _PixPaymentScreenState extends State<PixPaymentScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          // Info note
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF8E1),
+              color: AppTheme.sand,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFFFB300), width: 1),
+              border: Border.all(color: AppTheme.orange, width: 1),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, size: 16, color: Color(0xFFE65100)),
-                SizedBox(width: 8),
+                const Icon(Icons.info_outline, size: 16, color: AppTheme.orange),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Apos pagar, sua reserva sera confirmada automaticamente.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFFE65100)),
+                    style: AppTheme.ui(size: 12, color: AppTheme.orange),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Countdown widget isolated so only it rebuilds every second, not the QR image.
+class _PixCountdown extends StatefulWidget {
+  const _PixCountdown({
+    super.key,
+    required this.expiresAt,
+    required this.onExpired,
+    required this.onRegenerate,
+  });
+
+  final DateTime expiresAt;
+  final VoidCallback onExpired;
+  final VoidCallback onRegenerate;
+
+  @override
+  State<_PixCountdown> createState() => _PixCountdownState();
+}
+
+class _PixCountdownState extends State<_PixCountdown> {
+  late Duration _remaining;
+  bool _expired = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    final remaining = widget.expiresAt.difference(DateTime.now());
+    _remaining = remaining <= Duration.zero ? Duration.zero : remaining;
+    _expired = remaining <= Duration.zero;
+    if (!_expired) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+    }
+  }
+
+  void _tick() {
+    if (!mounted) return;
+    final remaining = widget.expiresAt.difference(DateTime.now());
+    final expired = remaining <= Duration.zero;
+    setState(() {
+      _remaining = expired ? Duration.zero : remaining;
+      _expired = expired;
+    });
+    if (expired) {
+      _timer?.cancel();
+      _timer = null;
+      widget.onExpired();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_expired) {
+      return Column(
+        children: [
+          Text(
+            'QR expirado. Gere um novo acima.',
+            style: AppTheme.ui(size: 14, color: AppTheme.orangeDk)
+                .copyWith(fontStyle: FontStyle.italic),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: widget.onRegenerate,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Gerar novo QR'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.orange,
+                foregroundColor: AppTheme.paper,
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final minutes =
+        _remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        _remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final isUrgent = _remaining.inSeconds < 120;
+
+    return Text(
+      '$minutes:$seconds restantes',
+      style: AppTheme.display(
+        size: 24,
+        color: isUrgent ? AppTheme.orangeDk : AppTheme.court,
       ),
     );
   }
