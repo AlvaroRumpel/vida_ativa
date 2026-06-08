@@ -8,8 +8,10 @@
 | Severity | Total | Fixed | Pending |
 |----------|-------|-------|---------|
 | CRITICAL | 21    | 21    | 0       |
-| MINOR    | 7     | 4     | 3       |
-| **TOTAL**| **28**| **25**| **3**   |
+| MINOR    | 7     | 7     | 0       |
+| **TOTAL**| **28**| **28**| **0**   |
+
+*(30-03 update: V-24, V-25, V-26, V-27 fixed; all conformance checks PASS — see section below)*
 
 ---
 
@@ -115,7 +117,59 @@
 
 ## Notes
 
-- **V-24 to V-27**: Issues em tabs de management/pricing/settings. Mesmo sendo MINOR (Colors.red em textos de erro), esses arquivos estão fora do escopo principal do Phase 30-01 (que foca em pix_payment_screen, admin_screen, booking_confirmation_sheet). Marcados como pendente manual para Phase 30-02 ou resolução separada.
+- **V-24 to V-27**: Fixados em 30-03 — `Colors.red` → `AppTheme.ui(color: AppTheme.orangeDk)` em slot_management_tab, booking_management_tab, pricing_tab (PricingError), settings_tab (SettingsError + SportConfigError).
 - **Colors.black.withValues(alpha:0.08)** no boxShadow do container QR (linha 370): MINOR — shadow não é cor de marca, mantido conforme plano.
 - **RoundedRectangleBorder** no OutlinedButton copiar: mantido conforme plano (aceitável para botão secundário especializado).
 - **FilledButton "Gerar novo QR"**: shape alterado de `RoundedRectangleBorder(borderRadius: circular(12))` para `const StadiumBorder()` para alinhar com SportBtn.filled pattern.
+
+---
+
+## Conformidade Visual por Tela (30-03)
+
+**Audit date:** 2026-06-07
+**Method:** Leitura direta dos arquivos Dart + verificação ponto-a-ponto contra decisões dos CONTEXT.md das fases 26-28.
+
+### Booking Flow
+
+| Criterion | Screen/File | Check | Result | Notes |
+|-----------|-------------|-------|--------|-------|
+| BOOK-07 | booking_confirmation_sheet.dart | `display(size: 88` presente — Anton 88px no hero block | PASS | linha 253 |
+| BOOK-08 | booking_confirmation_sheet.dart | `Container(width: 2, color: AppTheme.orange)` no banner de aprovação; sem `Container(color:` sólido em outros lugares | PASS | linha 268; sem fundo colorido extra |
+| BOOK-09 | booking_confirmation_sheet.dart | `SportBtn.filled(` e `SportBtn.outlined(` nas ações; nenhum `FilledButton(` ou `OutlinedButton(` direto para ações principais | PASS | linhas 402, 407, 415, 424 |
+| PIX-TOKEN | pix_payment_screen.dart | Zero `Color(0x` e zero `Colors.` (exceto `Colors.transparent`) | PASS | único hit: `Colors.black.withValues(alpha:0.08)` no boxShadow — MINOR previamente aceito |
+| PIX-URGENT | pix_payment_screen.dart | `AppTheme.orangeDk` no countdown estado urgente | PASS | linha 272 |
+| PIX-BTN | pix_payment_screen.dart | `AppTheme.orange` e `AppTheme.paper` no FilledButton "Gerar novo QR" | PASS | linhas 249-250 |
+| BOOK-10 | my_bookings_screen.dart | `display(size: 72` presente — Anton 72px no hero block | PASS | linha 133 |
+| BOOK-11 | my_bookings_screen.dart | `AppTheme.orange` na eyebrow do hero | PASS | linha 127 |
+| BOOK-12 | my_bookings_screen.dart | `HairlineBookingRow(` em ambas as listas (upcoming + past) | PASS | linhas 224, 237 |
+| HAIR-01 | hairline_booking_row.dart | Nenhum `Card(` — usa `DecoratedBox` | PASS | linha 87 |
+| HAIR-02 | hairline_booking_row.dart | `DecoratedBox` + `BorderSide(color: AppTheme.lineHair` presentes | PASS | linhas 87-93 |
+
+### Admin
+
+| Criterion | Screen/File | Check | Result | Notes |
+|-----------|-------------|-------|--------|-------|
+| ADMN-13 | admin_screen.dart | `Tab(text:` com strings uppercase; sem `backgroundColor:` no TabBar | PASS | linhas 171-178; TabBar usa apenas `isScrollable` e `dividerColor` |
+| ADMN-14 | admin_screen.dart | `VIDA`/`ATIVA` display tokens; `PAINEL ADMIN` em `AppTheme.mono`; `cliente →` em `AppTheme.mono(color: AppTheme.orange)` | PASS | linhas 139-160 |
+| ADMN-15 | admin_screen.dart | `Container(width: 2, color: AppTheme.orange)` no banner inline | PASS | linha 82 (banner FCM) e linha 247 (_NotificationBanner) |
+| ADMN-16 | slot_management_tab.dart | `display(size: 32` no SlotRow; nenhum `ChoiceChip` | PASS | linha 215; nenhum ChoiceChip no arquivo |
+| ADMN-17 | slot_management_tab.dart | `AdminDaySelector` presente; indicador underline laranja | PASS | classe AdminDaySelector linha 46; `color: isSelected ? AppTheme.orange` linha 147 |
+| D-02 | slot_management_tab.dart | `AppTheme.orange` para cor do slot reservado (hora Anton) | PASS | linha 218: `color: isBooked ? AppTheme.orange : AppTheme.ink` |
+| V-24 | slot_management_tab.dart | `Colors.red` no erro AdminSlotError | fix aplicado | `→ AppTheme.ui(color: AppTheme.orangeDk)` |
+| ADMN-18 | admin_booking_row.dart | `display(size: 36` no tempo; nenhum `AdminBookingCard` | PASS | linha 87; AdminBookingCard removido |
+| ADMN-19 | admin_booking_row.dart | Gate `booking.isPending` para pills; sem `backgroundColor:` sólido nas pills | PASS | linha 126; pills usam `FilledButton.styleFrom` com `AppTheme.ink` (CONFIRMAR) e `OutlinedButton` (RECUSAR) — conforme design |
+| V-25 | booking_management_tab.dart | `Colors.red` no erro AdminBookingError | fix aplicado | `→ AppTheme.ui(color: AppTheme.orangeDk)` |
+| ADMN-20 | users_management_tab.dart | `AppTheme.orange` e `AppTheme.ink` como fundo do avatar; `display(size:` na inicial | PASS | linha 182-183 (avatarBg); linha 201: `display(size: 20` |
+| ADMN-21 | user_detail_sheet.dart | `SportBtn` presente | PASS | linha 80: `SportBtn.filled(` |
+| ADMN-22 | pricing_tab.dart | `display(size: 30` e `display(size: 44` presentes; container laranja na timeline | PASS | linhas 313, 341; linha 362: `Container(color: AppTheme.orange)` |
+| ADMN-23 | pricing_tab.dart | `SportBtn.filledInk(` no rodapé | PASS | linha 248 |
+| V-26 | pricing_tab.dart | `Colors.red` no erro PricingError | fix aplicado | `→ AppTheme.ui(color: AppTheme.orangeDk)` |
+| ADMN-24 | settings_tab.dart | `display(size: 26` presente; sem `activeColor:` no Switch | PASS | linha 113; Switch usa apenas `value`/`onChanged` — tema global aplica laranja |
+| ADMN-25 | settings_tab.dart | `AppTheme.mono` nos campos TextField de credenciais; `Icons.visibility` e `Icons.visibility_off` | PASS | linhas 189, 243 (style: AppTheme.mono); linhas 213, 266 (visibility icons) |
+| V-27 | settings_tab.dart | `Colors.red` em SettingsError e SportConfigError (2 locais) | fix aplicado | ambos `→ AppTheme.ui(color: AppTheme.orangeDk)` |
+| SPORT-01 | sport_btn.dart | Três variantes presentes: `_SportBtnVariant.filledInk` existe | PASS | enum linha 4 |
+| SPORT-02 | sport_btn.dart | `backgroundColor: AppTheme.ink` no case filledInk | PASS | linha 68 |
+
+### Novos Issues Encontrados
+
+Nenhum novo issue CRITICAL identificado neste audit. Os 4 fixes aplicados (V-24 a V-27) são promoções de status "pendente manual" → "fix aplicado" para issues MINOR já documentados no audit anterior.
