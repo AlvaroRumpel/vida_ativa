@@ -37,7 +37,7 @@ class PricingTab extends StatelessWidget {
           PricingInitial() =>
             const Center(child: CircularProgressIndicator()),
           PricingError(:final message) =>
-            Center(child: Text(message, style: const TextStyle(color: Colors.red))),
+            Center(child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk))),
           PricingLoaded(:final tiers) => _PricingEditor(tiers: tiers),
         };
       },

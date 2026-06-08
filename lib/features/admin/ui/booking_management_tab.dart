@@ -20,7 +20,7 @@ class BookingManagementTab extends StatelessWidget {
           AdminBookingInitial() =>
             const Center(child: CircularProgressIndicator()),
           AdminBookingError(:final message) => Center(
-              child: Text(message, style: const TextStyle(color: Colors.red)),
+              child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk)),
             ),
           AdminBookingLoaded() => _BookingManagementView(state: state),
         };

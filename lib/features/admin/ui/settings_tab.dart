@@ -19,7 +19,7 @@ class SettingsTab extends StatelessWidget {
           SettingsInitial() =>
             const Center(child: CircularProgressIndicator()),
           SettingsError(:final message) => Center(
-              child: Text(message, style: const TextStyle(color: Colors.red)),
+              child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk)),
             ),
           SettingsLoaded() => _SettingsForm(state: state),
         };
@@ -444,7 +444,7 @@ class _SportsSectionState extends State<_SportsSection> {
               child: Center(child: CircularProgressIndicator()),
             ),
           SportConfigError(:final message) => Center(
-              child: Text(message, style: const TextStyle(color: Colors.red)),
+              child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk)),
             ),
           SportConfigLoaded(:final sports) => () {
               _syncFromState(sports);

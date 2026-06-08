@@ -28,7 +28,7 @@ class SlotManagementTab extends StatelessWidget {
         return switch (state) {
           AdminSlotInitial() => const Center(child: CircularProgressIndicator()),
           AdminSlotError(:final message) => Center(
-              child: Text(message, style: const TextStyle(color: Colors.red)),
+              child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk)),
             ),
           AdminSlotLoaded(:final slots) => _SlotDayView(slots: slots),
         };
