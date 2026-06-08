@@ -149,9 +149,16 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
           runSpacing: AppSpacing.sm,
           children: List.generate(7, (i) {
             final dow = i + 1; // 1=Mon..7=Sun
+            final isSelected = _selectedDays.contains(dow);
             return FilterChip(
-              label: Text(_dayLabels[i]),
-              selected: _selectedDays.contains(dow),
+              label: Text(
+                _dayLabels[i],
+                style: AppTheme.ui(
+                  size: 13,
+                  color: isSelected ? AppTheme.paper : AppTheme.ink,
+                ),
+              ),
+              selected: isSelected,
               onSelected: (selected) {
                 setState(() {
                   if (selected) {
@@ -163,6 +170,17 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
                   }
                 });
               },
+              backgroundColor: Colors.transparent,
+              selectedColor: AppTheme.ink,
+              checkmarkColor: AppTheme.paper,
+              side: WidgetStateBorderSide.resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? const BorderSide(color: AppTheme.ink)
+                    : const BorderSide(color: AppTheme.concrete, width: 0.8),
+              ),
+              shape: const StadiumBorder(),
+              showCheckmark: true,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
             );
           }),
         ),
@@ -175,18 +193,14 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
           children: [
             Text(
               _endDateLabel(_weeks),
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.primaryGreen,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTheme.ui(size: 14, color: AppTheme.court, weight: FontWeight.w600),
             ),
             Slider(
               value: _weeks.toDouble(),
               min: 1,
               max: 52,
               divisions: 51,
-              activeColor: AppTheme.primaryGreen,
+              activeColor: AppTheme.court,
               onChanged: (v) => setState(() => _weeks = v.round()),
               onChangeEnd: (_) => _refreshPreview(),
             ),
@@ -201,12 +215,12 @@ class _RecurrenceSectionState extends State<RecurrenceSection> {
           child: _isLoadingPreview
               ? const Text(
                   'Verificando disponibilidade...',
-                  style: TextStyle(color: Color(0xFF9E9A95)),
+                  style: TextStyle(color: AppTheme.concrete),
                 )
               : _previewItems.isEmpty
                   ? const Text(
                       'Nenhum horário disponível nas datas selecionadas',
-                      style: TextStyle(color: Color(0xFF9E9A95)),
+                      style: TextStyle(color: AppTheme.concrete),
                     )
                   : ListView(
                       shrinkWrap: true,
@@ -247,27 +261,25 @@ class _PreviewDateItem extends StatelessWidget {
           Icon(
             isAvailable ? Icons.circle : Icons.circle_outlined,
             size: 10,
-            color: isAvailable
-                ? AppTheme.primaryGreen
-                : const Color(0xFF9E9A95),
+            color: isAvailable ? AppTheme.court : AppTheme.concrete,
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(
             dateDisplay,
             style: TextStyle(
-              color: isAvailable ? null : const Color(0xFF9E9A95),
+              color: isAvailable ? null : AppTheme.concrete,
               fontSize: 14,
             ),
           ),
           if (item.status == _PreviewStatus.alreadyBooked)
             const Text(
               ' · Já reservado',
-              style: TextStyle(color: Color(0xFF9E9A95), fontSize: 12),
+              style: TextStyle(color: AppTheme.concrete, fontSize: 12),
             ),
           if (item.status == _PreviewStatus.notFound)
             const Text(
               ' · Horário não cadastrado',
-              style: TextStyle(color: Color(0xFF9E9A95), fontSize: 12),
+              style: TextStyle(color: AppTheme.concrete, fontSize: 12),
             ),
         ],
       ),
@@ -288,7 +300,7 @@ class _HiddenItemsSummary extends StatelessWidget {
     if (unavailable > 0) parts.add('$unavailable sem horário');
     return Text(
       parts.join(' · '),
-      style: const TextStyle(color: Color(0xFF9E9A95), fontSize: 12),
+      style: const TextStyle(color: AppTheme.concrete, fontSize: 12),
     );
   }
 }
