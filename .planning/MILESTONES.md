@@ -1,5 +1,26 @@
 # Milestones
 
+## v6.0 Arena Esportivo — Redesign Visual (Shipped: 2026-06-08)
+
+**Phases completed:** 8 phases (23–30), 21 plans
+**Timeline:** 2026-05-25 → 2026-06-08 (14 dias)
+**Codebase:** ~12,300 linhas Dart + ~1,189 linhas JS Cloud Functions
+
+**Key accomplishments:**
+
+1. Design system Arena Esportivo: Anton/Manrope/JBM bundled offline, AppTheme com 9 cores + 3 typography helpers — fundação pra todo o redesign
+2. Agenda (cliente) redesenhada: SportDayStrip com underline laranja animado, SlotHairlineRow sem Card, wordmark "VIDA/ATIVA" inline (sem AppBar)
+3. Frame admin redesenhado: header inline wordmark + TabBar underline laranja 2px + banners faixa laranja (sem container colorido)
+4. Fluxo de reserva: BookingConfirmationSheet com hero Anton 88px, SportBtn, HairlineBookingRow hairline rows
+5. 5 abas admin Arena: slots/reservas/usuários/preços/ajustes — hairline rows, tipografia Anton/Manrope/JBM em todas as abas
+6. Dashboard Arena: KPI grid hairline 2×N, barras Container simples, heatmap escala laranja, sparklines + deltas ↑/↓ period-over-period
+7. Token audit: 28 issues corrigidos (zero `Colors.*` hardcoded) — pix_payment_screen, admin_screen, 4 tabs admin
+8. UAT aprovado: 28/28 conformidade visual, 48/48 widget tests, checklist 110 itens em 9 telas
+
+**Archive:** `.planning/milestones/v6.0-ROADMAP.md`
+
+---
+
 ## v5.0 Dashboard e Esportes (Shipped: 2026-05-24)
 
 **Phases completed:** 3 phases, 9 plans, 10 tasks

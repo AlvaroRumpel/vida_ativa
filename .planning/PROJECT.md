@@ -4,7 +4,7 @@
 
 PWA de agendamento de quadra de areia (futevôlei/vôlei de praia) para a Academia Vida Ativa. Substitui o gerenciamento de reservas feito por listas no WhatsApp: clientes veem horários disponíveis, reservam pelo celular e pagam via Pix diretamente no app. Inclui confirmação automática de pagamento via webhook, expiração automática de reservas não pagas, visibilidade social entre jogadores, notificações push para admin, e painel admin completo com configuração de credenciais Mercado Pago.
 
-**Status:** v5.0 live em `vida-ativa-94ba0.web.app`
+**Status:** v6.0 live em `vida-ativa-94ba0.web.app`
 
 ## Core Value
 
@@ -91,19 +91,53 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 
 ### Validated (v6.0)
 
+- ✓ DS-01: Fontes Anton, Manrope, JetBrains Mono bundled offline em assets/google_fonts/ — Phase 23
+- ✓ DS-02: AppTheme com paleta Arena (sand, paper, ink, concrete, lineHair, orange, orangeDk, court, sun) — Phase 23
+- ✓ DS-03: AppTheme.display(), AppTheme.ui(), AppTheme.mono() disponíveis em todos os widgets — Phase 23
+- ✓ DS-04: flutter build web --release PASS com design system completo — Phase 23
+- ✓ NAV-01: BottomNavigationBar selecionado: ícone laranja + label mono uppercase — Phase 23
+- ✓ NAV-02: BottomNavigationBar: fundo sand + borda superior hairline + sem elevação — Phase 23
+- ✓ SCHED-04: Day selector SportDayStrip com colunas mono + número Anton; ativa tem underline laranja 2px — Phase 24
+- ✓ SCHED-05: SlotHairlineRow sem Card — hairline divisória, Anton 42px, faixa laranja 3px em myBooking — Phase 24
+- ✓ SCHED-06: Cabeçalho da agenda: wordmark "VIDA ATIVA" Anton + eyebrow mono com data — Phase 24
+- ✓ ADMN-13: TabBar admin: labels JetBrains Mono uppercase, underline laranja 2px, fundo sand — Phase 25
+- ✓ ADMN-14: Header admin: wordmark Arena + eyebrow "PAINEL ADMIN" + link "cliente →" laranja — Phase 25
+- ✓ ADMN-15: Notification banner faixa laranja 2px à esquerda, sem container colorido — Phase 25
+- ✓ BOOK-07: Confirmação: horário em Anton 88px sem bloco sólido — Phase 26
+- ✓ BOOK-08: Aviso aprovação manual: faixa laranja 2px à esquerda, sem banner colorido — Phase 26
+- ✓ BOOK-09: Botões "Pagar com Pix" / "Pagar na hora": SportBtn uppercase sem quebra — Phase 26
+- ✓ BOOK-10: Minhas Reservas: próxima reserva em Anton 72px sem bloco preto — Phase 26
+- ✓ BOOK-11: Minhas Reservas: eyebrow laranja "Próximo · hoje" — Phase 26
+- ✓ BOOK-12: Demais reservas: HairlineBookingRow hairline com Anton 30px e status pill quiet — Phase 26
+- ✓ ADMN-16: Aba Slots: SlotRow com Anton 32px, laranja se reservado, hairline sem Card — Phase 27
+- ✓ ADMN-17: Aba Slots: AdminDaySelector com underline laranja + navegação ← → — Phase 27
+- ✓ ADMN-18: Aba Reservas: AdminBookingRow com Anton 36px, Manrope nome, JBM status — Phase 27
+- ✓ ADMN-19: Aba Reservas: BookingManagementTab integra AdminBookingRow com pills confirmar/recusar — Phase 27
+- ✓ ADMN-20: Aba Usuários: UserDetailSheet DraggableScrollableSheet, CircleAvatar role-colors — Phase 27
+- ✓ ADMN-21: Aba Usuários: UserRow hairline, CircleAvatar, Manrope/JBM typography — Phase 27
+- ✓ ADMN-22: Aba Preços: faixas hairline, Anton 30px horário + Anton 44px preço, timeline laranja 3px — Phase 28
+- ✓ ADMN-23: Aba Preços: SportBtn.filledInk no rodapé sticky — Phase 28
+- ✓ ADMN-24: Aba Ajustes: Pix section Anton 26px, Switch sport (laranja/cinza) — Phase 28
+- ✓ ADMN-25: Aba Ajustes: underline fields mono + eye toggle para credenciais MP — Phase 28
 - ✓ ADMN-26: KPI cards em grid 2×N hairlines, Anton 32px, delta mono colorido, sem Card/sombra — Phase 29
 - ✓ ADMN-27: Gráfico de receita com barras Container simples sem bordas arredondadas, labels mono — Phase 29
 - ✓ ADMN-28: Heatmap 7×7 custom GridView com escala laranja rgba + status donut Arena 4 categorias — Phase 29
 - ✓ ADMN-29: Receita por esporte em hairline rows com progress bar 3px laranja, share calculado client-side — Phase 29
+- ✓ ADMN-30: KPI cards exibem sparkline de tendência (7 pontos diários) — `*Trend` fields em DashboardData — Phase 29+
+- ✓ ADMN-31: Admin pode tocar em "?" ao lado de cada KPI e ver tooltip com descrição do dado — Phase 29+
+- ✓ ADMN-32: Delta period-over-period (↑/↓ X.X%) exibido por KPI — campos `*Delta` em DashboardData — Phase 29+
+- ✓ ADMN-33: Heatmap hora×dia desbloqueado — campo `heatmap` flat[49], `_heatmapFromFlat` reconstrói 7×7 — Phase 29+
+- ✓ DEV-01: Script `scripts/seed_dashboard_staging.js` com dados realistas + trends + heatmap — Phase 29+
+- ✓ VAL-01: Token audit PASS — zero cores hardcoded em pix_payment_screen + admin_screen (21 fixes) — Phase 30
+- ✓ VAL-02: Token audit PASS — zero cores hardcoded em booking_confirmation_sheet (7 fixes) — Phase 30
+- ✓ VAL-03: flutter analyze 0 erros + flutter build web --release PASS — Phase 30
+- ✓ VAL-04: 48/48 widget tests passam (phases 26-29 coverage) — Phase 30
+- ✓ VAL-05: Conformidade visual ponto-a-ponto 28/28 critérios PASS em 9 telas — Phase 30
+- ✓ VAL-06: UAT manual aprovado — checklist 110 itens, aprovação 2026-06-08 — Phase 30
 
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
-- [x] ADMN-30: KPI cards exibem sparkline de tendência (7 pontos diários) — `*Trend` fields em DashboardData, sparkline inline com value widget
-- [x] ADMN-31: Admin pode tocar em "?" ao lado de cada KPI e ver tooltip com descrição do que o dado representa
-- [x] DEV-01: Script `scripts/seed_dashboard_staging.js` popula Firestore staging com dados realistas incluindo trend arrays, deltas e heatmap flat[49]
-- [x] ADMN-32: Delta period-over-period (↑/↓ X.X%) exibido por KPI — campos `*Delta` em DashboardData + seed
-- [x] ADMN-33: Heatmap hora×dia desbloqueado — campo `heatmap` flat[49] em DashboardData, `_heatmapFromFlat` reconstrói 7×7
 
 ### Out of Scope
 
@@ -128,7 +162,7 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - **Perfis:** `client` (reserva) e `admin` (gerencia) — `role: String` no Firestore; go_router guard + Firestore rules
 - **Cloud Functions:** `notifyAdminNewBooking`, `createPixPayment`, `handlePixWebhook`, `expireUnpaidBookings`, `cancelPixPayment`, `adminConfirmPixPayment`, `updateSlotPricesFromTiers`, `onBookingStateChange`, `scheduledDailyAggregation`
 - **Credenciais MP:** admin salva via SettingsCubit → Firestore `config/mercadopago`; CFs leem Firestore-first, Secret Manager fallback; cliente nunca lê (allow read: if false)
-- **Codebase:** ~10,786 linhas Dart + ~1,189 linhas JS Cloud Functions (v5.0)
+- **Codebase:** ~12,300 linhas Dart + ~1,189 linhas JS Cloud Functions (v6.0)
 - **Monitoramento:** Sentry com kReleaseMode guard; DSN via --dart-define
 - **Testes:** flutter_test + bloc_test + mocktail; 36 testes unitários cobrindo BookingModel, PriceTierModel, SettingsCubit, AppRouter, AuthCubit
 
@@ -173,4 +207,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-07 — sparkline posição corrigida (value row), deltas ↑/↓ (ADMN-32), heatmap desbloqueado (ADMN-33), seed atualizado com flat heatmap + deltas*
+*Last updated: 2026-06-08 — v6.0 milestone closed; all v6.0 requirements moved to Validated; LOC updated to ~12,300 Dart*

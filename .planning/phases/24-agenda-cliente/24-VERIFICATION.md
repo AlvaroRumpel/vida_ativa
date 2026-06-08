@@ -2,10 +2,12 @@
 phase: 24
 plan: 24-01
 verified: 2026-05-26T10:20:00Z
-status: human_needed
-score: 7/8 must-haves verified
+status: passed
+score: 8/8 must-haves verified
 re_verification: false
 overrides_applied: 0
+human_uat_completed: 2026-05-26
+human_uat_result: "7/7 PASS — see 24-HUMAN-UAT.md"
 human_verification:
   - test: "Wordmark header visual"
     expected: "Orange pill 'VIDA ATIVA' on left, eyebrow date (e.g. 'SEG, 26 MAI') on right, no AppBar, black text on orange"

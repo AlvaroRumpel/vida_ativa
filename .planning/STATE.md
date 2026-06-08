@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Arena Esportivo — Redesign Visual
-status: complete
-last_updated: "2026-06-08T12:00:00.000Z"
-last_activity: 2026-06-08 -- Phase 30 UAT approved, v6.0 milestone complete
+status: archived
+last_updated: "2026-06-08"
+last_activity: 2026-06-08
 progress:
-  total_phases: 11
-  completed_phases: 11
-  total_plans: 23
-  completed_plans: 23
+  total_phases: 8
+  completed_phases: 8
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -17,16 +17,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19)
+See: .planning/PROJECT.md (updated 2026-06-08)
 
 **Core value:** Clientes conseguem reservar um horário de quadra em segundos, sem depender de mensagens no WhatsApp.
-**Current focus:** v6.0 milestone COMPLETE — próximo milestone a definir
+**Current focus:** v6.0 ARCHIVED — próximo milestone a definir
 
 ## Current Position
 
-Phase: 30 (valida-o-visual-arena-uat-automatizado-checklist-manual) — COMPLETE
-Status: v6.0 milestone complete. UAT aprovado 2026-06-08.
-Last activity: 2026-06-08 -- Phase 30 UAT approved by user
+Phase: — (v6.0 fechado e arquivado 2026-06-08)
+Status: v6.0 milestone archived. Tag v6.0 criada. Próximo milestone: TBD.
+Last activity: 2026-06-08
 
 ```
 Progress: [████████████████████] 100% (11/11 phases)
