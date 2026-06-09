@@ -1,0 +1,17 @@
+# Supabase credentials — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Service role key pattern (bypasses ALL RLS — treat as god key)
+*sb_secret_*
+*service_role*
+
+# Flutter build artifacts (spike flutter app — Phase 34)
+flutter_app/build/
+flutter_app/.dart_tool/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+
+# General
+*.DS_Store
