@@ -20,6 +20,10 @@ DROP TABLE IF EXISTS tenants CASCADE;
 -- Table: tenants
 -- Root entity — every other table references this via tenant_id FK
 -- =============================================================================
+-- NOTE (spike): updated_at columns on tenants, slots, and bookings are NOT
+-- auto-updated by triggers. Auto-update triggers are deferred to Phase 32.
+-- The seed's ON CONFLICT DO UPDATE manually sets updated_at = now(), masking
+-- this during re-runs. Any application UPDATE will leave updated_at stale.
 CREATE TABLE tenants (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   name        VARCHAR(255) NOT NULL,
