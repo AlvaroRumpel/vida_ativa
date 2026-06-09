@@ -56,7 +56,9 @@ ROLLBACK;
 
 -- -----------------------------------------------------------------------------
 -- Attack 3: Admin in Tenant A sees ALL Tenant A bookings (not just own)
--- Expected: COUNT > 1 (admin sees all tenant rows, not just own user_id)
+-- Expected: COUNT >= 7 (all 7 Tenant A bookings from seed; seed has 7 bookings
+-- for Tenant A across 2 users). COUNT > 0 would be too weak — a bug that adds
+-- user_id = auth.uid() to admin policy still returns 1 row and would falsely PASS.
 -- This validates D-07: admin policy is broader than client policy
 -- -----------------------------------------------------------------------------
 SELECT '=== Attack 3: Admin SELECT — sees all Tenant A bookings ==='::TEXT AS test;
@@ -67,8 +69,8 @@ BEGIN;
 
   SELECT
     CASE
-      WHEN COUNT(*) > 0 THEN CONCAT('PASS: Admin sees ', COUNT(*)::TEXT, ' Tenant A bookings (all users)')
-      ELSE 'FAIL: Admin sees 0 bookings — admin policy too restrictive'
+      WHEN COUNT(*) >= 7 THEN CONCAT('PASS: Admin sees ', COUNT(*)::TEXT, ' Tenant A bookings (all users)')
+      ELSE CONCAT('FAIL: Admin sees only ', COUNT(*)::TEXT, ' bookings — expected >= 7 (admin policy too restrictive or seed data missing)')
     END AS result
   FROM bookings
   WHERE tenant_id = '10000000-0000-0000-0000-000000000001'::uuid;
