@@ -15,8 +15,8 @@
 -- =============================================================================
 -- Helper: reusable expressions (as SQL comments for documentation)
 -- JWT app_metadata access pattern (D-06):
---   tenant check:  (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
---   role check:    (auth.jwt() ->> 'app_metadata' ->> 'role')::text
+--   tenant check:  (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+--   role check:    (auth.jwt() -> 'app_metadata' ->> 'role')::text
 -- =============================================================================
 
 -- =============================================================================
@@ -30,7 +30,7 @@ CREATE POLICY "tenants_select_own"
   ON tenants FOR SELECT
   TO authenticated
   USING (
-    id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
   );
 
 -- =============================================================================
@@ -44,7 +44,7 @@ CREATE POLICY "memberships_select_own_tenant"
   ON memberships FOR SELECT
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
   );
 
 DROP POLICY IF EXISTS "memberships_insert_admin_only" ON memberships;
@@ -52,8 +52,8 @@ CREATE POLICY "memberships_insert_admin_only"
   ON memberships FOR INSERT
   TO authenticated
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 DROP POLICY IF EXISTS "memberships_update_admin_only" ON memberships;
@@ -61,12 +61,12 @@ CREATE POLICY "memberships_update_admin_only"
   ON memberships FOR UPDATE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   )
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- =============================================================================
@@ -80,7 +80,7 @@ CREATE POLICY "slots_select_own_tenant"
   ON slots FOR SELECT
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
   );
 
 DROP POLICY IF EXISTS "slots_insert_admin_only" ON slots;
@@ -88,8 +88,8 @@ CREATE POLICY "slots_insert_admin_only"
   ON slots FOR INSERT
   TO authenticated
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 DROP POLICY IF EXISTS "slots_update_admin_only" ON slots;
@@ -97,12 +97,12 @@ CREATE POLICY "slots_update_admin_only"
   ON slots FOR UPDATE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   )
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 DROP POLICY IF EXISTS "slots_delete_admin_only" ON slots;
@@ -110,8 +110,8 @@ CREATE POLICY "slots_delete_admin_only"
   ON slots FOR DELETE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- =============================================================================
@@ -131,9 +131,9 @@ CREATE POLICY "bookings_client_select"
   ON bookings FOR SELECT
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
     AND user_id = auth.uid()
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'client'
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'client'
   );
 
 -- Admin: SELECT ALL bookings in their tenant (D-07)
@@ -142,8 +142,8 @@ CREATE POLICY "bookings_admin_select"
   ON bookings FOR SELECT
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- Client: INSERT own bookings only (WITH CHECK required — Pitfall 2)
@@ -152,9 +152,9 @@ CREATE POLICY "bookings_client_insert"
   ON bookings FOR INSERT
   TO authenticated
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
     AND user_id = auth.uid()
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'client'
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'client'
   );
 
 -- Admin: INSERT bookings for their tenant (WITH CHECK required)
@@ -163,8 +163,8 @@ CREATE POLICY "bookings_admin_insert"
   ON bookings FOR INSERT
   TO authenticated
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- Client: UPDATE own bookings only (status changes, e.g. cancel)
@@ -173,14 +173,14 @@ CREATE POLICY "bookings_client_update"
   ON bookings FOR UPDATE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
     AND user_id = auth.uid()
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'client'
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'client'
   )
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
     AND user_id = auth.uid()
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'client'
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'client'
   );
 
 -- Admin: UPDATE any booking in their tenant (confirm, reject, etc.)
@@ -189,12 +189,12 @@ CREATE POLICY "bookings_admin_update"
   ON bookings FOR UPDATE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   )
   WITH CHECK (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- Admin: DELETE bookings in their tenant
@@ -203,8 +203,8 @@ CREATE POLICY "bookings_admin_delete"
   ON bookings FOR DELETE
   TO authenticated
   USING (
-    tenant_id = (auth.jwt() ->> 'app_metadata' ->> 'tenant_id')::uuid
-    AND (auth.jwt() ->> 'app_metadata' ->> 'role')::text = 'admin'
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
 -- =============================================================================
