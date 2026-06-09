@@ -135,6 +135,21 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ VAL-05: Conformidade visual ponto-a-ponto 28/28 critérios PASS em 9 telas — Phase 30
 - ✓ VAL-06: UAT manual aprovado — checklist 110 itens, aprovação 2026-06-08 — Phase 30
 
+## Current Milestone: v7.0 Spike Supabase Multi-tenant
+
+**Goal:** Validar por evidência se migrar o backend de Firebase para Supabase (Postgres + RLS) é viável para SaaS multi-tenant — produzindo um documento de decisão go/no-go antes de qualquer alteração em produção.
+
+**Target features:**
+- Schema SQL multi-tenant: tenants, memberships, slots, bookings com UNIQUE(tenant_id, slot_id, date)
+- RLS habilitado com políticas de isolamento (using + with check) + política cliente/admin
+- Prova de isolamento: 3 ataques cross-tenant documentados como FALHA
+- Prova de anti-double-booking: função book_slot + teste de concorrência documentado
+- Prova de integração Flutter: app mínimo isolado com Supabase Auth + leitura de slots via RLS + avaliação realtime
+- 2 riscos avaliados por escrito: migração de senhas Firebase→Supabase + realtime sob carga
+- Documento de decisão final: go/no-go com evidência e riscos remanescentes
+
+**Hard constraints:** Zero toque em código de produção (lib/, functions/, Firebase). Spike vive em /spike-supabase/. Credenciais fora do git.
+
 ### Active
 
 - [ ] UI-01: App exibe logo e paleta de cores fornecidas pelo cliente em todas as telas *(⚠️ BLOQUEADO — aguardando assets do cliente)*
