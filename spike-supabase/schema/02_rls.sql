@@ -158,6 +158,10 @@ CREATE POLICY "bookings_client_insert"
   );
 
 -- Admin: INSERT bookings for their tenant (WITH CHECK required)
+-- NOTE (spike): user_id is not validated against memberships here — admins can
+-- insert bookings on behalf of any user_id. This is intentional admin override
+-- behavior for spike validation purposes. Full user_id-must-be-tenant-member
+-- validation is deferred to Phase 32 book_slot() stored procedure.
 DROP POLICY IF EXISTS "bookings_admin_insert" ON bookings;
 CREATE POLICY "bookings_admin_insert"
   ON bookings FOR INSERT
