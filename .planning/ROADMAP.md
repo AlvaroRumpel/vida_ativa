@@ -8,6 +8,7 @@
 - ✅ **v4.0 Pagamento Pix** — Phases 17–19 (shipped 2026-05-08)
 - ✅ **v5.0 Dashboard & Esportes** — Phases 20–22 (shipped 2026-05-23)
 - ✅ **v6.0 Arena Esportivo — Redesign Visual** — Phases 23–30 (shipped 2026-06-08)
+- 🔬 **v7.0 Spike Supabase Multi-tenant** — Phases 31–35 (in progress)
 
 ## Phases
 
@@ -89,6 +90,17 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
 
 </details>
 
+<details>
+<summary>🔬 v7.0 Spike Supabase Multi-tenant (Phases 31–35) — IN PROGRESS</summary>
+
+- [ ] **Phase 31: Schema SQL + RLS** — Projeto Supabase staging criado; 4 tabelas com tenant_id FK; UNIQUE(tenant_id, slot_id, date); RLS habilitado com políticas USING + WITH CHECK; política cliente/admin; service role key fora do git
+- [ ] **Phase 32: book_slot() + Auth Hook** — Função PL/pgSQL com SELECT FOR UPDATE NOWAIT + captura unique_violation; Edge Function injeta tenant_id em app_metadata; JWT decodificado confirma claim presente
+- [ ] **Phase 33: Provas de Isolamento + Concorrência** — 3 ataques cross-tenant documentados como FALHA em isolation-proof.md; 50+ requests simultâneos → exatamente 1 confirmada em concurrency-proof.md
+- [ ] **Phase 34: Flutter Mini-App + Realtime** — App isolado em /spike-supabase/flutter_app/ autentica via Supabase Auth; RLS filtra por tenant sem .eq() no cliente; avaliação Realtime documentada
+- [ ] **Phase 35: Riscos + Documento de Decisão** — Risco migração senhas avaliado (SCRYPT vs bcrypt + Google OAuth); Realtime sob carga avaliado; DECISION.md go/no-go com evidência de todas as fases
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -123,3 +135,8 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
 | 28. Admin Preços + Ajustes | v6.0 | 3/3 | Complete    | 2026-06-05 |
 | 29. Admin Dashboard | v6.0 | 3/3 | Complete    | 2026-06-05 |
 | 30. Validação Visual Arena | v6.0 | 4/4 | Complete   | 2026-06-08 |
+| 31. Schema SQL + RLS | v7.0 | 0/0 | Pending | — |
+| 32. book_slot() + Auth Hook | v7.0 | 0/0 | Pending | — |
+| 33. Provas de Isolamento + Concorrência | v7.0 | 0/0 | Pending | — |
+| 34. Flutter Mini-App + Realtime | v7.0 | 0/0 | Pending | — |
+| 35. Riscos + Documento de Decisão | v7.0 | 0/0 | Pending | — |

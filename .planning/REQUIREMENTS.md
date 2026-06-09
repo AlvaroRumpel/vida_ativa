@@ -62,24 +62,24 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SPIKE-01 | — | Pending |
-| SPIKE-02 | — | Pending |
-| SPIKE-03 | — | Pending |
-| SPIKE-04 | — | Pending |
-| SPIKE-05 | — | Pending |
-| SPIKE-06 | — | Pending |
-| SPIKE-07 | — | Pending |
-| SPIKE-08 | — | Pending |
-| SPIKE-09 | — | Pending |
-| SPIKE-10 | — | Pending |
-| SPIKE-11 | — | Pending |
-| SPIKE-12 | — | Pending |
-| SPIKE-13 | — | Pending |
+| SPIKE-01 | Phase 31 | Pending |
+| SPIKE-03 | Phase 31 | Pending |
+| SPIKE-04 | Phase 31 | Pending |
+| SPIKE-13 | Phase 31 | Pending |
+| SPIKE-02 | Phase 32 | Pending |
+| SPIKE-05 | Phase 32 | Pending |
+| SPIKE-06 | Phase 33 | Pending |
+| SPIKE-07 | Phase 33 | Pending |
+| SPIKE-08 | Phase 34 | Pending |
+| SPIKE-09 | Phase 34 | Pending |
+| SPIKE-10 | Phase 35 | Pending |
+| SPIKE-11 | Phase 35 | Pending |
+| SPIKE-12 | Phase 35 | Pending |
 
 **Coverage:**
 - v7.0 requirements: 13 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 13 ⚠️
+- Mapped to phases: 13
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-09*
