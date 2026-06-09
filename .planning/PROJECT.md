@@ -135,6 +135,13 @@ Clientes conseguem reservar um horário de quadra em segundos, sem depender de m
 - ✓ VAL-05: Conformidade visual ponto-a-ponto 28/28 critérios PASS em 9 telas — Phase 30
 - ✓ VAL-06: UAT manual aprovado — checklist 110 itens, aprovação 2026-06-08 — Phase 30
 
+### Validated (v7.0)
+
+- ✓ SPIKE-01: 4 tabelas (tenants, memberships, slots, bookings) com tenant_id FK + UNIQUE(tenant_id, slot_id, date) + RLS enabled — Phase 31
+- ✓ SPIKE-03: RLS habilitado nas 4 tabelas com políticas USING + WITH CHECK usando auth.jwt() -> app_metadata (NUNCA user_metadata) — Phase 31
+- ✓ SPIKE-04: Política diferenciada: cliente vê apenas próprias reservas (user_id = auth.uid()); admin vê todas do tenant — Phase 31
+- ✓ SPIKE-13: Service role key fora do git; .gitignore com padrão sb_secret_*; .env.example com placeholders — Phase 31
+
 ## Current Milestone: v7.0 Spike Supabase Multi-tenant
 
 **Goal:** Validar por evidência se migrar o backend de Firebase para Supabase (Postgres + RLS) é viável para SaaS multi-tenant — produzindo um documento de decisão go/no-go antes de qualquer alteração em produção.
@@ -222,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08 — v6.0 milestone closed; all v6.0 requirements moved to Validated; LOC updated to ~12,300 Dart*
+*Last updated: 2026-06-09 — Phase 31 complete (schema SQL + RLS); SPIKE-01, SPIKE-03, SPIKE-04, SPIKE-13 validated; spike-supabase/ scaffolding ready for Phase 32*
