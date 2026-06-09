@@ -69,6 +69,15 @@ CREATE POLICY "memberships_update_admin_only"
     AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
   );
 
+DROP POLICY IF EXISTS "memberships_delete_admin_only" ON memberships;
+CREATE POLICY "memberships_delete_admin_only"
+  ON memberships FOR DELETE
+  TO authenticated
+  USING (
+    tenant_id = (auth.jwt() -> 'app_metadata' ->> 'tenant_id')::uuid
+    AND (auth.jwt() -> 'app_metadata' ->> 'role')::text = 'admin'
+  );
+
 -- =============================================================================
 -- TABLE: slots
 -- All authenticated users in the tenant can read slots.
