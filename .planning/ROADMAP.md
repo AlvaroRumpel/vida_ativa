@@ -104,6 +104,12 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
   - [x] 31-04-PLAN.md — Seed data: 03_seed.sql + README.md + SPIKE-13 final verification
 
 - [ ] **Phase 32: book_slot() + Auth Hook** — Função PL/pgSQL com SELECT FOR UPDATE NOWAIT + captura unique_violation; Edge Function injeta tenant_id em app_metadata; JWT decodificado confirma claim presente
+
+  **Plans:** 2 plans
+
+  Plans:
+  - [ ] 32-01-PLAN.md — book_slot() PL/pgSQL: test stubs + função + migração Supabase staging (Wave 1)
+  - [ ] 32-02-PLAN.md — Auth Hook Edge Function: deploy + registro Dashboard + verificação JWT app_metadata (Wave 2)
 - [ ] **Phase 33: Provas de Isolamento + Concorrência** — 3 ataques cross-tenant documentados como FALHA em isolation-proof.md; 50+ requests simultâneos → exatamente 1 confirmada em concurrency-proof.md
 - [ ] **Phase 34: Flutter Mini-App + Realtime** — App isolado em /spike-supabase/flutter_app/ autentica via Supabase Auth; RLS filtra por tenant sem .eq() no cliente; avaliação Realtime documentada
 - [ ] **Phase 35: Riscos + Documento de Decisão** — Risco migração senhas avaliado (SCRYPT vs bcrypt + Google OAuth); Realtime sob carga avaliado; DECISION.md go/no-go com evidência de todas as fases
@@ -145,7 +151,7 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
 | 29. Admin Dashboard | v6.0 | 3/3 | Complete    | 2026-06-05 |
 | 30. Validação Visual Arena | v6.0 | 4/4 | Complete   | 2026-06-08 |
 | 31. Schema SQL + RLS | v7.0 | 4/4 | Complete    | 2026-06-09 |
-| 32. book_slot() + Auth Hook | v7.0 | 0/0 | Pending | — |
+| 32. book_slot() + Auth Hook | v7.0 | 0/2 | Pending | — |
 | 33. Provas de Isolamento + Concorrência | v7.0 | 0/0 | Pending | — |
 | 34. Flutter Mini-App + Realtime | v7.0 | 0/0 | Pending | — |
 | 35. Riscos + Documento de Decisão | v7.0 | 0/0 | Pending | — |
