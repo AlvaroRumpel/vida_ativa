@@ -85,6 +85,22 @@ serve(async (req: Request) => {
       });
     }
 
+    // CR-01: Validate tenant_id consistency — prevent silent overwrite on refresh
+    // If user already has a tenant_id in claims, it must match the membership record.
+    // Mismatch suggests a session hijack attempt or misconfigured membership data.
+    const existingTenantId = (claims.app_metadata as Record<string, unknown>)?.tenant_id;
+    if (existingTenantId && existingTenantId !== membership.tenant_id) {
+      console.warn(
+        `Auth Hook: tenant_id mismatch for user ${user_id}. ` +
+        `Existing: ${existingTenantId}, Membership: ${membership.tenant_id}. ` +
+        `Returning claims unchanged (potential session hijack attempt).`
+      );
+      return new Response(JSON.stringify({ claims }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // Inject tenant_id and role into app_metadata
     // CRITICAL: spread existing claims first to preserve iss, aud, exp, sub, role, etc.
     // CRITICAL: app_metadata only (NOT user_metadata) — CVE-2025-48757
@@ -106,6 +122,14 @@ serve(async (req: Request) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
+    // WR-01: Differentiate JSON parse errors (400) from unexpected errors (500)
+    if (err instanceof SyntaxError) {
+      console.error("Auth Hook JSON parse error:", err.message);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON payload" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
     console.error("Auth Hook unexpected error:", err);
     // Return 500 — Supabase Auth will fail login (safer than issuing unmodified token)
     return new Response(
