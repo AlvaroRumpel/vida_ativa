@@ -27,6 +27,9 @@ migrate_working_dir/
 .claude/
 .metadata
 
+# Supabase CLI generated files
+supabase/.temp/
+
 # Firebase CLI cache
 .firebase/
 
