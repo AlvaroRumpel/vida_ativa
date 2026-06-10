@@ -27,8 +27,8 @@
 --     work without full JWT app_metadata configured in tests.
 --   T-32-01-03 (DoS): idx_bookings_slot_date index on (slot_id, booking_date)
 --     exists in 01_schema.sql — lock acquisition is O(log n), not full scan.
---   T-32-01-04 (p_user_id not validated): Spike limitation — production must
---     validate p_user_id belongs to tenant via JOIN with memberships.
+--   T-32-01-04 (p_user_id not validated): FIXED — validated via memberships JOIN
+--     before INSERT. Returns USER_NOT_IN_TENANT if user not in tenant.
 --   T-32-01-05 (error_code reveals booking existence): Accepted risk — slot IDs
 --     are non-guessable UUIDs; information not sensitive in spike context.
 -- =============================================================================
@@ -63,7 +63,17 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Step 3: No existing booking — proceed with INSERT.
+  -- Step 3: WR-02: Validate that p_user_id belongs to p_tenant_id.
+  -- Prevents bookings with arbitrary/invalid user UUIDs.
+  IF NOT EXISTS (
+    SELECT 1 FROM public.memberships
+    WHERE user_id = p_user_id AND tenant_id = p_tenant_id
+  ) THEN
+    RETURN QUERY SELECT FALSE, 'USER_NOT_IN_TENANT'::TEXT, NULL::UUID;
+    RETURN;
+  END IF;
+
+  -- Step 4: No existing booking and user is valid — proceed with INSERT.
   INSERT INTO public.bookings (tenant_id, user_id, slot_id, booking_date, status)
   VALUES (p_tenant_id, p_user_id, p_slot_id, p_booking_date, 'pending')
   RETURNING id INTO v_new_id;
