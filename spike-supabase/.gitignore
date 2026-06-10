@@ -13,5 +13,9 @@ flutter_app/.dart_tool/
 flutter_app/.flutter-plugins
 flutter_app/.flutter-plugins-dependencies
 
+# Node.js
+node_modules/
+package-lock.json
+
 # General
 *.DS_Store

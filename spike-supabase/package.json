@@ -1,0 +1,14 @@
+{
+  "name": "spike-supabase-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Supabase multi-tenant spike — isolation and concurrency proof scripts",
+  "scripts": {
+    "isolation": "node tests/isolation-proof.js",
+    "concurrency": "node tests/concurrency-test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.108.1",
+    "dotenv": "17.4.2"
+  }
+}
