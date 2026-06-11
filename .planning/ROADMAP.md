@@ -123,6 +123,13 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
   - [ ] 33-05-PLAN.md — concurrency-proof.md + verificação final + commit (Wave 5)
 
 - [ ] **Phase 34: Flutter Mini-App + Realtime** — App isolado em /spike-supabase/flutter_app/ autentica via Supabase Auth; RLS filtra por tenant sem .eq() no cliente; avaliação Realtime documentada
+
+  **Plans:** 2 plans
+
+  Plans:
+  - [ ] 34-01-PLAN.md — Flutter project scaffold + main.dart ProofScreen (auth, RLS slots, book_slot() RPC) (Wave 1)
+  - [ ] 34-02-PLAN.md — realtime-test.js isolation + latency + free-tier evaluation + realtime-evaluation.md (Wave 2)
+
 - [ ] **Phase 35: Riscos + Documento de Decisão** — Risco migração senhas avaliado (SCRYPT vs bcrypt + Google OAuth); Realtime sob carga avaliado; DECISION.md go/no-go com evidência de todas as fases
 
 </details>
@@ -164,5 +171,5 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
 | 31. Schema SQL + RLS | v7.0 | 4/4 | Complete    | 2026-06-09 |
 | 32. book_slot() + Auth Hook | v7.0 | 2/2 | Complete    | 2026-06-10 |
 | 33. Provas de Isolamento + Concorrência | v7.0 | 0/5 | Pending | — |
-| 34. Flutter Mini-App + Realtime | v7.0 | 0/0 | Pending | — |
+| 34. Flutter Mini-App + Realtime | v7.0 | 0/2 | Pending | — |
 | 35. Riscos + Documento de Decisão | v7.0 | 0/0 | Pending | — |
