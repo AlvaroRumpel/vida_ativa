@@ -135,8 +135,8 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
   **Plans:** 2 plans
 
   Plans:
-  - [ ] 35-01-PLAN.md — password-migration-risk.md (SPIKE-10) + realtime-load-risk.md (SPIKE-11) (Wave 1)
-  - [ ] 35-02-PLAN.md — DECISION.md go/no-go com tabela SPIKE-01..11 (Wave 2)
+  - [x] 35-01-PLAN.md — password-migration-risk.md (SPIKE-10) + realtime-load-risk.md (SPIKE-11) (Wave 1)
+  - [x] 35-02-PLAN.md — DECISION.md go/no-go com tabela SPIKE-01..11 (Wave 2)
 
 </details>
 
@@ -178,4 +178,4 @@ Full details: `.planning/milestones/v6.0-ROADMAP.md`
 | 32. book_slot() + Auth Hook | v7.0 | 2/2 | Complete    | 2026-06-10 |
 | 33. Provas de Isolamento + Concorrência | v7.0 | 0/5 | Pending | — |
 | 34. Flutter Mini-App + Realtime | v7.0 | 2/2 | Complete    | 2026-06-11 |
-| 35. Riscos + Documento de Decisão | v7.0 | 0/2 | Pending | — |
+| 35. Riscos + Documento de Decisão | v7.0 | 2/2 | Complete    | 2026-06-11 |
