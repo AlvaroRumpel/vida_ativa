@@ -229,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-09 — Phase 31 complete (schema SQL + RLS); SPIKE-01, SPIKE-03, SPIKE-04, SPIKE-13 validated; spike-supabase/ scaffolding ready for Phase 32*
+*Last updated: 2026-06-11 — Phase 34 complete (Flutter mini-app + Realtime evaluation); SPIKE-08, SPIKE-09, SPIKE-13 validated; flutter_app/ + realtime-test.js + proof docs ready for Phase 35 DECISION.md*
