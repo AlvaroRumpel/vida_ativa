@@ -229,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-11 — Phase 34 complete (Flutter mini-app + Realtime evaluation); SPIKE-08, SPIKE-09, SPIKE-13 validated; flutter_app/ + realtime-test.js + proof docs ready for Phase 35 DECISION.md*
+*Last updated: 2026-06-11 — Phase 35 complete (Riscos + Documento de Decisão); SPIKE-10/11/12 validated; password-migration-risk.md + realtime-load-risk.md + DECISION.md (conditional-go) produced; milestone v7.0 Spike Supabase Multi-tenant complete — all 5 phases done*
