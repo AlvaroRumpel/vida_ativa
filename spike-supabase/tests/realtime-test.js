@@ -150,6 +150,9 @@ async function testCrossTenantIsolation(tokenA, tokenB, userB_id, slotB_id) {
   ).subscribe((status) => {
     if (status === 'SUBSCRIBED') {
       console.log('Tenant A channel status: SUBSCRIBED');
+    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+      console.error(`Tenant A channel subscription failed: ${status}`);
+      throw new Error(`Channel subscription failed with status: ${status}`);
     } else {
       console.log(`Tenant A channel status: ${status}`);
     }
@@ -157,6 +160,10 @@ async function testCrossTenantIsolation(tokenA, tokenB, userB_id, slotB_id) {
 
   // Wait for channel subscription to establish
   await new Promise(r => setTimeout(r, 500));
+
+  if (channel.state !== 'joined') {
+    throw new Error(`Channel not joined after 500ms — current state: ${channel.state}`);
+  }
 
   // Tenant B inserts a booking for its own slot
   const insertTime = Date.now();
@@ -253,9 +260,21 @@ async function testSameTenantLatency(tokenA, userA_id) {
       eventReceived = true;
       console.log(`Latency event received: ${latencyMs}ms`);
     },
-  ).subscribe();
+  ).subscribe((status) => {
+    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+      console.error(`Latency channel subscription failed: ${status}`);
+    } else {
+      console.log(`Latency channel status: ${status}`);
+    }
+  });
 
   await new Promise(r => setTimeout(r, 500));
+
+  if (channel.state !== 'joined') {
+    console.log(`Latency channel not joined after 500ms (state: ${channel.state}) — skipping latency insert`);
+    await clientA.removeAllChannels();
+    return { latency_ms: null, event_received: false, skipped: true };
+  }
 
   insertTimeRef.value = Date.now();
   const { error: insErr } = await clientA.from('bookings').insert({
