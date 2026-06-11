@@ -18,6 +18,17 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SECRET_KEY) {
   process.exit(1);
 }
 
+function parseJWT(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Invalid JWT format');
+    const decoded = Buffer.from(parts[1], 'base64').toString('utf8');
+    return JSON.parse(decoded);
+  } catch (err) {
+    throw new Error(`JWT parse failed: ${err.message}`);
+  }
+}
+
 const TENANT_A            = '10000000-0000-0000-0000-000000000001';
 const TEST_DATE           = '2099-12-31';
 const CONCURRENT_REQUESTS = 50;
@@ -41,7 +52,7 @@ async function setupUser() {
   const { data: signInData, error: signInErr } = await anonClient.auth.signInWithPassword({ email, password });
   if (signInErr || !signInData.session) throw new Error(`signIn failed: ${signInErr?.message}`);
 
-  const jwt = JSON.parse(Buffer.from(signInData.session.access_token.split('.')[1], 'base64').toString('utf8'));
+  const jwt = parseJWT(signInData.session.access_token);
   console.log(`Test user created: ${userId}`);
   console.log(`tenant_id in JWT: ${jwt.app_metadata?.tenant_id ?? 'MISSING!'}`);
 

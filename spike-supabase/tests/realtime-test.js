@@ -26,6 +26,17 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SECRET_KEY) {
   process.exit(1);
 }
 
+function parseJWT(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Invalid JWT format');
+    const decoded = Buffer.from(parts[1], 'base64').toString('utf8');
+    return JSON.parse(decoded);
+  } catch (err) {
+    throw new Error(`JWT parse failed: ${err.message}`);
+  }
+}
+
 const TENANT_A = '10000000-0000-0000-0000-000000000001';
 const TENANT_B = '20000000-0000-0000-0000-000000000001';
 const TEST_DATE = '2099-01-15';
@@ -68,12 +79,12 @@ async function setupUsers() {
   // Sign in both users to get JWTs
   const { data: siA, error: siErrA } = await anonClient.auth.signInWithPassword({ email: emailA, password });
   if (siErrA || !siA.session) throw new Error(`signIn A failed: ${siErrA?.message}`);
-  const jwtA = JSON.parse(Buffer.from(siA.session.access_token.split('.')[1], 'base64').toString('utf8'));
+  const jwtA = parseJWT(siA.session.access_token);
   console.log(`User A: ${userA_id} | tenant_id in JWT: ${jwtA.app_metadata?.tenant_id ?? 'MISSING'}`);
 
   const { data: siB, error: siErrB } = await anonClient.auth.signInWithPassword({ email: emailB, password });
   if (siErrB || !siB.session) throw new Error(`signIn B failed: ${siErrB?.message}`);
-  const jwtB = JSON.parse(Buffer.from(siB.session.access_token.split('.')[1], 'base64').toString('utf8'));
+  const jwtB = parseJWT(siB.session.access_token);
   console.log(`User B: ${userB_id} | tenant_id in JWT: ${jwtB.app_metadata?.tenant_id ?? 'MISSING'}`);
 
   if (!jwtA.app_metadata?.tenant_id || !jwtB.app_metadata?.tenant_id) {
