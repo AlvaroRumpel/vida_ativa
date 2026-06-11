@@ -46,11 +46,44 @@ void main() async {
   if (_supabaseAnonKey.isEmpty) {
     debugPrint('FATAL: SUPABASE_ANON_KEY not set. '
         'Run with --dart-define=SUPABASE_ANON_KEY=<key>');
+    runApp(const _FatalErrorApp(
+      message: 'SUPABASE_ANON_KEY not set.\n\n'
+          'Run with:\n--dart-define=SUPABASE_ANON_KEY=<key>',
+    ));
+    return;
   }
 
   await Supabase.initialize(url: _supabaseUrl, anonKey: _supabaseAnonKey);
 
   runApp(const SpikeApp());
+}
+
+class _FatalErrorApp extends StatelessWidget {
+  const _FatalErrorApp({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.red.shade900,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'monospace',
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class SpikeApp extends StatelessWidget {
