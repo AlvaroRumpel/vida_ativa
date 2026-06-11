@@ -199,12 +199,28 @@ class _ProofScreenState extends State<ProofScreen> {
         'p_tenant_id': tenant1bId,
       });
 
-      final rows = rpcResult as List;
+      if (rpcResult is! List) {
+        _append('RPC returned non-list: ${rpcResult.runtimeType}');
+        return;
+      }
+      final rows = rpcResult;
       if (rows.isNotEmpty) {
-        final row = rows.first as Map<String, dynamic>;
-        final success = row['success'] as bool? ?? false;
-        final errorCode = row['error_code'] as String?;
-        final bookingId = row['booking_id'] as String?;
+        final rawRow = rows.first;
+        if (rawRow is! Map) {
+          _append('RPC row[0] is not a map: ${rawRow.runtimeType}');
+          return;
+        }
+        final row = Map<String, dynamic>.from(rawRow as Map);
+        final successRaw = row['success'];
+        if (successRaw is! bool) {
+          _append('RPC error: success is ${successRaw.runtimeType}, expected bool');
+          return;
+        }
+        final success = successRaw;
+        final rawErrorCode = row['error_code'];
+        final errorCode = rawErrorCode is String ? rawErrorCode : null;
+        final rawBookingId = row['booking_id'];
+        final bookingId = rawBookingId is String ? rawBookingId : null;
         _append('RPC book_slot(): success=$success, error_code=$errorCode, booking_id=$bookingId');
 
         if (success) {
