@@ -18,8 +18,8 @@
 
 ### PROOF — Provas documentadas
 
-- [ ] **SPIKE-06**: Prova de isolamento escrita: 3 ataques cross-tenant (SELECT / INSERT / UPDATE em dados de outro tenant) FALHAM via cliente com anon key — resultado registrado em `/spike-supabase/docs/isolation-proof.md`
-- [ ] **SPIKE-07**: Prova de anti-double-booking escrita: 50+ requests HTTP simultâneos no mesmo slot resultam em exatamente 1 confirmada — resultado registrado em `/spike-supabase/docs/concurrency-proof.md`
+- [x] **SPIKE-06**: Prova de isolamento escrita: 3 ataques cross-tenant (SELECT / INSERT / UPDATE em dados de outro tenant) FALHAM via cliente com anon key — resultado registrado em `/spike-supabase/docs/isolation-proof.md`
+- [x] **SPIKE-07**: Prova de anti-double-booking escrita: 50+ requests HTTP simultâneos no mesmo slot resultam em exatamente 1 confirmada — resultado registrado em `/spike-supabase/docs/concurrency-proof.md`
 
 ### FLUTTER — Integração mínima
 
