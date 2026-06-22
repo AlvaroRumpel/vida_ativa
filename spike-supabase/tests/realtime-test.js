@@ -150,19 +150,26 @@ async function testCrossTenantIsolation(tokenA, tokenB, userB_id, slotB_id) {
   ).subscribe((status) => {
     if (status === 'SUBSCRIBED') {
       console.log('Tenant A channel status: SUBSCRIBED');
-    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
       console.error(`Tenant A channel subscription failed: ${status}`);
-      throw new Error(`Channel subscription failed with status: ${status}`);
+    } else if (status === 'CLOSED') {
+      console.log('Tenant A channel closed (expected during cleanup)');
     } else {
       console.log(`Tenant A channel status: ${status}`);
     }
   });
 
-  // Wait for channel subscription to establish
-  await new Promise(r => setTimeout(r, 500));
+  // Wait for channel subscription to establish (WebSocket handshake can take 1-5s)
+  const SUBSCRIBE_TIMEOUT_MS = 10000;
+  const POLL_INTERVAL_MS = 200;
+  let waited = 0;
+  while (channel.state !== 'joined' && waited < SUBSCRIBE_TIMEOUT_MS) {
+    await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+    waited += POLL_INTERVAL_MS;
+  }
 
   if (channel.state !== 'joined') {
-    throw new Error(`Channel not joined after 500ms — current state: ${channel.state}`);
+    throw new Error(`Channel not joined after ${SUBSCRIBE_TIMEOUT_MS}ms — current state: ${channel.state}`);
   }
 
   // Tenant B inserts a booking for its own slot
@@ -268,10 +275,14 @@ async function testSameTenantLatency(tokenA, userA_id) {
     }
   });
 
-  await new Promise(r => setTimeout(r, 500));
+  let waitedLatency = 0;
+  while (channel.state !== 'joined' && waitedLatency < 10000) {
+    await new Promise(r => setTimeout(r, 200));
+    waitedLatency += 200;
+  }
 
   if (channel.state !== 'joined') {
-    console.log(`Latency channel not joined after 500ms (state: ${channel.state}) — skipping latency insert`);
+    console.log(`Latency channel not joined after 10s (state: ${channel.state}) — skipping latency insert`);
     await clientA.removeAllChannels();
     return { latency_ms: null, event_received: false, skipped: true };
   }
