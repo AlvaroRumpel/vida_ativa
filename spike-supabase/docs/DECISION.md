@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-O spike de Supabase provou que os pilares críticos de uma migração multi-tenant são sólidos: isolamento por tenant bloqueou 7 de 7 ataques, reservas concorrentes garantiram exatamente 1 confirmação em 50 tentativas simultâneas, e a injeção de contexto de tenant no JWT funcionou como esperado. O risco principal é o isolamento do Supabase Realtime (atualizações em tempo real), cujo teste não foi executado — mas o fluxo de reserva e pagamento não depende de Realtime, tornando esse risco gerenciável. A recomendação é **conditional-go**: prosseguir com o planejamento da migração, com a condição de resolver ou substituir o Realtime antes de ir a produção.
+O spike de Supabase provou que todos os pilares críticos de uma migração multi-tenant são sólidos: isolamento por tenant bloqueou 7 de 7 ataques, reservas concorrentes garantiram exatamente 1 confirmação em 50 tentativas simultâneas, Auth Hook injetou tenant_id no JWT corretamente, Flutter mini-app confirmou auth + RLS sem `.eq()` + RPC funcionando, e Realtime cross-tenant foi isolado (Tenant A não recebeu eventos de Tenant B). Todos os 11 SPIKEs estão provados ou com risco aceito. A recomendação é **go**: prosseguir com o planejamento da migração Firebase → Supabase.
 
 ---
 
@@ -23,8 +23,8 @@ O spike de Supabase provou que os pilares críticos de uma migração multi-tena
 | SPIKE-05 | Auth Hook injeta tenant_id em app_metadata do JWT | proved | Phase 32 — Edge Function deployed + JWT decode verified |
 | SPIKE-06 | Isolamento cross-tenant: 7/7 ataques bloqueados (SQL + HTTP) | proved | isolation-proof.md — 2026-06-10 — OVERALL: PASS |
 | SPIKE-07 | Anti-double-booking: 50 requests simultâneos → 1 confirmada | proved | concurrency-proof.md — 2026-06-10 — CONFIRMED=1, rejected=49 |
-| SPIKE-08 | Flutter mini-app: auth + RLS sem .eq() + book_slot() RPC | pending | flutter-proof.md — campos [fill after run] não preenchidos |
-| SPIKE-09 | Realtime isolamento cross-tenant + latência + free tier limits | conditional | realtime-evaluation.md — teste não executado; ver D-07 |
+| SPIKE-08 | Flutter mini-app: auth + RLS sem .eq() + book_slot() RPC | proved | flutter-proof.md — 2026-06-22 — tenant_id PASS, RLS 3vs1 PASS, RPC SLOT_ALREADY_BOOKED PASS |
+| SPIKE-09 | Realtime isolamento cross-tenant + latência + free tier limits | proved | realtime-evaluation.md — 2026-06-22 — isolation PASS (Tenant A received 0 events from Tenant B) |
 | SPIKE-10 | Migração senhas: SCRYPT→bcrypt, ~200 users, Google OAuth ~30 | acceptable-risk | password-migration-risk.md — JIT provisioning recommended |
 | SPIKE-11 | Realtime sob carga: free tier 200 conns, cálculo multi-tenant | acceptable-risk | realtime-load-risk.md — Pro tier ($25/mo) quando >160 conns |
 
@@ -32,14 +32,14 @@ O spike de Supabase provou que os pilares críticos de uma migração multi-tena
 
 ## Recommendation
 
-Recomendação: **conditional-go**. Os pilares críticos da migração — isolamento por tenant (SPIKE-06), anti-double-booking (SPIKE-07), auth com tenant context (SPIKE-05), e schema multi-tenant (SPIKE-01..04) — estão todos provados por evidência automatizada em staging. O risco principal é o isolamento do Realtime (SPIKE-09): o teste não foi executado, portanto a recomendação permanece condicional até que o resultado seja conhecido — se o resultado confirmar isolamento correto, a recomendação sobe para **go**; se confirmar falha de isolamento, Realtime deve ser substituído por polling ou Server-Sent Events antes de produção. O fluxo de reserva (book_slot + RLS) não depende de Realtime — uma falha em SPIKE-09 não invalida a migração. RLS, book_slot(), e Auth Hook são os pilares críticos e estão provados. A migração de senhas (SPIKE-10) é viável via JIT provisioning sem disruption para os ~200 usuários. A integração Flutter (SPIKE-08) está pendente de execução do mini-app, mas não bloqueia a decisão go/no-go sobre os pilares de backend.
+Recomendação: **go**. Todos os 11 SPIKEs estão provados ou com risco aceito por evidência automatizada em staging. SPIKE-06 (isolamento 7/7), SPIKE-07 (anti-double-booking 50→1), SPIKE-05 (Auth Hook JWT), SPIKE-01..04 (schema + RLS), SPIKE-08 (Flutter auth + RLS + RPC), e SPIKE-09 (Realtime cross-tenant isolation PASS) — todos provados. SPIKE-10/11 têm riscos documentados e mitigações definidas. A condição que mantinha a recomendação como conditional-go foi resolvida: SPIKE-09 confirmou que RLS filtra eventos Realtime cross-tenant corretamente. Prosseguir com planejamento da migração Firebase → Supabase.
 
 ---
 
 ## Residual Risks
 
 1. **SCRYPT params incorretos durante import** — Severidade: MEDIUM — Mitigação: Testar import em staging com 10 usuários reais antes de produção; usar JIT Provisioning como fallback garantido (Strategy 2 recomendada em password-migration-risk.md)
-2. **Realtime cross-tenant leak** (SPIKE-09 não executado — resultado desconhecido) — Severidade: HIGH se FAIL / PENDING — Mitigação: Executar `node spike-supabase/tests/realtime-test.js` antes de decisão final; se FAIL, substituir Realtime por polling ou SSE; o fluxo de booking não depende de Realtime (ver realtime-load-risk.md)
+2. **Realtime cross-tenant leak** — Severidade: RESOLVED — SPIKE-09 executado 2026-06-22: Tenant A não recebeu eventos de Tenant B. RLS filtra Realtime corretamente. Risco eliminado.
 3. **Free tier Realtime saturação** — Severidade: MEDIUM (após ~3 tenants × 50 usuários simultâneos) — Mitigação: Monitorar dashboard Supabase (Usage → Realtime); upgrade para Pro ($25/mo) quando total de conexões ativas ultrapassar 160
 4. **Firebase tokens em localStorage pós-cutover** — Severidade: LOW — Mitigação: Limpar tokens Firebase no primeiro load pós-migração com migration script: `if (oldFirebaseToken) { localStorage.clear(); redirectToLogin(); }`
 5. **Timestamps Firebase perdidos no import** — Severidade: LOW — Mitigação: Aceitar perda de createdAt histórico ou exportar para metadata separado antes de cutover; não impacta fluxo de booking ativo
@@ -51,8 +51,6 @@ Recomendação: **conditional-go**. Os pilares críticos da migração — isola
 1. **Spike de migração de senhas** — Implementar JIT Provisioning em ambiente de teste com 10 usuários reais do Firebase; validar fluxo completo (Firebase fallback → provisioning Supabase → segundo login); confirmar que mapping table `firebase_uid_mapping(firebase_uid, supabase_uuid)` persiste corretamente
 2. **Definir tier Supabase** — Avaliar volume esperado de conexões Realtime no MVP e decidir free vs Pro ($25/mo); baseline: free tier até 3 tenants × 50 usuários simultâneos; upgrade ao Pro quando conexões ativas ultrapassarem 160 (80% do limite free)
 3. **Planejar schema multi-tenant em produção** — Mapear tabelas Firebase existentes (bookings, payments, users) para o schema Supabase validado neste spike; identificar campos Firebase sem equivalente (BookingModel.sport, BlockedDateModel, config/*) e definir equivalentes Postgres
-4. **Resolver SPIKE-09 (se pending)** — Executar `node spike-supabase/tests/realtime-test.js` e preencher `spike-supabase/docs/realtime-evaluation.md` antes de tomar decisão final sobre uso de Realtime em produção; resultado determina se conditional-go sobe para go ou se Realtime precisa ser substituído por polling/SSE
-
 ---
 
 ## SPIKE-13 Audit
