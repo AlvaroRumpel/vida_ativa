@@ -67,7 +67,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     _bookingsSubscription = _firestore
         .collection('bookings')
         .where('date', isEqualTo: dateString)
-        .where('status', whereIn: ['pending', 'confirmed', 'pending_payment'])
+        .where('status', whereIn: BookingModel.activeStatuses)
         .snapshots()
         .listen(
       (snapshot) {

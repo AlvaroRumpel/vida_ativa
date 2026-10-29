@@ -7,6 +7,9 @@ const crypto = require('crypto');
 
 admin.initializeApp();
 
+// Statuses that hold a slot. Keep in sync with BookingModel.activeStatuses and firestore.rules.
+const ACTIVE_STATUSES = ['pending', 'confirmed', 'pending_payment'];
+
 // Reads MP_ACCESS_TOKEN from Firestore config/mercadopago (set via admin panel).
 async function getMpAccessToken(db) {
   const configSnap = await db.collection('config').doc('mercadopago').get();
@@ -29,7 +32,7 @@ async function getMpWebhookSecret(db) {
  *
  * Fires on:
  *   - Document created with status != 'cancelled'
- *   - Document updated where status changed FROM 'cancelled' TO 'pending'|'confirmed'
+ *   - Document updated where status changed FROM a freed status TO an active one (rebook)
  *
  * Firestore structure used:
  *   /users/{userId}                   — { role: "admin"|"client", displayName, ... }
@@ -42,13 +45,13 @@ exports.notifyAdminNewBooking = onDocumentWritten('bookings/{bookingId}', async 
 
   if (!after) return; // document deleted — ignore
 
-  const isActive = after.status !== 'cancelled' && after.status !== 'refunded';
+  const isActive = ACTIVE_STATUSES.includes(after.status);
 
   // Only notify on new active bookings:
   // - Document just created (no before) with active status
-  // - Status changed from 'cancelled' to active (rebook)
+  // - Status changed from a freed status to active (rebook)
   const isNewBooking = !before && isActive;
-  const isRebook = before && before.status === 'cancelled' && isActive;
+  const isRebook = before && !ACTIVE_STATUSES.includes(before.status) && isActive;
 
   if (!isNewBooking && !isRebook) {
     console.log(`Skipping — status: ${before?.status ?? 'new'} → ${after.status}`);
@@ -874,8 +877,8 @@ function computeDeltas(before, after) {
     }
   };
 
-  // CREATE — before is null/undefined
-  if (!before) {
+  // CREATE — before is null/undefined, or a rebook over a freed slot
+  if (!before || !ACTIVE_STATUSES.includes(beforeStatus)) {
     if (afterStatus === 'pending') {
       deltas.totalBookings = 1;
       deltas.pendingBookings = 1;

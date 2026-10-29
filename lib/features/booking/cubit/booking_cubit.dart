@@ -110,7 +110,13 @@ class BookingCubit extends Cubit<BookingState> {
       final snap = await tx.get(ref);
       if (snap.exists) {
         final existing = BookingModel.fromFirestore(snap);
-        if (!existing.isCancelled) throw Exception('slot_already_booked');
+        if (existing.isActive) {
+          Sentry.captureMessage(
+            'slot_already_booked $docId (status=${existing.status})',
+            level: SentryLevel.warning,
+          );
+          throw Exception('slot_already_booked');
+        }
       }
 
       final booking = BookingModel(

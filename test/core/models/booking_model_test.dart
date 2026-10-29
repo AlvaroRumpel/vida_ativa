@@ -54,6 +54,15 @@ void main() {
       expect(_make(status: 'pending').isPendingPayment, isFalse);
     });
 
+    test('isActive only for statuses that hold the slot', () {
+      for (final s in ['pending', 'confirmed', 'pending_payment']) {
+        expect(_make(status: s).isActive, isTrue, reason: s);
+      }
+      for (final s in ['cancelled', 'rejected', 'expired', 'refunded']) {
+        expect(_make(status: s).isActive, isFalse, reason: s);
+      }
+    });
+
     test('isExpired true for expired', () {
       expect(_make(status: 'expired').isExpired, isTrue);
     });

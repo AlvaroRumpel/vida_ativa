@@ -95,6 +95,10 @@ class BookingModel extends Equatable {
   bool get isPendingPayment => status == 'pending_payment';
   bool get isExpired => status == 'expired';
   bool get isRefunded => status == 'refunded';
+  // Statuses that hold the slot. Must match ScheduleCubit's whereIn and the
+  // ACTIVE list in firestore.rules — any other status frees the slot for rebooking.
+  static const activeStatuses = ['pending', 'confirmed', 'pending_payment'];
+  bool get isActive => activeStatuses.contains(status);
   // NOTE: isOnArrival checks both confirmed status AND on_arrival method
   // because on_arrival bookings go directly to 'confirmed'
   bool get isOnArrival => isConfirmed && paymentMethod == 'on_arrival';
