@@ -61,6 +61,25 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
     );
   }
 
+  /// Live bookings for the calendar month containing [month].
+  Stream<List<BookingModel>> watchMonth(DateTime month) {
+    return _firestore
+        .collection('bookings')
+        .where('date',
+            isGreaterThanOrEqualTo:
+                _toDateString(DateTime(month.year, month.month)))
+        .where('date',
+            isLessThanOrEqualTo:
+                _toDateString(DateTime(month.year, month.month + 1, 0)))
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((d) => BookingModel.fromFirestore(d)).toList())
+        .handleError((Object e, StackTrace s) {
+      Sentry.captureException(e, stackTrace: s);
+      throw e;
+    });
+  }
+
   Future<void> confirmBooking(String bookingId) async {
     await _firestore
         .collection('bookings')

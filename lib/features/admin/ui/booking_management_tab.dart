@@ -8,43 +8,102 @@ import 'package:vida_ativa/features/admin/cubit/admin_booking_cubit.dart';
 import 'package:vida_ativa/features/admin/cubit/admin_booking_state.dart';
 import 'package:vida_ativa/features/admin/ui/admin_booking_detail_sheet.dart';
 import 'package:vida_ativa/features/admin/ui/admin_booking_row.dart';
+import 'package:vida_ativa/features/admin/ui/booking_month_view.dart';
 
-class BookingManagementTab extends StatelessWidget {
+class BookingManagementTab extends StatefulWidget {
   const BookingManagementTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AdminBookingCubit, AdminBookingState>(
-      builder: (context, state) {
-        return switch (state) {
-          AdminBookingInitial() =>
-            const Center(child: CircularProgressIndicator()),
-          AdminBookingError(:final message) => Center(
-              child: Text(message, style: AppTheme.ui(color: AppTheme.orangeDk)),
-            ),
-          AdminBookingLoaded() => _BookingManagementView(state: state),
-        };
-      },
+  State<BookingManagementTab> createState() => _BookingManagementTabState();
+}
+
+class _BookingManagementTabState extends State<BookingManagementTab> {
+  bool _showMonth = false;
+
+  Widget _modeChip(String label, bool isMonth) {
+    final selected = _showMonth == isMonth;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: AppTheme.mono(
+          size: 10,
+          color: selected ? AppTheme.paper : AppTheme.ink,
+        ),
+      ),
+      selected: selected,
+      showCheckmark: false,
+      onSelected: (_) => setState(() => _showMonth = isMonth),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<AdminBookingCubit>();
+    final current = cubit.state;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _modeChip('DIA', false),
+              const SizedBox(width: 8),
+              _modeChip('MÊS', true),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _showMonth
+              ? BookingMonthView(
+                  initialMonth: current is AdminBookingLoaded
+                      ? current.selectedDate
+                      : DateTime.now(),
+                  watchMonth: cubit.watchMonth,
+                  onDaySelected: (date) {
+                    cubit.selectDate(date);
+                    setState(() => _showMonth = false);
+                  },
+                  onBookingSelected: (booking) =>
+                      _showBookingDetailSheet(context, booking),
+                )
+              : BlocBuilder<AdminBookingCubit, AdminBookingState>(
+                  builder: (context, state) {
+                    return switch (state) {
+                      AdminBookingInitial() =>
+                        const Center(child: CircularProgressIndicator()),
+                      AdminBookingError(:final message) => Center(
+                          child: Text(message,
+                              style: AppTheme.ui(color: AppTheme.orangeDk)),
+                        ),
+                      AdminBookingLoaded() =>
+                        _BookingManagementView(state: state),
+                    };
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+void _showBookingDetailSheet(BuildContext context, BookingModel booking) {
+  final cubit = context.read<AdminBookingCubit>();
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => AdminBookingDetailSheet(
+      booking: booking,
+      adminBookingCubit: cubit,
+    ),
+  );
 }
 
 class _BookingManagementView extends StatelessWidget {
   final AdminBookingLoaded state;
 
   const _BookingManagementView({required this.state});
-
-  void _showBookingDetailSheet(BuildContext context, BookingModel booking) {
-    final cubit = context.read<AdminBookingCubit>();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => AdminBookingDetailSheet(
-        booking: booking,
-        adminBookingCubit: cubit,
-      ),
-    );
-  }
 
   String _dayOfWeek(DateTime date) =>
       DateFormat('EEEE', 'pt_BR').format(date).toUpperCase();

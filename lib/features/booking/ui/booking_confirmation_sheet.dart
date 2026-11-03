@@ -259,8 +259,8 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
     );
   }
 
-  // ── Approval banner: 2px orange left stripe, no colored background ────────
-  Widget _buildApprovalBanner() {
+  // ── Notice banner: 2px orange left stripe, no colored background ──────────
+  Widget _buildNoticeBanner(String message) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -271,7 +271,7 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
-                'Esta reserva será confirmada após aprovação do estabelecimento.',
+                message,
                 style: AppTheme.ui(size: 13, color: AppTheme.ink),
               ),
             ),
@@ -309,9 +309,16 @@ class _BookingConfirmationSheetState extends State<BookingConfirmationSheet> {
 
             // Approval banner — BOOK-08: 2px orange left stripe, no colored background
             if (_requiresConfirmation && !widget.pixEnabled) ...[
-              _buildApprovalBanner(),
+              _buildNoticeBanner(
+                'Esta reserva será confirmada após aprovação do estabelecimento.',
+              ),
               const SizedBox(height: 16),
             ],
+
+            _buildNoticeBanner(
+              'Cancelamentos com menos de 1 hora de antecedência serão cobrados normalmente.',
+            ),
+            const SizedBox(height: 16),
 
             // Recurrence toggle — D-11: Switch uses AppTheme.lightTheme.switchTheme (no activeThumbColor)
             Row(
