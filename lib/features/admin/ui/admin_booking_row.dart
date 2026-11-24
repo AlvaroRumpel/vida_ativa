@@ -55,6 +55,7 @@ class AdminBookingRow extends StatelessWidget {
       ('confirmed', _) => 'CONFIRMADO',
       ('expired', _) => 'EXPIRADO',
       ('rejected', _) => 'RECUSADO',
+      ('cancelled', _) => 'CANCELADO',
       _ => status.toUpperCase(),
     };
   }

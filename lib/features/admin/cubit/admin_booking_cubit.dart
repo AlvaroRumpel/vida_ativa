@@ -94,6 +94,41 @@ class AdminBookingCubit extends Cubit<AdminBookingState> {
         .update({'status': 'rejected'});
   }
 
+  Future<void> cancelBooking(String bookingId) async {
+    await _firestore.collection('bookings').doc(bookingId).update({
+      'status': 'cancelled',
+      'cancelledAt': Timestamp.fromDate(DateTime.now()),
+    });
+  }
+
+  /// Cancels every active booking in [recurrenceGroupId] dated on or after
+  /// [fromDateInclusive]. Same query as BookingCubit.cancelGroupFuture (reuses
+  /// its composite index) but without the userId filter — admin acts on any client.
+  /// Skips Pix pending_payment: those hold a live MP order (cancelPixPayment CF).
+  Future<void> cancelGroupFuture({
+    required String recurrenceGroupId,
+    required String fromDateInclusive,
+  }) async {
+    final snap = await _firestore
+        .collection('bookings')
+        .where('recurrenceGroupId', isEqualTo: recurrenceGroupId)
+        .where('date', isGreaterThanOrEqualTo: fromDateInclusive)
+        .where('status', whereIn: ['pending', 'confirmed', 'pending_payment'])
+        .get();
+
+    final batch = _firestore.batch();
+    final now = Timestamp.fromDate(DateTime.now());
+    for (final doc in snap.docs) {
+      final data = doc.data();
+      if (data['paymentMethod'] == 'pix' &&
+          data['status'] == 'pending_payment') {
+        continue;
+      }
+      batch.update(doc.reference, {'status': 'cancelled', 'cancelledAt': now});
+    }
+    await batch.commit();
+  }
+
   Future<void> setConfirmationMode(String mode) async {
     await _firestore
         .collection('config')

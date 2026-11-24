@@ -170,9 +170,85 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
     }
   }
 
+  Future<void> _handleCancel() async {
+    final booking = widget.booking;
+    final isRecurrent = booking.recurrenceGroupId != null;
+    // null = voltar; 'single' = só esta; 'group' = esta e as próximas
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(isRecurrent
+            ? 'Cancelar reserva mensal?'
+            : 'Cancelar reserva?'),
+        content: Text(isRecurrent
+            ? 'Cancelar só esta reserva ou esta e todas as próximas de '
+                '${booking.userDisplayName ?? 'este cliente'}?'
+            : 'Deseja cancelar esta reserva?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Voltar'),
+          ),
+          if (isRecurrent)
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'single'),
+              child: const Text('Cancelar só esta'),
+            ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () =>
+                Navigator.pop(ctx, isRecurrent ? 'group' : 'single'),
+            child: Text(isRecurrent
+                ? 'Cancelar esta e as próximas'
+                : 'Cancelar reserva'),
+          ),
+        ],
+      ),
+    );
+    if (choice == null) return;
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+    try {
+      if (choice == 'group') {
+        await widget.adminBookingCubit.cancelGroupFuture(
+          recurrenceGroupId: booking.recurrenceGroupId!,
+          fromDateInclusive: booking.date,
+        );
+      } else {
+        await widget.adminBookingCubit.cancelBooking(booking.id);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(choice == 'group'
+                ? 'Reservas mensais canceladas.'
+                : 'Reserva cancelada.'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _errorMessage = 'Falha ao cancelar reserva. Tente novamente.';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final booking = widget.booking;
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final canCancel =
+        booking.status == 'confirmed' && booking.date.compareTo(today) >= 0;
     final statusColor = _statusColor(booking.status, booking.paymentMethod);
     final statusLabel = _statusLabel(booking.status, booking.paymentMethod);
 
@@ -340,6 +416,29 @@ class _AdminBookingDetailSheetState extends State<AdminBookingDetailSheet> {
                   ),
                 ),
               ],
+            ),
+          ],
+          if (canCancel) ...[
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: _isSubmitting ? null : _handleCancel,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: const BorderSide(color: Colors.red),
+                minimumSize: const Size(double.infinity, 52),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(booking.recurrenceGroupId != null
+                      ? 'Cancelar reserva mensal'
+                      : 'Cancelar reserva'),
             ),
           ],
           const SizedBox(height: 8),
